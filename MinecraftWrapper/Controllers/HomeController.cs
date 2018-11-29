@@ -5,11 +5,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MinecraftWrapper.Models;
+using MinecraftWrapper.Services;
 
 namespace MinecraftWrapper.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly ConsoleApplicationWrapper _wrapper;
+
+        public HomeController (ConsoleApplicationWrapper wrapper)
+        {
+            _wrapper = wrapper;
+        }
+
         public IActionResult Index ()
         {
             return View ();
@@ -38,6 +46,12 @@ namespace MinecraftWrapper.Controllers
         public IActionResult Error ()
         {
             return View ( new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier } );
+        }
+
+        [HttpGet("[controller]/[action]")]
+        public IEnumerable<string> Test ()
+        {
+            return _wrapper.StandardOutput;
         }
     }
 }

@@ -13,6 +13,8 @@ using MinecraftWrapper.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MinecraftWrapper.Models;
+using MinecraftWrapper.Services;
+using System.ComponentModel.Design;
 
 namespace MinecraftWrapper
 {
@@ -65,7 +67,10 @@ namespace MinecraftWrapper
                 options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
             } );
 
+            services.Configure<ApplicationSettings> ( Configuration.GetSection ( "ApplicationSettings" ) );
+
             services.AddTransient<UserRepository> ();
+            services.AddSingleton<ConsoleApplicationWrapper> ();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

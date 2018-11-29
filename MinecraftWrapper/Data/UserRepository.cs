@@ -19,5 +19,12 @@ namespace MinecraftWrapper.Data
         {
             return _context.AuthorizationKey.SingleOrDefault ( key => key.AuthorizationToken == authorizationToken );
         }
+
+        public AuthorizationKey ReserveAuthorizationKey ( AuthorizationKey key, string userId )
+        {
+            key.UserId = userId;
+            _context.SaveChanges ();
+            return key;
+        }
     }
 }
