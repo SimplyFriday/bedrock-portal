@@ -49,7 +49,7 @@ namespace MinecraftWrapper.Controllers
         }
 
         [HttpGet("[controller]/[action]")]
-        public IEnumerable<string> Test ()
+        public IEnumerable<string> FetchConsoleOutput ()
         {
             return _wrapper.StandardOutput;
         }

@@ -35,3 +35,13 @@ body {
         display: none;
     }
 }
+
+.console-output {
+    white-space: pre-line;
+    min-height: 200px;
+    background-color: dimgrey;
+    color: lightgrey;
+    padding: 15px;
+    border-radius:5px;
+}
+

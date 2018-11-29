@@ -26,5 +26,24 @@ namespace MinecraftWrapper.Data
             _context.SaveChanges ();
             return key;
         }
+
+        public AdditionalUserData GetAdditionalUserDataByUserId ( string userId )
+        {
+            return _context.AdditionalUserData.SingleOrDefault ( data => data.UserId == userId );
+        }
+
+        public void SaveAdditionalData ( AdditionalUserData data )
+        {
+            if ( data.AdditionalUserDataId == Guid.Empty )
+            {
+                _context.AdditionalUserData.Add ( data );
+            }
+            else
+            {
+                _context.AdditionalUserData.Update ( data );
+            }
+
+            _context.SaveChanges ();
+        }
     }
 }

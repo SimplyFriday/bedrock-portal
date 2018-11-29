@@ -1,0 +1,38 @@
+﻿@model UpdateTickingAreaViewModel
+
+@{
+    ViewData[ "Title" ] = "UpdateTickingAreaView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Update Ticking Area</h2>
+
+<div class="row">
+    <div class="col-md-10">
+        Everyone on the Fresh Start server gets a personal tickingarea, and you can set/relocate that using this page! Please note
+        that tickingareas are currently limited to the overworld. This is great for farms that you'd like to get more from without
+        needing to AFK forever, but please be courteous to other players and avoid setting a tickingarea on a farm that generates
+        a lot of lag. Each tickingarea is a 2 chunk circle, centered on the point provided.
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-route-returnUrl="" method="post">
+            <h4>Update Tickingarea.</h4>
+            <hr />
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="XCoord"></label>
+                <input asp-for="XCoord" class="form-control" />
+                <span asp-validation-for="XCoord" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ZCoord"></label>
+                <input asp-for="ZCoord" class="form-control" />
+                <span asp-validation-for="ZCoord" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-default">Update</button>
+        </form>
+    </div>
+</div>
