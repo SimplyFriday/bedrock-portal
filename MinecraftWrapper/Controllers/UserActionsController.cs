@@ -16,9 +16,9 @@ namespace MinecraftWrapper.Controllers
     {
         private readonly ConsoleApplicationWrapper _wrapper;
         private readonly UserRepository _userRepository;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<AuthorizedUser> _userManager;
 
-        public UserActionsController ( ConsoleApplicationWrapper wrapper, UserRepository userRepository, UserManager<IdentityUser> userManager )
+        public UserActionsController ( ConsoleApplicationWrapper wrapper, UserRepository userRepository, UserManager<AuthorizedUser> userManager )
         {
             _wrapper = wrapper;
             _userRepository = userRepository;

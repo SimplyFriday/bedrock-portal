@@ -45,7 +45,7 @@ namespace MinecraftWrapper
                   }, contextLifetime: ServiceLifetime.Transient, optionsLifetime: ServiceLifetime.Transient );
 
 
-            services.AddDefaultIdentity<IdentityUser> (options =>
+            services.AddDefaultIdentity<AuthorizedUser> (options =>
             {
                 options.Password.RequiredLength = 8;
                 options.Password.RequiredUniqueChars = 4;
@@ -72,6 +72,13 @@ namespace MinecraftWrapper
             } );
 
             services.Configure<ApplicationSettings> ( Configuration.GetSection ( "ApplicationSettings" ) );
+
+            services.AddAuthentication ()
+                .AddGoogle ( options => 
+                {
+                    options.ClientId = Configuration[ "Authentication:Google:ClientId" ];
+                    options.ClientSecret = Configuration[ "Authentication:Google:ClientSecret" ];
+                } );
 
             services.AddTransient<UserRepository> ();
             services.AddTransient<SystemRepository> ();

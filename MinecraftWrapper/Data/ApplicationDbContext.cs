@@ -7,7 +7,7 @@ using MinecraftWrapper.Models;
 
 namespace MinecraftWrapper.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<AuthorizedUser>
     {
         public ApplicationDbContext ( DbContextOptions<ApplicationDbContext> options )
             : base ( options )

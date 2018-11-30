@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using MinecraftWrapper.Models;
 
 namespace MinecraftWrapper.Data
@@ -30,6 +31,11 @@ namespace MinecraftWrapper.Data
         public AdditionalUserData GetAdditionalUserDataByUserId ( string userId )
         {
             return _context.AdditionalUserData.SingleOrDefault ( data => data.UserId == userId );
+        }
+
+        public IQueryable<AuthorizedUser> GetUsersWithData ()
+        {
+            return _context.Users.Include ( u => u.AdditionalUserData );
         }
 
         public void SaveAdditionalData ( AdditionalUserData data )

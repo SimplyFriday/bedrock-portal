@@ -65,7 +65,7 @@ namespace MinecraftWrapper.Data.Migrations
                       b.ToTable ( "AspNetRoleClaims" );
                   } );
 
-            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.IdentityUser", b =>
+            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.AuthorizedUser", b =>
                   {
                       b.Property<string> ( "Id" )
                           .ValueGeneratedOnAdd ();
@@ -116,7 +116,7 @@ namespace MinecraftWrapper.Data.Migrations
                       b.ToTable ( "AspNetUsers" );
                   } );
 
-            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.AuthorizedUserClaim<string>", b =>
                   {
                       b.Property<int> ( "Id" )
                           .ValueGeneratedOnAdd ()
@@ -136,7 +136,7 @@ namespace MinecraftWrapper.Data.Migrations
                       b.ToTable ( "AspNetUserClaims" );
                   } );
 
-            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.AuthorizedUserLogin<string>", b =>
                   {
                       b.Property<string> ( "LoginProvider" )
                           .HasMaxLength ( 128 );
@@ -156,7 +156,7 @@ namespace MinecraftWrapper.Data.Migrations
                       b.ToTable ( "AspNetUserLogins" );
                   } );
 
-            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.AuthorizedUserRole<string>", b =>
                   {
                       b.Property<string> ( "UserId" );
 
@@ -169,7 +169,7 @@ namespace MinecraftWrapper.Data.Migrations
                       b.ToTable ( "AspNetUserRoles" );
                   } );
 
-            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.AuthorizedUserToken<string>", b =>
                   {
                       b.Property<string> ( "UserId" );
 
@@ -194,38 +194,38 @@ namespace MinecraftWrapper.Data.Migrations
                           .OnDelete ( DeleteBehavior.Cascade );
                   } );
 
-            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.AuthorizedUserClaim<string>", b =>
                   {
-                      b.HasOne ( "Microsoft.AspNetCore.Identity.IdentityUser" )
+                      b.HasOne ( "Microsoft.AspNetCore.Identity.AuthorizedUser" )
                           .WithMany ()
                           .HasForeignKey ( "UserId" )
                           .OnDelete ( DeleteBehavior.Cascade );
                   } );
 
-            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.AuthorizedUserLogin<string>", b =>
                   {
-                      b.HasOne ( "Microsoft.AspNetCore.Identity.IdentityUser" )
+                      b.HasOne ( "Microsoft.AspNetCore.Identity.AuthorizedUser" )
                           .WithMany ()
                           .HasForeignKey ( "UserId" )
                           .OnDelete ( DeleteBehavior.Cascade );
                   } );
 
-            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.AuthorizedUserRole<string>", b =>
                   {
                       b.HasOne ( "Microsoft.AspNetCore.Identity.IdentityRole" )
                           .WithMany ()
                           .HasForeignKey ( "RoleId" )
                           .OnDelete ( DeleteBehavior.Cascade );
 
-                      b.HasOne ( "Microsoft.AspNetCore.Identity.IdentityUser" )
+                      b.HasOne ( "Microsoft.AspNetCore.Identity.AuthorizedUser" )
                           .WithMany ()
                           .HasForeignKey ( "UserId" )
                           .OnDelete ( DeleteBehavior.Cascade );
                   } );
 
-            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity ( "Microsoft.AspNetCore.Identity.AuthorizedUserToken<string>", b =>
                   {
-                      b.HasOne ( "Microsoft.AspNetCore.Identity.IdentityUser" )
+                      b.HasOne ( "Microsoft.AspNetCore.Identity.AuthorizedUser" )
                           .WithMany ()
                           .HasForeignKey ( "UserId" )
                           .OnDelete ( DeleteBehavior.Cascade );

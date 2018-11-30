@@ -10,21 +10,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using MinecraftWrapper.Data;
+using MinecraftWrapper.Models;
 
 namespace MinecraftWrapper.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<AuthorizedUser> _signInManager;
+        private readonly UserManager<AuthorizedUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly UserRepository _userRepository;
 
         public RegisterModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<AuthorizedUser> userManager,
+            SignInManager<AuthorizedUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
             UserRepository userRepository)
@@ -78,7 +79,7 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account
 
                 if ( key != null && string.IsNullOrEmpty ( key.UserId ) )
                 {
-                    var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
+                    var user = new AuthorizedUser { UserName = Input.Email, Email = Input.Email };
                     var result = await _userManager.CreateAsync ( user, Input.Password );
                     if ( result.Succeeded )
                     {

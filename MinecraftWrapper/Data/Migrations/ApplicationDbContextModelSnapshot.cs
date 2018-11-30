@@ -73,6 +73,9 @@ namespace MinecraftWrapper.Data.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired();
+
                     b.Property<string>("Email")
                         .HasMaxLength(256);
 
@@ -112,6 +115,8 @@ namespace MinecraftWrapper.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -198,7 +203,8 @@ namespace MinecraftWrapper.Data.Migrations
 
                     b.HasKey("AdditionalUserDataId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("AdditionalUserData");
                 });
@@ -233,9 +239,21 @@ namespace MinecraftWrapper.Data.Migrations
 
                     b.HasKey("AuthorizationKeyId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("AuthorizationKey");
+                });
+
+            modelBuilder.Entity("MinecraftWrapper.Models.AuthorizedUser", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+
+                    b.ToTable("AuthorizedUser");
+
+                    b.HasDiscriminator().HasValue("AuthorizedUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -285,17 +303,17 @@ namespace MinecraftWrapper.Data.Migrations
 
             modelBuilder.Entity("MinecraftWrapper.Models.AdditionalUserData", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("MinecraftWrapper.Models.AuthorizedUser", "User")
+                        .WithOne("AdditionalUserData")
+                        .HasForeignKey("MinecraftWrapper.Models.AdditionalUserData", "UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("MinecraftWrapper.Models.AuthorizationKey", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                    b.HasOne("MinecraftWrapper.Models.AuthorizedUser", "User")
+                        .WithOne("AuthorizationKey")
+                        .HasForeignKey("MinecraftWrapper.Models.AuthorizationKey", "UserId");
                 });
 #pragma warning restore 612, 618
         }

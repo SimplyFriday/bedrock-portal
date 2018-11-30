@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MinecraftWrapper.Data;
 using MinecraftWrapper.Models;
 using MinecraftWrapper.Services;
 
@@ -12,15 +15,22 @@ namespace MinecraftWrapper.Controllers
     public class HomeController : Controller
     {
         private readonly ConsoleApplicationWrapper _wrapper;
+        private readonly UserRepository _userRepository;
 
-        public HomeController (ConsoleApplicationWrapper wrapper)
+        public HomeController ( ConsoleApplicationWrapper wrapper, UserRepository userRepository )
         {
             _wrapper = wrapper;
+            _userRepository = userRepository;
         }
 
         public IActionResult Index ()
         {
-            return View ();
+            var model = new HomeIndexViewModel
+            {
+                Users = _userRepository.GetUsersWithData ()
+            };
+
+            return View (model);
         }
 
         public IActionResult About ()
@@ -48,6 +58,7 @@ namespace MinecraftWrapper.Controllers
             return View ( new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier } );
         }
 
+        [Authorize]
         [HttpGet("[controller]/[action]")]
         public IEnumerable<string> FetchConsoleOutput ()
         {

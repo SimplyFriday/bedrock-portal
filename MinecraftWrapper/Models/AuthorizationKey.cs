@@ -17,6 +17,6 @@ namespace MinecraftWrapper.Models
         [ForeignKey("User")]
         public string UserId { get; set; }
 
-        public virtual IdentityUser User { get; set; }
+        public virtual AuthorizedUser User { get; set; }
     }
 }

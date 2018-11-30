@@ -1,44 +1,51 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model HomeIndexViewModel
+
+@{
+    ViewData[ "Title" ] = "Home Page";
 }
-<div class="row">
-    <div class="col-md-10">
-        Welcome!
+
+<div class="container">
+    <div class="row">
+        <h2>Community Guidelines</h2>
+        <p>
+            The "rules" for this server are pretty simple and straightforward, but it all boils down to one principle: have fun without ruining somebody else's.
+            Here are a few "dos" and "don'ts" to help illustrate:
+        </p>
+        <h4>Do</h4>
+        <ul>
+            <li>Mark out areas that you intend to build in</li>
+            <li>Talk to nearby players about themes and plans before building in a new area</li>
+            <li>Ask before modifying another player's build</li>
+        </ul>
+        <h4>Don't</h4>
+        <ul>
+            <li>Destory other player's builds (or dramatically alter terrain near them) without permission</li>
+            <li>Steal items from other players</li>
+            <li>Maliciously kill other players (duals, mini games, challenges are fine)</li>
+        </ul>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-9">
+            <h2>Roster</h2>
+        </div>
+    </div>
+    <div class="row">
+        @foreach ( var user in Model.Users )
+        {
+            @if ( !string.IsNullOrEmpty ( user?.AdditionalUserData?.GamerTag ) )
+            {
+                <div class="col-md-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">@user.AdditionalUserData.GamerTag</h3>
+                        </div>
+                        <div class="panel-body">
+                            @user.AdditionalUserData.Bio
+                        </div>
+                    </div>
+                </div>
+            }
+        }
     </div>
 </div>
-
-<hr/>
-
-<h4>See what's going on!</h4>
-<div class="row">
-    <div hidden class="console-output"></div>
-</div>
-
-@section Scripts 
-{ 
-    <script type="text/javascript">
-        window.setInterval(function () {
-                var serviceURL = '/Home/FetchConsoleOutput';
-
-                $.ajax({
-                    type: "GET",
-                    url: serviceURL,
-                    data: param = "",
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    success: successFunc,
-                    error: errorFunc
-                });
-
-            function successFunc(data, status) {
-                    $('div.console-output').show()
-                    val = String(data).split(',').join('\r\n');
-                    $('div.console-output').text(val);
-                }
-
-                function errorFunc() {
-                    $('div.console-output').text("Oh oh! Something's not right here!");
-                }
-            }, 3000);
-    </script>
-}

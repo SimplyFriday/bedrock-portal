@@ -1,11 +1,12 @@
-﻿@inject SignInManager<IdentityUser> SignInManager
+﻿@using MinecraftWrapper.Models;
+@inject SignInManager<AuthorizedUser> SignInManager
 @{
-    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+    var hasExternalLogins = ( await SignInManager.GetExternalAuthenticationSchemesAsync () ).Any ();
 }
 <ul class="nav nav-pills nav-stacked">
     <li class="@ManageNavPages.IndexNavClass(ViewContext)"><a asp-page="./Index">Profile</a></li>
     <li class="@ManageNavPages.ChangePasswordNavClass(ViewContext)"><a id="change-password" asp-page="./ChangePassword">Password</a></li>
-    @if (hasExternalLogins)
+    @if ( hasExternalLogins )
     {
         <li class="@ManageNavPages.ExternalLoginsNavClass(ViewContext)"><a id="external-login" asp-page="./ExternalLogins">External logins</a></li>
     }

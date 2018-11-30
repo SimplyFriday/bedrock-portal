@@ -15,14 +15,14 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account.Manage
 {
     public partial class IndexModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<AuthorizedUser> _userManager;
+        private readonly SignInManager<AuthorizedUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly UserRepository _userRepository;
 
         public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<AuthorizedUser> userManager,
+            SignInManager<AuthorizedUser> signInManager,
             IEmailSender emailSender,
             UserRepository userRepository)
         {
