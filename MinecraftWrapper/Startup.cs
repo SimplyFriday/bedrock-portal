@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MinecraftWrapper.Models;
 using MinecraftWrapper.Services;
 using System.ComponentModel.Design;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace MinecraftWrapper
 {
@@ -70,6 +71,8 @@ namespace MinecraftWrapper
             services.Configure<ApplicationSettings> ( Configuration.GetSection ( "ApplicationSettings" ) );
 
             services.AddTransient<UserRepository> ();
+            services.AddTransient<IEmailSender, SendGridSender> ();
+
             services.AddSingleton<ConsoleApplicationWrapper> ();
         }
 

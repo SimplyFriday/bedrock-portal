@@ -1,4 +1,6 @@
-﻿namespace MinecraftWrapper.Data
+﻿using System.Net;
+
+namespace MinecraftWrapper.Data
 {
     public class ApplicationSettings
     {
@@ -7,5 +9,7 @@
         public string StartDirectory { get; set; }
         public bool RestartOnFailure { get; set; }
         public int MaxOutputRetained { get; set; }
+        public string SendGridApiKey { get; set; }
+        public string SystemFromEmailAddress { get; set; }
     }
 }
