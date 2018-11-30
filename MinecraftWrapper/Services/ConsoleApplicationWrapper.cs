@@ -4,8 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MinecraftWrapper.Data;
+using MinecraftWrapper.Models;
 
 namespace MinecraftWrapper.Services
 {
@@ -18,24 +20,27 @@ namespace MinecraftWrapper.Services
         private readonly int _maxOutputRetained;
         private Process _proc = null;
 
-        private Queue<string> _standardOutputQueue = new Queue<string> ();
+        private readonly IServiceProvider _serviceProvider;
+
+        private Queue<ApplicationLog> _standardOutputQueue = new Queue<ApplicationLog> ();
         public IEnumerable<string> StandardOutput
         {
-            get { return _standardOutputQueue.ToList(); }
+            get { return _standardOutputQueue.Select ( item => item.LogText ).ToList (); }
         }
 
-        private Queue<string> _errorOutputQueue = new Queue<string> ();
+        private Queue<ApplicationLog> _errorOutputQueue = new Queue<ApplicationLog> ();
         public IEnumerable<string> ErrorOutput
         {
-            get { return _errorOutputQueue.ToList (); }
+            get { return _errorOutputQueue.Select ( item => item.LogText ).ToList (); }
         }
 
-        public ConsoleApplicationWrapper ( IOptions<ApplicationSettings> options )
+        public ConsoleApplicationWrapper ( IOptions<ApplicationSettings> options, SystemRepository systemRepository, IServiceProvider serviceProvider )
         {
             _exePath = options.Value.ExePath;
             _startDirectory = options.Value.StartDirectory;
             _restartOnFailure = options.Value.RestartOnFailure;
             _maxOutputRetained = options.Value.MaxOutputRetained;
+            _serviceProvider = serviceProvider;
 
             Start ();
         }
@@ -56,12 +61,26 @@ namespace MinecraftWrapper.Services
             {
                 if ( !string.IsNullOrEmpty ( e.Data ) )
                 {
-                    _standardOutputQueue.Enqueue ( e.Data );
+                    var log = new ApplicationLog
+                    {
+                        ApplicationLogType = ApplicationLogType.Stdout,
+                        LogTime = DateTime.UtcNow,
+                        LogText = e.Data
+                    };
+
+                    _standardOutputQueue.Enqueue ( log );
                 }
+
+                var logs = new List<ApplicationLog> ();
 
                 while ( _standardOutputQueue.Count > _maxOutputRetained )
                 {
-                    _standardOutputQueue.Dequeue ();
+                    logs.Add ( _standardOutputQueue.Dequeue () );
+                }
+
+                if ( logs.Count > 0 )
+                {
+                    LogInputOutput ( logs );
                 }
             } );
 
@@ -69,12 +88,26 @@ namespace MinecraftWrapper.Services
             {
                 if ( !string.IsNullOrEmpty ( e.Data ) )
                 {
-                    _errorOutputQueue.Enqueue ( e.Data );
+                    var log = new ApplicationLog
+                    {
+                        ApplicationLogType = ApplicationLogType.Stderr,
+                        LogTime = DateTime.UtcNow,
+                        LogText = e.Data
+                    };
+
+                    _errorOutputQueue.Enqueue ( log );
                 }
+
+                var logs = new List<ApplicationLog> ();
 
                 while ( _errorOutputQueue.Count > _maxOutputRetained )
                 {
-                    _errorOutputQueue.Dequeue ();
+                    logs.Add ( _errorOutputQueue.Dequeue () );
+                }
+
+                if ( logs.Count > 0 )
+                {
+                    LogInputOutput ( logs );
                 }
             } );
 
@@ -95,6 +128,15 @@ namespace MinecraftWrapper.Services
 
         public void SendInput (string input )
         {
+            var log = new ApplicationLog
+            {
+                ApplicationLogType = ApplicationLogType.Stdin,
+                LogTime = DateTime.UtcNow,
+                LogText = input
+            };
+
+            LogInputOutput ( log );
+
             _proc.StandardInput.Write ( input );
             _proc.StandardInput.Flush ();
         }
@@ -108,6 +150,20 @@ namespace MinecraftWrapper.Services
             Thread.Sleep ( 2000 );
             _proc.Kill ();
             _proc.Dispose ();
+        }
+
+        private void LogInputOutput (ApplicationLog log )
+        {
+            LogInputOutput ( new List<ApplicationLog> { log } );
+        }
+
+        private void LogInputOutput ( IEnumerable<ApplicationLog> logs )
+        {
+            using (var scope = _serviceProvider.CreateScope () )
+            {
+                var repo = scope.ServiceProvider.GetService<SystemRepository> ();
+                repo.SaveApplicationLogs ( logs );
+            }
         }
     }
 }

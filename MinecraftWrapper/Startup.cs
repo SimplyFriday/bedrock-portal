@@ -33,14 +33,17 @@ namespace MinecraftWrapper
         {
             services.Configure<CookiePolicyOptions> ( options =>
               {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
+                  // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                  options.CheckConsentNeeded = context => true;
                   options.MinimumSameSitePolicy = SameSiteMode.None;
               } );
 
             services.AddDbContext<ApplicationDbContext> ( options =>
-                  options.UseSqlServer (
-                      Configuration.GetConnectionString ( "DefaultConnection" ) ) );
+                  {
+                      options.UseSqlServer (
+                          Configuration.GetConnectionString ( "DefaultConnection" ) );
+                  }, contextLifetime: ServiceLifetime.Transient, optionsLifetime: ServiceLifetime.Transient );
+
 
             services.AddDefaultIdentity<IdentityUser> (options =>
             {
@@ -71,6 +74,7 @@ namespace MinecraftWrapper
             services.Configure<ApplicationSettings> ( Configuration.GetSection ( "ApplicationSettings" ) );
 
             services.AddTransient<UserRepository> ();
+            services.AddTransient<SystemRepository> ();
             services.AddTransient<IEmailSender, SendGridSender> ();
 
             services.AddSingleton<ConsoleApplicationWrapper> ();
