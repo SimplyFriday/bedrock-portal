@@ -69,18 +69,13 @@ namespace MinecraftWrapper.Services
                     };
 
                     _standardOutputQueue.Enqueue ( log );
-                }
 
-                var logs = new List<ApplicationLog> ();
+                    LogInputOutput ( log );
+                }
 
                 while ( _standardOutputQueue.Count > _maxOutputRetained )
                 {
-                    logs.Add ( _standardOutputQueue.Dequeue () );
-                }
-
-                if ( logs.Count > 0 )
-                {
-                    LogInputOutput ( logs );
+                    _standardOutputQueue.Dequeue ();
                 }
             } );
 
@@ -96,18 +91,13 @@ namespace MinecraftWrapper.Services
                     };
 
                     _errorOutputQueue.Enqueue ( log );
-                }
 
-                var logs = new List<ApplicationLog> ();
+                    LogInputOutput ( log );
+                }
 
                 while ( _errorOutputQueue.Count > _maxOutputRetained )
                 {
-                    logs.Add ( _errorOutputQueue.Dequeue () );
-                }
-
-                if ( logs.Count > 0 )
-                {
-                    LogInputOutput ( logs );
+                    _errorOutputQueue.Dequeue ();
                 }
             } );
 
