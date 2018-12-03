@@ -64,5 +64,11 @@ namespace MinecraftWrapper.Controllers
         {
             return _wrapper.StandardOutput;
         }
+
+        [HttpGet]
+        public IActionResult CommunityGuidelines()
+        {
+            return View ();
+        }
     }
 }
