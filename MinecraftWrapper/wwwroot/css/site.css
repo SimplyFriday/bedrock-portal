@@ -45,3 +45,66 @@ body {
     border-radius:5px;
 }
 
+.navbar-inverse {
+    background-color: #222222
+}
+
+    .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus {
+        background-color: #A6A6A6
+    }
+
+    .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
+        background-color: #080808
+    }
+
+.dropdown-menu {
+    background-color: #222222
+}
+
+    .dropdown-menu > li > a {
+        background-color: #222222;
+        color:#999999;
+    }
+
+        .dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
+            background-color: #A6A6A6;
+            color:#FFFFFF
+        }
+
+.navbar-inverse {
+    background-image: none;
+}
+
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
+    background-image: none;
+}
+
+.navbar-inverse {
+    border-color: #080808
+}
+
+    .navbar-inverse .navbar-brand {
+        color: #999999
+    }
+
+        .navbar-inverse .navbar-brand:hover {
+            color: #FFFFFF
+        }
+
+    .navbar-inverse .navbar-nav > li > a {
+        color: #999999
+    }
+
+        .navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus {
+            color: #FFFFFF
+        }
+
+    .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
+        color: #FFFFFF
+    }
+
+@media (min-width: 979px) {
+    ul.nav li.dropdown:hover > ul.dropdown-menu {
+        display: block;
+    }
+}

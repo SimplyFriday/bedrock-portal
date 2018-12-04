@@ -14,7 +14,8 @@ namespace MinecraftWrapper.Models
         public Guid AdditionalUserDataId { get; set; }
 
         public string Bio { get; set; }
-
+        
+        [StringLength(255)]
         public string GamerTag { get; set; }
 
         [Required]

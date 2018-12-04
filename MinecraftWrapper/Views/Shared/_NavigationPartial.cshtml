@@ -20,7 +20,16 @@
                 <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                 @if ( SignInManager.IsSignedIn ( User ) )
                 {
-                    <li><a asp-area="" asp-controller="UserActions" asp-action="UpdateTickingArea">Ticking Area</a></li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Utilities
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a asp-area="" asp-controller="UserActions" asp-action="UpdateTickingArea">Ticking Area</a>
+                        </li>
+                    </ul>
+                </li>
                 }
                 <li><a asp-area="" asp-controller="Home" asp-action="CommunityGuidelines">Community Guidelines</a></li>
             </ul>

@@ -5,21 +5,22 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Update Ticking Area</h2>
+<h2>Update Tickingarea</h2>
+
+<partial name="_StatusMessage" model="ViewBag.Status" />
 
 <div class="row">
     <div class="col-md-10">
         Everyone on the Fresh Start server gets a personal tickingarea, and you can set/relocate that using this page! Please note
         that tickingareas are currently limited to the overworld. This is great for farms that you'd like to get more from without
         needing to AFK forever, but please be courteous to other players and avoid setting a tickingarea on a farm that generates
-        a lot of lag. Each tickingarea is a 2 chunk circle, centered on the point provided.
+        a lot of lag. Each tickingarea is a 3 chunk square, centered on the point provided.
     </div>
 </div>
 
 <div class="row">
     <div class="col-md-4">
         <form asp-route-returnUrl="" method="post">
-            <h4>Update Tickingarea.</h4>
             <hr />
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">

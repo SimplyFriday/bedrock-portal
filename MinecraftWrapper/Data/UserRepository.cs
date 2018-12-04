@@ -35,7 +35,9 @@ namespace MinecraftWrapper.Data
 
         public IQueryable<AuthorizedUser> GetUsersWithData ()
         {
-            return _context.Users.Include ( u => u.AdditionalUserData );
+            return _context.Users
+                .Include ( u => u.AdditionalUserData )
+                .Include ( u => u.AuthorizationKey );
         }
 
         public void SaveAdditionalData ( AdditionalUserData data )

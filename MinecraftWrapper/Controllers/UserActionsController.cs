@@ -44,7 +44,7 @@ namespace MinecraftWrapper.Controllers
             else
             {
                 _wrapper.SendInput ( $"tickingarea remove {data.GamerTag}" );
-                _wrapper.SendInput ( $"tickingarea add circle {model.XCoord} 0 {model.ZCoord} 2 {data.GamerTag}" );
+                _wrapper.SendInput ( $"execute {data.GamerTag} ~ ~ ~ tickingarea add circle {model.XCoord} 0 {model.ZCoord} 1 {data.GamerTag}" );
             }
 
             return View ();

@@ -31,6 +31,12 @@ namespace MinecraftWrapper.Data.Migrations
                 name: "IX_AdditionalUserData_UserId",
                 table: "AdditionalUserData",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex (
+                name: "IX_AdditionalUserData_GamerTag",
+                table: "AdditionalUserData",
+                column: "GamerTag",
+                unique: true );
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
