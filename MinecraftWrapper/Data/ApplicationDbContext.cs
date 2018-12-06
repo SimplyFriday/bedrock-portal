@@ -17,5 +17,6 @@ namespace MinecraftWrapper.Data
         public DbSet<AuthorizationKey> AuthorizationKey { get; set; }
         public DbSet<AdditionalUserData> AdditionalUserData { get; set; }
         public DbSet<ApplicationLog> ApplicationLog { get; set; }
+        public DbSet<NewsItem> NewsItem { get; set; }
     }
 }

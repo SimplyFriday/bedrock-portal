@@ -16,18 +16,21 @@ namespace MinecraftWrapper.Controllers
     {
         private readonly ConsoleApplicationWrapper _wrapper;
         private readonly UserRepository _userRepository;
+        private readonly SystemRepository _systemRepository;
 
-        public HomeController ( ConsoleApplicationWrapper wrapper, UserRepository userRepository )
+        public HomeController ( ConsoleApplicationWrapper wrapper, UserRepository userRepository, SystemRepository systemRepository )
         {
             _wrapper = wrapper;
             _userRepository = userRepository;
+            _systemRepository = systemRepository;
         }
 
         public IActionResult Index ()
         {
             var model = new HomeIndexViewModel
             {
-                Users = _userRepository.GetUsersWithData ()
+                Users = _userRepository.GetUsersWithData (),
+                NewsItems = _systemRepository.GetRecentNewsItems ( 5 )
             };
 
             return View (model);

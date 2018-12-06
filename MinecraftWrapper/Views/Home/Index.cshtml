@@ -6,7 +6,29 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-9">
+        <div class="col-md-12">
+            <h2>News</h2>
+        </div>
+    </div>
+    <div class="row">
+        @foreach ( var item in Model.NewsItems )
+        {
+            @if ( !string.IsNullOrEmpty ( item.HtmlContent ) )
+            {
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <h4>@item.Title</h4>
+                            <hr />
+                            @Html.Raw( item.HtmlContent )
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+    <div class="row">
+        <div class="col-md-12">
             <h2>Roster</h2>
         </div>
     </div>
@@ -15,7 +37,7 @@
         {
             @if ( !string.IsNullOrEmpty ( user?.AdditionalUserData?.GamerTag ) )
             {
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title">@user.AdditionalUserData.GamerTag</h3>

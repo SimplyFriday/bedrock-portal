@@ -9,5 +9,6 @@ namespace MinecraftWrapper.Models
     public class HomeIndexViewModel
     {
         public IEnumerable<AuthorizedUser> Users { get; set; }
+        public IEnumerable<NewsItem> NewsItems { get; set; }
     }
 }
