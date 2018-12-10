@@ -18,6 +18,8 @@ namespace MinecraftWrapper.Models
         [StringLength(255)]
         public string GamerTag { get; set; }
 
+        public string MinecraftId { get; set; }
+
         [Required]
         [ForeignKey("User")]
         public virtual string UserId { get; set; }

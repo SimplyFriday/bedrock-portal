@@ -84,12 +84,16 @@ namespace MinecraftWrapper
             services.AddTransient<SystemRepository> ();
             services.AddTransient<IEmailSender, SendGridSender> ();
 
+            services.AddSingleton<StatusService> ();
             services.AddSingleton<ConsoleApplicationWrapper> ();
+            services.AddSingleton<MinecraftMessageParser> ();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure ( IApplicationBuilder app, IHostingEnvironment env )
+        public void Configure ( IApplicationBuilder app, IHostingEnvironment env, MinecraftMessageParser parser, ConsoleApplicationWrapper wrapper )
         {
+            wrapper.MessageParser = parser;
+
             if ( env.IsDevelopment () )
             {
                 app.UseDeveloperExceptionPage ();

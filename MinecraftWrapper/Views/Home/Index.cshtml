@@ -1,4 +1,6 @@
 ﻿@model HomeIndexViewModel
+@using MinecraftWrapper.Services
+@inject StatusService statusService
 
 @{
     ViewData[ "Title" ] = "Home Page";
@@ -35,14 +37,24 @@
     <div class="row">
         @foreach ( var user in Model.Users )
         {
+            var divClass = "";
+
             @if ( !string.IsNullOrEmpty ( user?.AdditionalUserData?.GamerTag ) )
             {
                 <div class="col-md-4">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
+                    @if ( statusService.GetUserStatus ( user.Id ) )
+                    {
+                        divClass = "panel panel-success";
+                    }
+                    else
+                    {
+                        divClass = "panel panel-default";
+                    }
+                    <div class="@divClass">
+                        <button class="divbutton panel-heading headerbutton" data-toggle="collapse" href="#@user.AdditionalUserData.GamerTag">
                             <h3 class="panel-title">@user.AdditionalUserData.GamerTag</h3>
-                        </div>
-                        <div class="panel-body">
+                        </button>
+                        <div id="@user.AdditionalUserData.GamerTag" class="panel-body collapse">
                             @user.AdditionalUserData.Bio
                         </div>
                     </div>

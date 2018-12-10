@@ -21,6 +21,7 @@ namespace MinecraftWrapper.Services
         private Process _proc = null;
 
         private readonly IServiceProvider _serviceProvider;
+        public IMessageParser MessageParser { get; set; }
 
         private Queue<ApplicationLog> _standardOutputQueue = new Queue<ApplicationLog> ();
         public IEnumerable<string> StandardOutput
@@ -59,46 +60,12 @@ namespace MinecraftWrapper.Services
 
             _proc.OutputDataReceived += new DataReceivedEventHandler ( ( s, e ) =>
             {
-                if ( !string.IsNullOrEmpty ( e.Data ) )
-                {
-                    var log = new ApplicationLog
-                    {
-                        ApplicationLogType = ApplicationLogType.Stdout,
-                        LogTime = DateTime.UtcNow,
-                        LogText = e.Data
-                    };
-
-                    _standardOutputQueue.Enqueue ( log );
-
-                    LogInputOutput ( log );
-                }
-
-                while ( _standardOutputQueue.Count > _maxOutputRetained )
-                {
-                    _standardOutputQueue.Dequeue ();
-                }
+                HandleOutput ( e.Data, ApplicationLogType.Stdout );
             } );
 
             _proc.ErrorDataReceived += new DataReceivedEventHandler ( ( s, e ) =>
             {
-                if ( !string.IsNullOrEmpty ( e.Data ) )
-                {
-                    var log = new ApplicationLog
-                    {
-                        ApplicationLogType = ApplicationLogType.Stderr,
-                        LogTime = DateTime.UtcNow,
-                        LogText = e.Data
-                    };
-
-                    _errorOutputQueue.Enqueue ( log );
-
-                    LogInputOutput ( log );
-                }
-
-                while ( _errorOutputQueue.Count > _maxOutputRetained )
-                {
-                    _errorOutputQueue.Dequeue ();
-                }
+                HandleOutput ( e.Data, ApplicationLogType.Stderr );
             } );
 
             _proc.Exited += _proc_Exited;
@@ -106,6 +73,33 @@ namespace MinecraftWrapper.Services
             _proc.Start ();
             _proc.BeginErrorReadLine ();
             _proc.BeginOutputReadLine ();
+        }
+
+        private void HandleOutput(string output, ApplicationLogType type )
+        {
+            if ( !string.IsNullOrEmpty ( output ) )
+            {
+                var log = new ApplicationLog
+                {
+                    ApplicationLogType = type,
+                    LogTime = DateTime.UtcNow,
+                    LogText = output
+                };
+
+                _standardOutputQueue.Enqueue ( log );
+
+                LogInputOutput ( log );
+
+                if ( MessageParser != null )
+                {
+                    MessageParser.HandleOutput ( output );
+                }
+            }
+
+            while ( _standardOutputQueue.Count > _maxOutputRetained )
+            {
+                _standardOutputQueue.Dequeue ();
+            }
         }
 
         private void _proc_Exited ( object sender, EventArgs e )
@@ -118,17 +112,20 @@ namespace MinecraftWrapper.Services
 
         public void SendInput (string input )
         {
-            var log = new ApplicationLog
+            if ( MessageParser == null || MessageParser.FilterInput ( input ) )
             {
-                ApplicationLogType = ApplicationLogType.Stdin,
-                LogTime = DateTime.UtcNow,
-                LogText = input
-            };
+                var log = new ApplicationLog
+                {
+                    ApplicationLogType = ApplicationLogType.Stdin,
+                    LogTime = DateTime.UtcNow,
+                    LogText = input
+                };
 
-            LogInputOutput ( log );
+                LogInputOutput ( log );
 
-            _proc.StandardInput.Write ( input );
-            _proc.StandardInput.Flush ();
+                _proc.StandardInput.Write ( input );
+                _proc.StandardInput.Flush ();
+            }
         }
 
         public void Dispose ()

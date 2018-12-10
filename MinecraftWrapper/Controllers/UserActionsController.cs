@@ -45,6 +45,8 @@ namespace MinecraftWrapper.Controllers
             {
                 _wrapper.SendInput ( $"tickingarea remove {data.GamerTag}" );
                 _wrapper.SendInput ( $"execute {data.GamerTag} ~ ~ ~ tickingarea add circle {model.XCoord} 0 {model.ZCoord} 1 {data.GamerTag}" );
+
+                ViewBag.Status = "Update sent to server.";
             }
 
             return View ();

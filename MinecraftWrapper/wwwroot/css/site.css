@@ -108,3 +108,8 @@ body {
         display: block;
     }
 }
+
+.headerbutton{
+    display:block;
+    width:100%;
+}

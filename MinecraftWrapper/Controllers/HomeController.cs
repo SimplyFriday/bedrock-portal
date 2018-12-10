@@ -30,7 +30,7 @@ namespace MinecraftWrapper.Controllers
             var model = new HomeIndexViewModel
             {
                 Users = _userRepository.GetUsersWithData (),
-                NewsItems = _systemRepository.GetRecentNewsItems ( 5 )
+                NewsItems = _systemRepository.GetRecentNewsItems ( 5 ),
             };
 
             return View (model);
