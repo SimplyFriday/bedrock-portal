@@ -123,7 +123,7 @@ namespace MinecraftWrapper.Services
 
                 LogInputOutput ( log );
 
-                _proc.StandardInput.Write ( input );
+                _proc.StandardInput.WriteLine ( input );
                 _proc.StandardInput.Flush ();
             }
         }

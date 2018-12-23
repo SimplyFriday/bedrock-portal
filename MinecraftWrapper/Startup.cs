@@ -90,9 +90,9 @@ namespace MinecraftWrapper
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure ( IApplicationBuilder app, IHostingEnvironment env, MinecraftMessageParser parser, ConsoleApplicationWrapper wrapper )
+        public void Configure ( IApplicationBuilder app, IHostingEnvironment env )
         {
-            wrapper.MessageParser = parser;
+            //wrapper.MessageParser = parser;
 
             if ( env.IsDevelopment () )
             {
