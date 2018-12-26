@@ -17,12 +17,14 @@ namespace MinecraftWrapper.Controllers
         private readonly ConsoleApplicationWrapper _wrapper;
         private readonly UserRepository _userRepository;
         private readonly UserManager<AuthorizedUser> _userManager;
+        private readonly WhiteListService _whiteListService;
 
-        public UserActionsController ( ConsoleApplicationWrapper wrapper, UserRepository userRepository, UserManager<AuthorizedUser> userManager )
+        public UserActionsController ( ConsoleApplicationWrapper wrapper, UserRepository userRepository, UserManager<AuthorizedUser> userManager, WhiteListService whiteListService )
         {
             _wrapper = wrapper;
             _userRepository = userRepository;
             _userManager = userManager;
+            _whiteListService = whiteListService;
         }
 
         [HttpGet]
@@ -50,6 +52,29 @@ namespace MinecraftWrapper.Controllers
             }
 
             return View ();
+        }
+
+        [HttpGet]
+        public IActionResult ManageWhiteList ()
+        {
+            var items = _whiteListService.GetWhiteListEntries ();
+
+            return View (items);
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteWhiteListEntry ( string name )
+        {
+            _whiteListService.DeleteWhiteListEntry ( name );
+            return Redirect ( "ManageWhiteList" );
+        }
+
+        [ HttpPost]
+        public IActionResult AddWhiteListEntry ( string name )
+        {
+            _whiteListService.AddWhiteListEntry ( name );
+
+            return Redirect ( "ManageWhiteList" );
         }
     }
 }

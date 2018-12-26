@@ -11,5 +11,6 @@ namespace MinecraftWrapper.Data
         public int MaxOutputRetained { get; set; }
         public string SendGridApiKey { get; set; }
         public string SystemFromEmailAddress { get; set; }
+        public string WhiteListPath { get; set; }
     }
 }
