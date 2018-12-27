@@ -28,6 +28,12 @@
                         <li>
                             <a asp-area="" asp-controller="UserActions" asp-action="UpdateTickingArea">Ticking Area</a>
                         </li>
+                        @if ( ViewContext.HttpContext.User.IsInRole ( "Admin" ) )
+                        {
+                        <li>
+                            <a asp-area="" asp-controller="UserActions" asp-action="ManageWhiteList">White List</a>
+                        </li>
+                        }
                     </ul>
                 </li>
                 }

@@ -54,6 +54,7 @@ namespace MinecraftWrapper.Controllers
             return View ();
         }
 
+        [Authorize ( Roles = "Admin" )]
         [HttpGet]
         public IActionResult ManageWhiteList ()
         {
@@ -62,14 +63,16 @@ namespace MinecraftWrapper.Controllers
             return View (items);
         }
 
-        [HttpDelete]
+        [Authorize ( Roles = "Admin" )]
+        [HttpGet]
         public IActionResult DeleteWhiteListEntry ( string name )
         {
             _whiteListService.DeleteWhiteListEntry ( name );
             return Redirect ( "ManageWhiteList" );
         }
 
-        [ HttpPost]
+        [Authorize ( Roles = "Admin" )]
+        [HttpPost]
         public IActionResult AddWhiteListEntry ( string name )
         {
             _whiteListService.AddWhiteListEntry ( name );

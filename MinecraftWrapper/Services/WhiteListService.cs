@@ -67,6 +67,13 @@ namespace MinecraftWrapper.Services
             try
             {
                 var entries = GetWhiteListEntries ();
+
+                // Do not add the same one
+                if ( entries.Any ( e => e.name == name ) )
+                {
+                    return;
+                }
+
                 entries.Add ( new WhiteListEntry { name = name, ignoresPlayerLimit = false } );
                 var jsonString = JsonConvert.SerializeObject ( entries );
 

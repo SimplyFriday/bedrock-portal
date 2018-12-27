@@ -45,7 +45,7 @@ namespace MinecraftWrapper
                   }, contextLifetime: ServiceLifetime.Transient, optionsLifetime: ServiceLifetime.Transient );
 
 
-            services.AddDefaultIdentity<AuthorizedUser> (options =>
+            services.AddIdentity<AuthorizedUser, IdentityRole> (options =>
             {
                 options.Password.RequiredLength = 8;
                 options.Password.RequiredUniqueChars = 4;
