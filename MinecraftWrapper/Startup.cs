@@ -45,15 +45,16 @@ namespace MinecraftWrapper
                   }, contextLifetime: ServiceLifetime.Transient, optionsLifetime: ServiceLifetime.Transient );
 
 
-            services.AddIdentity<AuthorizedUser, IdentityRole> (options =>
-            {
-                options.Password.RequiredLength = 8;
-                options.Password.RequiredUniqueChars = 4;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireDigit = false;
-            } )
+            services.AddIdentity<AuthorizedUser, IdentityRole> ( options =>
+             {
+                 options.Password.RequiredLength = 8;
+                 options.Password.RequiredUniqueChars = 4;
+                 options.Password.RequireLowercase = false;
+                 options.Password.RequireNonAlphanumeric = false;
+                 options.Password.RequireUppercase = false;
+                 options.Password.RequireDigit = false;
+             } )
+                .AddDefaultTokenProviders ()
                 .AddEntityFrameworkStores<ApplicationDbContext> ();
 
             services.AddMvc ().SetCompatibilityVersion ( CompatibilityVersion.Version_2_1 )

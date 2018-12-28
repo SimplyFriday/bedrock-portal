@@ -30,9 +30,12 @@
                         </li>
                         @if ( ViewContext.HttpContext.User.IsInRole ( "Admin" ) )
                         {
-                        <li>
-                            <a asp-area="" asp-controller="UserActions" asp-action="ManageWhiteList">White List</a>
-                        </li>
+                            <li>
+                                <a asp-area="" asp-controller="UserActions" asp-action="ManageWhiteList">White List</a>
+                            </li>
+                            <li>
+                                <a asp-area="" asp-controller="AuthorizationKeys" asp-action="Index">Manage Auth Keys</a>
+                            </li>
                         }
                     </ul>
                 </li>
