@@ -1,0 +1,72 @@
+﻿
+@{
+    ViewData[ "Title" ] = "Console";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Console</h2>
+
+<div class="row">
+    <div hidden class="console-output"></div>
+    <div class="console-input-wrapper">
+        <div class="row">
+            <div class="col-md-10">
+                <input type="text" class="super-clean console-input" />
+            </div>
+            <div class="col-md-2">
+                <button onclick="sendData" class="super-clean console-button">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+    {
+    <script type="text/javascript">
+        window.setInterval(function () {
+            var serviceURL = '/Home/FetchConsoleOutput';
+
+            $.ajax({
+                type: "GET",
+                url: serviceURL,
+                data: param = "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+
+            function successFunc(data, status) {
+                $('div.console-output').show()
+                val = String(data).split(',').join('\r\n');
+                $('div.console-output').text(val);
+            }
+
+            function errorFunc() {
+                $('div.console-output').text("Oh oh! Something's not right here!");
+            }
+        }, 500);
+
+        function sendData(data) {
+            var inputURL = '/UserActions/SendConsoleInput';
+
+            $.ajax({
+                type: "POST",
+                url: inputURL,
+                data: data,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+
+            function successFunc(data, status) {
+                // Wait for update, I guess... I'm lazy
+            }
+
+            function errorFunc() {
+                $('div.console-output').text("Oh oh! Something's not right here!");
+            }
+        }
+    </script>
+}

@@ -8,8 +8,8 @@ namespace MinecraftWrapper.Services
 {
     public class MinecraftMessageParser : IMessageParser
     {
-        private const string PLAYER_CONNECTED = "Player connected: ";
-        private const string PLAYER_DISCONNECTED = "Player disconnected: ";
+        private const string PLAYER_CONNECTED = "player connected: ";
+        private const string PLAYER_DISCONNECTED = "player disconnected: ";
 
         private readonly StatusService _statusService;
 

@@ -42,7 +42,34 @@ body {
     background-color: dimgrey;
     color: lightgrey;
     padding: 15px;
-    border-radius:5px;
+    border-radius: 5px,5px,0px,0px;
+}
+
+.console-input-wrapper {
+    white-space: pre-line;
+    background-color: dimgrey;
+    color: lightgrey;
+    border-radius: 0px,0px,5px,5px;
+    font-size: 1.2em;
+    padding: 10px;
+}
+
+.console-input{
+    float:left;
+    border: 1px solid;
+    width:100%;
+}
+
+.console-button {
+    font-weight: 600;
+    display: inline;
+    float: right;
+}
+
+.console-button:hover {   
+    float: right;
+    background-color:grey;
+    color:lightgrey;
 }
 
 .navbar-inverse {

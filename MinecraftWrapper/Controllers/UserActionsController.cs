@@ -79,5 +79,12 @@ namespace MinecraftWrapper.Controllers
 
             return Redirect ( "ManageWhiteList" );
         }
+
+        [Authorize ( Roles = "Admin" )]
+        [HttpGet]
+        public IActionResult Console ()
+        {
+            return View ();
+        }
     }
 }
