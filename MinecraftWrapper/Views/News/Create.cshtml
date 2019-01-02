@@ -1,7 +1,7 @@
 ﻿@model MinecraftWrapper.Models.NewsItem
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData[ "Title" ] = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -25,7 +25,8 @@
             </div>
             <div class="form-group">
                 <label asp-for="HtmlContent" class="control-label"></label>
-                <input asp-for="HtmlContent" class="form-control" />
+                @*<input asp-for="HtmlContent" class="form-control" />*@
+                <textarea asp-for="HtmlContent" id="summernote"></textarea>
                 <span asp-validation-for="HtmlContent" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -44,3 +45,10 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+@section Scripts{
+    <script>
+    $(document).ready(function() {
+        $('#summernote').summernote();
+    });
+    </script>
+}
