@@ -14,11 +14,11 @@ namespace MinecraftWrapper.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ConsoleApplicationWrapper _wrapper;
+        private readonly ConsoleApplicationWrapper<MinecraftMessageParser> _wrapper;
         private readonly UserRepository _userRepository;
         private readonly SystemRepository _systemRepository;
 
-        public HomeController ( ConsoleApplicationWrapper wrapper, UserRepository userRepository, SystemRepository systemRepository )
+        public HomeController ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, UserRepository userRepository, SystemRepository systemRepository )
         {
             _wrapper = wrapper;
             _userRepository = userRepository;

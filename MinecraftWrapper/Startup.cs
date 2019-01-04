@@ -87,7 +87,7 @@ namespace MinecraftWrapper
             services.AddTransient<WhiteListService> ();
 
             services.AddSingleton<StatusService> ();
-            services.AddSingleton<ConsoleApplicationWrapper> ();
+            services.AddSingleton<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
             services.AddSingleton<MinecraftMessageParser> ();
         }
 

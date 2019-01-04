@@ -14,9 +14,9 @@ namespace MinecraftWrapper.Services
     {
         private readonly ILogger<WhiteListService> _logger;
         private readonly ApplicationSettings _applicationSettings;
-        private readonly ConsoleApplicationWrapper _wrapper;
+        private readonly ConsoleApplicationWrapper<MinecraftMessageParser> _wrapper;
 
-        public WhiteListService( ILogger<WhiteListService> logger, IOptions<ApplicationSettings> options, ConsoleApplicationWrapper wrapper )
+        public WhiteListService( ILogger<WhiteListService> logger, IOptions<ApplicationSettings> options, ConsoleApplicationWrapper<MinecraftMessageParser> wrapper )
         {
             _logger = logger;
             _applicationSettings = options.Value;
