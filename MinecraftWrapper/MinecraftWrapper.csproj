@@ -11,10 +11,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" PrivateAssets="All" />
     <PackageReference Include="Sendgrid" Version="9.10.0" />
+    <PackageReference Include="summernote.editor" Version="0.8.10" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Areas\Identity\Services\" />
+    <Folder Include="wwwroot\lib\summernote\" />
   </ItemGroup>
 
 </Project>

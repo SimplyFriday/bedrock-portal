@@ -28,7 +28,7 @@ namespace MinecraftWrapper.Data
         public IEnumerable<NewsItem> GetRecentNewsItems ( int numberToReturn )
         {
             return _context.NewsItem
-                .Where ( ni => ni.DateExpires == null || ni.DateExpires <= DateTime.UtcNow )
+                .Where ( ni => ni.DateExpires == null || ni.DateExpires >= DateTime.UtcNow )
                 .OrderByDescending ( ni => ni.DateActive )
                 .Take ( numberToReturn );
         }

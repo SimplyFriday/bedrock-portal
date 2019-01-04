@@ -14,11 +14,13 @@ namespace MinecraftWrapper.Services
     {
         private readonly ILogger<WhiteListService> _logger;
         private readonly ApplicationSettings _applicationSettings;
+        private readonly ConsoleApplicationWrapper<MinecraftMessageParser> _wrapper;
 
-        public WhiteListService( ILogger<WhiteListService> logger, IOptions<ApplicationSettings> options )
+        public WhiteListService( ILogger<WhiteListService> logger, IOptions<ApplicationSettings> options, ConsoleApplicationWrapper<MinecraftMessageParser> wrapper )
         {
             _logger = logger;
             _applicationSettings = options.Value;
+            _wrapper = wrapper;
         }
 
         public List<WhiteListEntry> GetWhiteListEntries ()
@@ -28,8 +30,7 @@ namespace MinecraftWrapper.Services
             try
             {
                 var jsonString = File.ReadAllText ( _applicationSettings.WhiteListPath );
-                entries = JsonConvert.DeserializeObject<List<WhiteListEntry>> ( jsonString );
-                
+                entries = JsonConvert.DeserializeObject<List<WhiteListEntry>> ( jsonString );                
             } catch (Exception ex )
             {
                 _logger.LogError ( ex, "An unexpected error occured while fetching whitelist" );
@@ -37,15 +38,7 @@ namespace MinecraftWrapper.Services
 
             return entries;
         }
-
-        //public void SaveWhitelist (IEnumerable<WhiteListEntry> entries)
-        //{
-        //    entries = entries.Where ( e => !e.DeletePending );
-
-        //    var jsonString = JsonConvert.SerializeObject ( entries );
-        //    File.WriteAllText ( _applicationSettings.WhiteListPath, jsonString );
-        //}
-
+        
         public void DeleteWhiteListEntry ( string name )
         {
             try
@@ -55,6 +48,8 @@ namespace MinecraftWrapper.Services
                 var jsonString = JsonConvert.SerializeObject ( entries );
 
                 File.WriteAllText ( _applicationSettings.WhiteListPath, jsonString );
+
+                _wrapper.SendInput ( "whitelist reload" );
             }
             catch ( Exception ex )
             {
@@ -78,6 +73,8 @@ namespace MinecraftWrapper.Services
                 var jsonString = JsonConvert.SerializeObject ( entries );
 
                 File.WriteAllText ( _applicationSettings.WhiteListPath, jsonString );
+
+                _wrapper.SendInput ( "whitelist reload" );
             }
             catch ( Exception ex )
             {

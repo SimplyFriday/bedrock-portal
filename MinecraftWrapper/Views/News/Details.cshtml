@@ -1,0 +1,43 @@
+﻿@model MinecraftWrapper.Models.NewsItem
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>NewsItem</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.DateActive)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DateActive)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DateExpires)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DateExpires)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.HtmlContent)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.HtmlContent)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.NewsItemId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

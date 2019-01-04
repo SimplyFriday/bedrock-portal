@@ -14,12 +14,12 @@ namespace MinecraftWrapper.Controllers
     [Authorize]
     public class UserActionsController : Controller
     {
-        private readonly ConsoleApplicationWrapper _wrapper;
+        private readonly ConsoleApplicationWrapper<MinecraftMessageParser> _wrapper;
         private readonly UserRepository _userRepository;
         private readonly UserManager<AuthorizedUser> _userManager;
         private readonly WhiteListService _whiteListService;
 
-        public UserActionsController ( ConsoleApplicationWrapper wrapper, UserRepository userRepository, UserManager<AuthorizedUser> userManager, WhiteListService whiteListService )
+        public UserActionsController ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, UserRepository userRepository, UserManager<AuthorizedUser> userManager, WhiteListService whiteListService )
         {
             _wrapper = wrapper;
             _userRepository = userRepository;

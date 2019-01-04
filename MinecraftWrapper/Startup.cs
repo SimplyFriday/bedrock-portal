@@ -45,15 +45,16 @@ namespace MinecraftWrapper
                   }, contextLifetime: ServiceLifetime.Transient, optionsLifetime: ServiceLifetime.Transient );
 
 
-            services.AddIdentity<AuthorizedUser, IdentityRole> (options =>
-            {
-                options.Password.RequiredLength = 8;
-                options.Password.RequiredUniqueChars = 4;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireDigit = false;
-            } )
+            services.AddIdentity<AuthorizedUser, IdentityRole> ( options =>
+             {
+                 options.Password.RequiredLength = 8;
+                 options.Password.RequiredUniqueChars = 4;
+                 options.Password.RequireLowercase = false;
+                 options.Password.RequireNonAlphanumeric = false;
+                 options.Password.RequireUppercase = false;
+                 options.Password.RequireDigit = false;
+             } )
+                .AddDefaultTokenProviders ()
                 .AddEntityFrameworkStores<ApplicationDbContext> ();
 
             services.AddMvc ().SetCompatibilityVersion ( CompatibilityVersion.Version_2_1 )
@@ -74,7 +75,7 @@ namespace MinecraftWrapper
             services.Configure<ApplicationSettings> ( Configuration.GetSection ( "ApplicationSettings" ) );
 
             services.AddAuthentication ()
-                .AddGoogle ( options => 
+                .AddGoogle ( options =>
                 {
                     options.ClientId = Configuration[ "Authentication:Google:ClientId" ];
                     options.ClientSecret = Configuration[ "Authentication:Google:ClientSecret" ];
@@ -84,16 +85,21 @@ namespace MinecraftWrapper
             services.AddTransient<SystemRepository> ();
             services.AddTransient<IEmailSender, SendGridSender> ();
             services.AddTransient<WhiteListService> ();
+            services.AddTransient<DiscordService> ();
 
             services.AddSingleton<StatusService> ();
-            services.AddSingleton<ConsoleApplicationWrapper> ();
+            services.AddSingleton<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
             services.AddSingleton<MinecraftMessageParser> ();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure ( IApplicationBuilder app, IHostingEnvironment env )
+        public void Configure ( IApplicationBuilder app, IHostingEnvironment env, IServiceProvider provider )
         {
-            //wrapper.MessageParser = parser;
+            //using ( var scope = provider.CreateScope () )
+            //{
+                var wrapper = provider.GetService<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
+                wrapper.Start ();
+            //}
 
             if ( env.IsDevelopment () )
             {

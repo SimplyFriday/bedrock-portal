@@ -11,7 +11,7 @@ using MinecraftWrapper.Models;
 
 namespace MinecraftWrapper.Services
 {
-    public class ConsoleApplicationWrapper : IDisposable
+    public class ConsoleApplicationWrapper<TParser> : IDisposable where TParser : IMessageParser
     {
         private bool _stopRequested = false;
         private readonly string _exePath;
@@ -21,7 +21,7 @@ namespace MinecraftWrapper.Services
         private Process _proc = null;
 
         private readonly IServiceProvider _serviceProvider;
-        public IMessageParser MessageParser { get; set; }
+        public IMessageParser MessageParser { get; private set;  }
 
         private Queue<ApplicationLog> _standardOutputQueue = new Queue<ApplicationLog> ();
         public IEnumerable<string> StandardOutput
@@ -42,12 +42,28 @@ namespace MinecraftWrapper.Services
             _restartOnFailure = options.Value.RestartOnFailure;
             _maxOutputRetained = options.Value.MaxOutputRetained;
             _serviceProvider = serviceProvider;
+        }
 
-            Start ();
+        private IMessageParser CreateMessageParser ()
+        {
+            using (var scope = _serviceProvider.CreateScope () )
+            {
+                return scope.ServiceProvider.GetService<TParser> ();
+            }
         }
 
         public void Start ()
         {
+            if ( _proc != null && !_proc.HasExited )
+            {
+                return;
+            }
+
+            if ( MessageParser == null )
+            {
+                MessageParser = CreateMessageParser ();
+            }
+
             _proc = new Process ();
 
             _proc.EnableRaisingEvents = true;
