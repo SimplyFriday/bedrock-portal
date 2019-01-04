@@ -42,22 +42,28 @@ namespace MinecraftWrapper.Services
             _restartOnFailure = options.Value.RestartOnFailure;
             _maxOutputRetained = options.Value.MaxOutputRetained;
             _serviceProvider = serviceProvider;
-
-            MessageParser = CreateMessageParser ();
-
-            Start ();
         }
 
         private IMessageParser CreateMessageParser ()
         {
             using (var scope = _serviceProvider.CreateScope () )
             {
-                return scope.ServiceProvider.GetService<MinecraftMessageParser> ();
+                return scope.ServiceProvider.GetService<TParser> ();
             }
         }
 
         public void Start ()
         {
+            if ( _proc != null && !_proc.HasExited )
+            {
+                return;
+            }
+
+            if ( MessageParser == null )
+            {
+                MessageParser = CreateMessageParser ();
+            }
+
             _proc = new Process ();
 
             _proc.EnableRaisingEvents = true;

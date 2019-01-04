@@ -75,7 +75,7 @@ namespace MinecraftWrapper
             services.Configure<ApplicationSettings> ( Configuration.GetSection ( "ApplicationSettings" ) );
 
             services.AddAuthentication ()
-                .AddGoogle ( options => 
+                .AddGoogle ( options =>
                 {
                     options.ClientId = Configuration[ "Authentication:Google:ClientId" ];
                     options.ClientSecret = Configuration[ "Authentication:Google:ClientSecret" ];
@@ -93,9 +93,13 @@ namespace MinecraftWrapper
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure ( IApplicationBuilder app, IHostingEnvironment env )
+        public void Configure ( IApplicationBuilder app, IHostingEnvironment env, IServiceProvider provider )
         {
-            //wrapper.MessageParser = parser;
+            //using ( var scope = provider.CreateScope () )
+            //{
+                var wrapper = provider.GetService<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
+                wrapper.Start ();
+            //}
 
             if ( env.IsDevelopment () )
             {
