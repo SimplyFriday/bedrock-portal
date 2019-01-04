@@ -38,32 +38,52 @@ body {
 
 .console-output {
     white-space: pre-line;
-    min-height: 200px;
+    height: 400px;
     background-color: dimgrey;
     color: lightgrey;
     padding: 15px;
-    border-radius: 5px,5px,0px,0px;
+    border-radius: 5px 5px 0px 0px;
+    overflow-y: scroll;
+}
+
+/*div::-webkit-scrollbar {
+    width: 10px;
+    background: transparent;
+}*/
+
+div::-webkit-scrollbar {
+    width: 8px;
+}
+
+div::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+    border-radius: 4px;
+}
+
+div::-webkit-scrollbar-thumb {
+    background: grey;
+    border-radius: 4px;
 }
 
 .console-input-wrapper {
     white-space: pre-line;
     background-color: dimgrey;
     color: lightgrey;
-    border-radius: 0px,0px,5px,5px;
+    border-radius: 0px 0px 5px 5px;
     font-size: 1.2em;
     padding: 10px;
 }
 
-.console-input{
-    float:left;
+.console-input {
     border: 1px solid;
-    width:100%;
+    background-color: dimgray;
+    color: lightgrey;
 }
 
 .console-button {
     font-weight: 600;
-    display: inline;
-    float: right;
+    background-color: dimgrey;
+    color: lightgrey;
 }
 
 .console-button:hover {   

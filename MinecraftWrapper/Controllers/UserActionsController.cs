@@ -86,5 +86,17 @@ namespace MinecraftWrapper.Controllers
         {
             return View ();
         }
+
+        [Authorize ( Roles = "Admin" )]
+        [HttpPost]
+        public bool SendConsoleInput ([FromBody] string input)
+        {
+            if ( input != null )
+            {
+                _wrapper.SendInput ( input );
+            }
+
+            return true;
+        }
     }
 }
