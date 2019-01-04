@@ -12,5 +12,7 @@ namespace MinecraftWrapper.Data
         public string SendGridApiKey { get; set; }
         public string SystemFromEmailAddress { get; set; }
         public string WhiteListPath { get; set; }
+        public string DiscordWebhookUrl { get; set; }
+        public string DiscordUserName { get; set; }
     }
 }

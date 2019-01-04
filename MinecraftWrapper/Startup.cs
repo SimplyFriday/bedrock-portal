@@ -85,6 +85,7 @@ namespace MinecraftWrapper
             services.AddTransient<SystemRepository> ();
             services.AddTransient<IEmailSender, SendGridSender> ();
             services.AddTransient<WhiteListService> ();
+            services.AddTransient<DiscordService> ();
 
             services.AddSingleton<StatusService> ();
             services.AddSingleton<ConsoleApplicationWrapper<MinecraftMessageParser>> ();

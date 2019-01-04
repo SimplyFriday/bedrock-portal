@@ -12,10 +12,14 @@ namespace MinecraftWrapper.Services
         private const string PLAYER_DISCONNECTED = "Player disconnected: ";
 
         private readonly StatusService _statusService;
+        private readonly WhiteListService _whiteListService;
+        private readonly DiscordService _discordService;
 
-        public MinecraftMessageParser (StatusService statusService)
+        public MinecraftMessageParser ( StatusService statusService, WhiteListService whiteListService, DiscordService discordService )
         {
             _statusService = statusService;
+            _whiteListService = whiteListService;
+            _discordService = discordService;
         }
 
         public bool FilterInput ( string input )
@@ -30,7 +34,14 @@ namespace MinecraftWrapper.Services
             ChangePlayerOnlineStatus ( PLAYER_DISCONNECTED, output, false );
         }
 
-        private void ChangePlayerOnlineStatus(string needle, string haystack, bool status )
+        /// <summary>
+        /// This method updates the player's online state based on the target status and the message coming in. It also sends out a discord webhook notification, if present.
+        /// </summary>
+        /// <param name="needle">Phrase to search for</param>
+        /// <param name="haystack">Text to search</param>
+        /// <param name="status">What to change the player's online state to - true for logged in, false for logged out</param>
+        /// <returns>Returns true if the needle was found and the status was successfully updated</returns>
+        private bool ChangePlayerOnlineStatus(string needle, string haystack, bool status )
         {
             Regex regex = new Regex ( $"{needle}(\\d+)" );
             var matches = regex.Matches ( haystack );
@@ -39,7 +50,19 @@ namespace MinecraftWrapper.Services
             {
                 var id = matches[ 0 ].Groups[ 1 ].Value;
                 _statusService.UpdateUserStatus ( id, status );
+
+                var player = _whiteListService.GetWhiteListEntries ().SingleOrDefault ( w => w.xuid == id );
+
+                if ( status && player != null )
+                {
+                    // Player has logged in, notify Discord
+                    _discordService.SendWebhookMessage ( $"{player.name} has logged in!" );
+                }
+
+                return true;
             }
+
+            return false;
         }
     }
 }
