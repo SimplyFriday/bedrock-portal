@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using MinecraftWrapper.Data;
 using MinecraftWrapper.Models;
 using MinecraftWrapper.Services;
+using Newtonsoft.Json;
+using static MinecraftWrapper.Models.UpdateTickingAreaViewModel;
 
 namespace MinecraftWrapper.Controllers
 {
@@ -28,9 +30,29 @@ namespace MinecraftWrapper.Controllers
         }
 
         [HttpGet]
-        public IActionResult UpdateTickingArea ()
+        public async Task<IActionResult> UpdateTickingArea ()
         {
-            return View ( new UpdateTickingAreaViewModel () );
+            var user = await _userManager.GetUserAsync ( HttpContext.User );
+            var tickingAreas = GetTickingAreasByUser ( user );
+
+            return View ( new UpdateTickingAreaViewModel { SavedTickingAreas = tickingAreas } );
+        }
+
+        private List<SavedTickingArea> GetTickingAreasByUser (IdentityUser user)
+        {
+            var preferences = _userRepository.GetUserPreferencesByUserId ( user.Id )
+                                             .Where ( p => p.UserPreferenceType == UserPreferenceType.SavedTickingArea )
+                                             .Select ( p => p.Value )
+                                             .ToList ();
+
+            var tickingAreas = new List<SavedTickingArea> ();
+
+            foreach ( var p in preferences )
+            {
+                tickingAreas.Add ( JsonConvert.DeserializeObject<SavedTickingArea> ( p ) );
+            }
+
+            return tickingAreas;
         }
 
         [HttpPost]
@@ -38,7 +60,7 @@ namespace MinecraftWrapper.Controllers
         {
             var user = await _userManager.GetUserAsync ( HttpContext.User );
             var data = _userRepository.GetAdditionalUserDataByUserId ( user.Id );
-
+            
             if ( string.IsNullOrEmpty ( data?.GamerTag ) )
             {
                 ModelState.AddModelError ( "", "An Xbox Live gamertag is required to use this function." );
@@ -46,14 +68,26 @@ namespace MinecraftWrapper.Controllers
             else
             {
                 _wrapper.SendInput ( $"tickingarea remove {data.GamerTag}" );
-                _wrapper.SendInput ( $"execute {data.GamerTag} ~ ~ ~ tickingarea add circle {model.XCoord} 0 {model.ZCoord} 1 {data.GamerTag}" );
+                _wrapper.SendInput ( $"tickingarea add circle {model.XCoord} 0 {model.ZCoord} 1 {data.GamerTag}" );
+
+                if ( !string.IsNullOrEmpty ( model.Name ) )
+                {
+                    await _userRepository.SaveUserPreferance ( new UserPreference
+                    {
+                        UserId = user.Id,
+                        UserPreferenceType = UserPreferenceType.SavedTickingArea,
+                        Value = JsonConvert.SerializeObject ( new { model.XCoord, model.ZCoord, model.Name } )
+                    } );
+                }
 
                 ViewBag.Status = "Update sent to server.";
             }
 
-            return View ();
-        }
+            var tickingAreas = GetTickingAreasByUser ( user );
 
+            return View ( new UpdateTickingAreaViewModel { SavedTickingAreas = tickingAreas } );
+        }
+        
         [Authorize ( Roles = "Admin" )]
         [HttpGet]
         public IActionResult ManageWhiteList ()
