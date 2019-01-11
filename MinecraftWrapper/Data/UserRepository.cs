@@ -53,5 +53,26 @@ namespace MinecraftWrapper.Data
 
             _context.SaveChanges ();
         }
+
+        public async Task<bool> SaveUserPreferance ( UserPreference userPreference )
+        {
+            if ( userPreference.UserPreferenceId == Guid.Empty )
+            {
+                _context.UserPreference.Add ( userPreference );
+            }
+            else
+            {
+                _context.UserPreference.Update ( userPreference );
+            }
+
+            await _context.SaveChangesAsync ();
+
+            return true;
+        }
+
+        public IQueryable<UserPreference> GetUserPreferencesByUserId ( string userId )
+        {
+            return _context.UserPreference.Where ( p => p.User.Id == userId );
+        }
     }
 }

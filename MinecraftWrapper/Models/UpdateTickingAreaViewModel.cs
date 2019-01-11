@@ -9,5 +9,16 @@ namespace MinecraftWrapper.Models
     {
         public float XCoord { get; set; }
         public float ZCoord { get; set; }
+        public string Name { get; set; }
+
+        public List<SavedTickingArea> SavedTickingAreas { get; set; }
+
+        public class SavedTickingArea
+        {
+            public float XCoord { get; set; }
+            public float ZCoord { get; set; }
+            public string Name { get; set; }
+        }
     }
 }
+

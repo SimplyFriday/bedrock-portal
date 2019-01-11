@@ -13,5 +13,7 @@ namespace MinecraftWrapper.Models
         public virtual AuthorizationKey AuthorizationKey { get; set; }
 
         public virtual AdditionalUserData AdditionalUserData { get; set; }
+
+        public virtual IEnumerable<UserPreference> UserPreferences { get; set; }
     }
 }
