@@ -43,6 +43,9 @@ namespace MinecraftWrapper.Services
         /// <returns>Returns true if the needle was found and the status was successfully updated</returns>
         private bool ChangePlayerOnlineStatus(string needle, string haystack, bool status )
         {
+            needle = needle.ToLower ();
+            haystack = haystack.ToLower ();
+
             Regex regex = new Regex ( $"{needle}(\\d+)" );
             var matches = regex.Matches ( haystack );
 
