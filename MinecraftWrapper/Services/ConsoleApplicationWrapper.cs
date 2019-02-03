@@ -126,7 +126,7 @@ namespace MinecraftWrapper.Services
             }
         }
 
-        public void SendInput (string input )
+        public void SendInput ( string input, string userId )
         {
             if ( MessageParser == null || MessageParser.FilterInput ( input ) )
             {
@@ -134,13 +134,16 @@ namespace MinecraftWrapper.Services
                 {
                     ApplicationLogType = ApplicationLogType.Stdin,
                     LogTime = DateTime.UtcNow,
-                    LogText = input
+                    LogText = input,
+                    UserId = userId
                 };
 
                 LogInputOutput ( log );
 
                 _proc.StandardInput.WriteLine ( input );
                 _proc.StandardInput.Flush ();
+
+                _standardOutputQueue.Enqueue ( log );
             }
         }
 
@@ -149,7 +152,7 @@ namespace MinecraftWrapper.Services
             _stopRequested = true;
 
             // Try to stop properly
-            SendInput ( "stop" );
+            SendInput ( "stop", null );
             Thread.Sleep ( 2000 );
             _proc.Kill ();
             _proc.Dispose ();

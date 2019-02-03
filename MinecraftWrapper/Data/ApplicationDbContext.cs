@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MinecraftWrapper.Models;
 
@@ -19,5 +16,6 @@ namespace MinecraftWrapper.Data
         public DbSet<ApplicationLog> ApplicationLog { get; set; }
         public DbSet<NewsItem> NewsItem { get; set; }
         public DbSet<UserPreference> UserPreference { get; set; }
+        public DbSet<UtilityRequest> UtilityRequest { get; set; }
     }
 }

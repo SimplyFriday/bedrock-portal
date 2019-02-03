@@ -11,7 +11,7 @@ using MinecraftWrapper.Models;
 
 namespace MinecraftWrapper.Controllers
 {
-    [Authorize(Roles ="Admin")]
+    [Authorize(Roles ="Admin,Moderator")]
     public class AuthorizationKeysController : Controller
     {
         private readonly ApplicationDbContext _context;

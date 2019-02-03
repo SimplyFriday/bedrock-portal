@@ -28,7 +28,10 @@
                         <li>
                             <a asp-area="" asp-controller="UserActions" asp-action="UpdateTickingArea">Ticking Area</a>
                         </li>
-                        @if ( ViewContext.HttpContext.User.IsInRole ( "Admin" ) )
+                        <li>
+                            <a asp-area="" asp-controller="UserActions" asp-action="ClearMobs">Clear Mobs</a>
+                        </li>
+                        @if ( ViewContext.HttpContext.User.IsInRole ( "Admin" ) || ViewContext.HttpContext.User.IsInRole ( "Moderator" ) )
                         {
                             <li>
                                 <a asp-area="" asp-controller="UserActions" asp-action="ManageWhiteList">White List</a>
@@ -37,10 +40,13 @@
                                 <a asp-area="" asp-controller="AuthorizationKeys" asp-action="Index">Manage Auth Keys</a>
                             </li>
                             <li>
-                                <a asp-area="" asp-controller="News" asp-action="Index">Manage News Articles</a>
-                            </li>
-                            <li>
                                 <a asp-area="" asp-controller="UserActions" asp-action="Console">Console</a>
+                            </li>
+                        }
+                        @if ( ViewContext.HttpContext.User.IsInRole ( "Admin" ) )
+                        {
+                            <li>
+                                <a asp-area="" asp-controller="News" asp-action="Index">Manage News Articles</a>
                             </li>
                         }
                     </ul>

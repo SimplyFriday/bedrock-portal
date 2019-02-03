@@ -49,7 +49,7 @@ namespace MinecraftWrapper.Services
 
                 File.WriteAllText ( _applicationSettings.WhiteListPath, jsonString );
 
-                _wrapper.SendInput ( "whitelist reload" );
+                _wrapper.SendInput ( "whitelist reload", null );
             }
             catch ( Exception ex )
             {
@@ -74,7 +74,7 @@ namespace MinecraftWrapper.Services
 
                 File.WriteAllText ( _applicationSettings.WhiteListPath, jsonString );
 
-                _wrapper.SendInput ( "whitelist reload" );
+                _wrapper.SendInput ( "whitelist reload", null );
             }
             catch ( Exception ex )
             {

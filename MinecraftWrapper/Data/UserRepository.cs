@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MinecraftWrapper.Data.Constants;
 using MinecraftWrapper.Models;
 
 namespace MinecraftWrapper.Data
@@ -73,6 +74,18 @@ namespace MinecraftWrapper.Data
         public IQueryable<UserPreference> GetUserPreferencesByUserId ( string userId )
         {
             return _context.UserPreference.Where ( p => p.User.Id == userId );
+        }
+
+        public UtilityRequest GetLastUtilityRequestByType ( UtilityRequestType utilityRequestType, string userId )
+        {
+            return _context.UtilityRequest
+                .SingleOrDefault ( ur => ur.UtilityRequestType == utilityRequestType  && ur.UserId == userId );
+        }
+
+        public async void SaveUtilityRequestAsync ( UtilityRequest newRequest )
+        {
+            _context.UtilityRequest.Add ( newRequest );
+            await _context.SaveChangesAsync ();
         }
     }
 }

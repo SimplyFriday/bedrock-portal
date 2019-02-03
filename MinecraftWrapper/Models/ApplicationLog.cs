@@ -15,6 +15,8 @@ namespace MinecraftWrapper.Models
 
         [Required]
         public ApplicationLogType ApplicationLogType { get; set; }
+
+        public string UserId { get; set; }
     }
 
     public enum ApplicationLogType

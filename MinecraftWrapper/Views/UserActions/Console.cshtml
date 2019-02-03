@@ -44,6 +44,8 @@
                 $('div.console-output').show()
                 val = String(data).split(',').join('<br/>');
                 $('div.console-output').html(val);
+
+                updateScroll();
             }
 
             function errorFunc() {
@@ -53,6 +55,16 @@
     </script>
 
     <script type="text/javascript">
+        $(document).ready(function () {
+            // Modified from https://stackoverflow.com/questions/16011312/execute-function-on-enter-key
+            var input = $("input.console-input");
+            input.on("keydown", function (e) {
+                if (e.keyCode === 13) {  //checks whether the pressed key is "Enter"
+                    sendData(e);
+                }
+            });
+        });
+
         function sendData() {
             var inputURL = '/UserActions/SendConsoleInput';
             var inputText = $("input.console-input").val();
@@ -75,6 +87,12 @@
             function errorFunc() {
                 $('div.console-output').text("Oh oh! Something's not right here!");
             }
+        }
+        
+        // Modified from https://stackoverflow.com/questions/18614301/keep-overflow-div-scrolled-to-bottom-unless-user-scrolls-up
+        function updateScroll() {
+            var element = $("console-output");
+            element.scrollTop = element.scrollHeight;
         }
     </script>
 }

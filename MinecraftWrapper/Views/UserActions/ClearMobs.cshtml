@@ -1,0 +1,55 @@
+﻿@model DateTime?
+
+@{
+    ViewData [ "Title" ] = "Clear Mobs";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Update Tickingarea</h2>
+
+
+<div class="panel panel-warning">
+    <div class="panel-body">
+        @if ( Model.HasValue && Model.Value.AddSeconds ( SystemConstants.CLEAR_MOBS_COOLDOWN ) >= DateTime.UtcNow )
+        {
+            <div>This utility cannot be used again until <span id="nextUseDate" style="font-weight:600">@Model.Value.AddSeconds(SystemConstants.CLEAR_MOBS_COOLDOWN).ToString( "yyyy-MM-dd HH:mm:ss" ) UTC</span></div>
+        }
+        else
+        {
+            <div>
+                WARNING: This utility will kill of the following entities near you: Blaze, Zombie, Zombie Pigman, Enderman, Spider,
+                Cave Spider, Skeleton, Zombie Villager, Creeper, Witch, Stray, Magma Cube, Slime
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-10">
+        You can use this utility to clear out pesky mobs that are eating up your whole mob cap. To use this utility you must be logged
+        on to the Minecraft server because only mobs that are in loaded chunks can be affected. It can only be run once every
+        @(SystemConstants.CLEAR_MOBS_COOLDOWN / 3600); hours. This process may take up to 1 minute to full clear mobs, so it is recommended that you do not move for a little bit.
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-route-returnUrl="" method="post">
+            <button type="submit" class="btn btn-default">CLEAR MOBS</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        // Modified from https://stackoverflow.com/questions/6525538/convert-utc-date-time-to-local-date-time
+        $(document).ready(function () {
+            var date_to_convert_str = $("#nextUseDate").text();
+            var date_to_convert = new Date(date_to_convert_str);
+            
+            $("#nextUseDate").text(date_to_convert.toString());
+        });
+    </script>
+}
