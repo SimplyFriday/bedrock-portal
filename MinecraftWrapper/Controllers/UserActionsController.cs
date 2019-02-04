@@ -108,7 +108,7 @@ namespace MinecraftWrapper.Controllers
             var lastRequest = _userRepository.GetLastUtilityRequestByType ( UtilityRequestType.ClearMobs, user.Id );
             DateTime? lastUsed = lastRequest?.RequestTime;
 
-            if ( lastRequest?.RequestTime == null || lastRequest?.RequestTime < DateTime.UtcNow )
+            if ( lastUsed == null || lastUsed.Value.AddSeconds(SystemConstants.CLEAR_MOBS_COOLDOWN) < DateTime.UtcNow )
             {
                 var data = _userRepository.GetAdditionalUserDataByUserId(user.Id);
 
@@ -122,7 +122,11 @@ namespace MinecraftWrapper.Controllers
                     {
                         var command = $"execute {data.GamerTag} ~ ~ ~ kill @e[r=65, type={mob}]";
                         _wrapper.SendInput ( command, null );
-                        Thread.Sleep ( 1000 );
+
+                        if (mob == "slime" || mob == "magma_cube" )
+                        {
+                            Thread.Sleep ( 1000 );
+                        }
                     }
 
                     ViewBag.Status = "Request processed.";

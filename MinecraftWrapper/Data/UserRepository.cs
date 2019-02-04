@@ -79,7 +79,8 @@ namespace MinecraftWrapper.Data
         public UtilityRequest GetLastUtilityRequestByType ( UtilityRequestType utilityRequestType, string userId )
         {
             return _context.UtilityRequest
-                .SingleOrDefault ( ur => ur.UtilityRequestType == utilityRequestType  && ur.UserId == userId );
+                .OrderByDescending(ur => ur.RequestTime)
+                .FirstOrDefault ( ur => ur.UtilityRequestType == utilityRequestType  && ur.UserId == userId );
         }
 
         public async void SaveUtilityRequestAsync ( UtilityRequest newRequest )
