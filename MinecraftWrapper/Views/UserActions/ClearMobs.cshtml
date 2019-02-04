@@ -28,7 +28,7 @@
     <div class="col-md-10">
         You can use this utility to clear out pesky mobs that are eating up your whole mob cap. To use this utility you must be logged
         on to the Minecraft server because only mobs that are in loaded chunks can be affected. It can only be run once every
-        @(SystemConstants.CLEAR_MOBS_COOLDOWN / 3600); hours. This process may take up to 1 minute to full clear mobs, so it is recommended that you do not move for a little bit.
+        @(SystemConstants.CLEAR_MOBS_COOLDOWN / 3600) hours. This process may take up to 1 minute to full clear mobs, so it is recommended that you do not move for a little bit.
     </div>
 </div>
 
@@ -48,7 +48,8 @@
         $(document).ready(function () {
             var date_to_convert_str = $("#nextUseDate").text();
             var date_to_convert = new Date(date_to_convert_str);
-            
+            date_to_convert = new Date(date_to_convert.toUTCString);
+
             $("#nextUseDate").text(date_to_convert.toString());
         });
     </script>
