@@ -120,7 +120,7 @@ namespace MinecraftWrapper.Controllers
 
                     foreach ( var mob in _applicationSettings.MobsToClear )
                     {
-                        var command = $"execute {data.GamerTag} ~ ~ ~ kill @e[r=65, type={mob}]";
+                        var command = $"execute {data.GamerTag} ~ ~ ~ kill @e[r=65, type={mob}, name=!KEEPME]";
                         _wrapper.SendInput ( command, null );
 
                         if (mob == "slime" || mob == "magma_cube" )

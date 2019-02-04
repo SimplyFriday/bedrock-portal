@@ -48,7 +48,6 @@
         $(document).ready(function () {
             var date_to_convert_str = $("#nextUseDate").text();
             var date_to_convert = new Date(date_to_convert_str);
-            date_to_convert = new Date(date_to_convert.toUTCString);
 
             $("#nextUseDate").text(date_to_convert.toString());
         });
