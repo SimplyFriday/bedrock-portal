@@ -15,7 +15,7 @@ namespace MinecraftWrapper.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
+                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -63,7 +63,135 @@ namespace MinecraftWrapper.Data.Migrations
                     b.ToTable("AspNetRoleClaims");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ClaimType");
+
+                    b.Property<string>("ClaimValue");
+
+                    b.Property<string>("UserId")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider");
+
+                    b.Property<string>("ProviderKey");
+
+                    b.Property<string>("ProviderDisplayName");
+
+                    b.Property<string>("UserId")
+                        .IsRequired();
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId");
+
+                    b.Property<string>("RoleId");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId");
+
+                    b.Property<string>("LoginProvider");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Value");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("MinecraftWrapper.Models.AdditionalUserData", b =>
+                {
+                    b.Property<Guid>("AdditionalUserDataId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Bio");
+
+                    b.Property<string>("GamerTag")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("MinecraftId");
+
+                    b.Property<string>("UserId")
+                        .IsRequired();
+
+                    b.HasKey("AdditionalUserDataId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("AdditionalUserData");
+                });
+
+            modelBuilder.Entity("MinecraftWrapper.Models.ApplicationLog", b =>
+                {
+                    b.Property<Guid>("ApplicationLogId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("ApplicationLogType");
+
+                    b.Property<string>("LogText")
+                        .IsRequired();
+
+                    b.Property<DateTime>("LogTime");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("ApplicationLogId");
+
+                    b.ToTable("ApplicationLog");
+                });
+
+            modelBuilder.Entity("MinecraftWrapper.Models.AuthorizationKey", b =>
+                {
+                    b.Property<Guid>("AuthorizationKeyId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("AuthorizationToken")
+                        .IsRequired()
+                        .HasMaxLength(16);
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("AuthorizationKeyId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
+
+                    b.ToTable("AuthorizationKey");
+                });
+
+            modelBuilder.Entity("MinecraftWrapper.Models.AuthorizedUser", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -114,92 +242,58 @@ namespace MinecraftWrapper.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("MinecraftWrapper.Models.NewsItem", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<Guid>("NewsItemId")
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("ClaimType");
+                    b.Property<DateTime>("DateActive");
 
-                    b.Property<string>("ClaimValue");
+                    b.Property<DateTime?>("DateExpires");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("HtmlContent")
                         .IsRequired();
 
-                    b.HasKey("Id");
+                    b.Property<string>("Title");
 
-                    b.HasIndex("UserId");
+                    b.HasKey("NewsItemId");
 
-                    b.ToTable("AspNetUserClaims");
+                    b.ToTable("NewsItem");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("MinecraftWrapper.Models.UserPreference", b =>
                 {
-                    b.Property<string>("LoginProvider")
-                        .HasMaxLength(128);
+                    b.Property<Guid>("UserPreferenceId")
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("ProviderKey")
-                        .HasMaxLength(128);
-
-                    b.Property<string>("ProviderDisplayName");
-
-                    b.Property<string>("UserId")
-                        .IsRequired();
-
-                    b.HasKey("LoginProvider", "ProviderKey");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserLogins");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
                     b.Property<string>("UserId");
 
-                    b.Property<string>("RoleId");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.Property<string>("UserId");
-
-                    b.Property<string>("LoginProvider")
-                        .HasMaxLength(128);
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(128);
+                    b.Property<int>("UserPreferenceType");
 
                     b.Property<string>("Value");
 
-                    b.HasKey("UserId", "LoginProvider", "Name");
-
-                    b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("MinecraftWrapper.Models.AuthorizationKey", b =>
-                {
-                    b.Property<Guid>("AuthorizationKeyId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("AuthorizationToken")
-                        .IsRequired()
-                        .HasMaxLength(16);
-
-                    b.Property<string>("UserId");
-
-                    b.HasKey("AuthorizationKeyId");
+                    b.HasKey("UserPreferenceId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AuthorizationKey");
+                    b.ToTable("UserPreference");
+                });
+
+            modelBuilder.Entity("MinecraftWrapper.Models.UtilityRequest", b =>
+                {
+                    b.Property<Guid>("UtilityRequestId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("RequestTime");
+
+                    b.Property<string>("UserId")
+                        .IsRequired();
+
+                    b.Property<int>("UtilityRequestType");
+
+                    b.HasKey("UtilityRequestId");
+
+                    b.ToTable("UtilityRequest");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -212,7 +306,7 @@ namespace MinecraftWrapper.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("MinecraftWrapper.Models.AuthorizedUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -220,7 +314,7 @@ namespace MinecraftWrapper.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("MinecraftWrapper.Models.AuthorizedUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -233,7 +327,7 @@ namespace MinecraftWrapper.Data.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("MinecraftWrapper.Models.AuthorizedUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -241,16 +335,31 @@ namespace MinecraftWrapper.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("MinecraftWrapper.Models.AuthorizedUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("MinecraftWrapper.Models.AdditionalUserData", b =>
+                {
+                    b.HasOne("MinecraftWrapper.Models.AuthorizedUser", "User")
+                        .WithOne("AdditionalUserData")
+                        .HasForeignKey("MinecraftWrapper.Models.AdditionalUserData", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("MinecraftWrapper.Models.AuthorizationKey", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
+                    b.HasOne("MinecraftWrapper.Models.AuthorizedUser", "User")
+                        .WithOne("AuthorizationKey")
+                        .HasForeignKey("MinecraftWrapper.Models.AuthorizationKey", "UserId");
+                });
+
+            modelBuilder.Entity("MinecraftWrapper.Models.UserPreference", b =>
+                {
+                    b.HasOne("MinecraftWrapper.Models.AuthorizedUser", "User")
+                        .WithMany("UserPreferences")
                         .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618

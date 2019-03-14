@@ -13,6 +13,9 @@ using MinecraftWrapper.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MinecraftWrapper.Models;
+using MinecraftWrapper.Services;
+using System.ComponentModel.Design;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace MinecraftWrapper
 {
@@ -30,24 +33,28 @@ namespace MinecraftWrapper
         {
             services.Configure<CookiePolicyOptions> ( options =>
               {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
+                  // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                  options.CheckConsentNeeded = context => true;
                   options.MinimumSameSitePolicy = SameSiteMode.None;
               } );
 
             services.AddDbContext<ApplicationDbContext> ( options =>
-                  options.UseSqlServer (
-                      Configuration.GetConnectionString ( "DefaultConnection" ) ) );
+                  {
+                      options.UseSqlServer (
+                          Configuration.GetConnectionString ( "DefaultConnection" ) );
+                  }, contextLifetime: ServiceLifetime.Transient, optionsLifetime: ServiceLifetime.Transient );
 
-            services.AddDefaultIdentity<IdentityUser> (options =>
-            {
-                options.Password.RequiredLength = 8;
-                options.Password.RequiredUniqueChars = 4;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireDigit = false;
-            } )
+
+            services.AddIdentity<AuthorizedUser, IdentityRole> ( options =>
+             {
+                 options.Password.RequiredLength = 8;
+                 options.Password.RequiredUniqueChars = 4;
+                 options.Password.RequireLowercase = false;
+                 options.Password.RequireNonAlphanumeric = false;
+                 options.Password.RequireUppercase = false;
+                 options.Password.RequireDigit = false;
+             } )
+                .AddDefaultTokenProviders ()
                 .AddEntityFrameworkStores<ApplicationDbContext> ();
 
             services.AddMvc ().SetCompatibilityVersion ( CompatibilityVersion.Version_2_1 )
@@ -65,12 +72,35 @@ namespace MinecraftWrapper
                 options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
             } );
 
+            services.Configure<ApplicationSettings> ( Configuration.GetSection ( "ApplicationSettings" ) );
+
+            services.AddAuthentication ()
+                .AddGoogle ( options =>
+                {
+                    options.ClientId = Configuration[ "Authentication:Google:ClientId" ];
+                    options.ClientSecret = Configuration[ "Authentication:Google:ClientSecret" ];
+                } );
+
             services.AddTransient<UserRepository> ();
+            services.AddTransient<SystemRepository> ();
+            services.AddTransient<IEmailSender, SendGridSender> ();
+            services.AddTransient<WhiteListService> ();
+            services.AddTransient<DiscordService> ();
+
+            services.AddSingleton<StatusService> ();
+            services.AddSingleton<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
+            services.AddSingleton<MinecraftMessageParser> ();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure ( IApplicationBuilder app, IHostingEnvironment env )
+        public void Configure ( IApplicationBuilder app, IHostingEnvironment env, IServiceProvider provider )
         {
+            //using ( var scope = provider.CreateScope () )
+            //{
+                var wrapper = provider.GetService<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
+                wrapper.Start ();
+            //}
+
             if ( env.IsDevelopment () )
             {
                 app.UseDeveloperExceptionPage ();

@@ -1,0 +1,51 @@
+﻿@model IEnumerable<MinecraftWrapper.Data.WhiteListEntry>
+
+    @{
+    ViewData["Title"] = "Manage White List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    <h2>White List</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.xuid)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ignoresPlayerLimit)
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.xuid)
+                </td>
+                <td>
+                    @item.ignoresPlayerLimit
+                </td>
+                <td>
+                    @Html.ActionLink("Delete", "DeleteWhiteListEntry", new { item.name }, new { onclick = "return confirm('Are you sure you wish to delete this entry?');" } )
+                </td>
+            </tr>
+}
+        </tbody>
+    </table>
+
+<form action="AddWhiteListEntry" method="post">
+    <label>Name</label>
+    <input type="text" name="name" />
+    <input type="submit" value="Add"/>
+</form>
