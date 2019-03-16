@@ -43,23 +43,18 @@ namespace MinecraftWrapper.Services
         /// <returns>Returns true if the needle was found and the status was successfully updated</returns>
         private bool ChangePlayerOnlineStatus(string needle, string haystack, bool status )
         {
-            needle = needle.ToLower ();
-            haystack = haystack.ToLower ();
-
-            Regex regex = new Regex ( $"{needle}(\\d+)" );
+            Regex regex = new Regex ( $"{needle}(.+?)\\b", RegexOptions.IgnoreCase);
             var matches = regex.Matches ( haystack );
 
             if ( matches.Count () > 0 )
             {
-                var id = matches[ 0 ].Groups[ 1 ].Value;
-                _statusService.UpdateUserStatus ( id, status );
+                var gamerTag = matches[ 0 ].Groups[ 1 ].Value;
+                _statusService.UpdateUserStatus ( gamerTag, status );
 
-                var player = _whiteListService.GetWhiteListEntries ().SingleOrDefault ( w => w.xuid == id );
-
-                if ( status && player != null )
+                if ( status && gamerTag != null )
                 {
                     // Player has logged in, notify Discord
-                    _discordService.SendWebhookMessage ( $"{player.name} has logged in!" );
+                    _discordService.SendWebhookMessage ( $"{gamerTag} has logged in!" );
                 }
 
                 return true;
