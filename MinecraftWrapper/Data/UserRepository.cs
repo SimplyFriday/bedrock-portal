@@ -17,22 +17,9 @@ namespace MinecraftWrapper.Data
             _context = context;
         }
 
-        public AuthorizationKey GetAuthorizationKeyByToken ( string authorizationToken )
+        public IQueryable<ApplicationUser> GetAllUsers ()
         {
-            return _context.AuthorizationKey.SingleOrDefault ( key => key.AuthorizationToken == authorizationToken );
-        }
-
-        public AuthorizationKey ReserveAuthorizationKey ( AuthorizationKey key, string userId )
-        {
-            key.UserId = userId;
-            _context.SaveChanges ();
-            return key;
-        }
-        
-        public IQueryable<AuthorizedUser> GetUsers ()
-        {
-            return _context.Users
-                .Include ( u => u.AuthorizationKey );
+            return _context.Users;
         }
 
         public async Task<bool> SaveUserPreferance ( UserPreference userPreference )
@@ -82,7 +69,7 @@ namespace MinecraftWrapper.Data
             await _context.SaveChangesAsync ();
         }
 
-        public async void SaveUserAsync ( AuthorizedUser user )
+        public async void SaveUserAsync ( ApplicationUser user )
         {
             _context.Users.Update ( user );
             await _context.SaveChangesAsync ();

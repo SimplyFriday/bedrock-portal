@@ -21,11 +21,11 @@ namespace MinecraftWrapper.Controllers
     {
         private readonly ConsoleApplicationWrapper<MinecraftMessageParser> _wrapper;
         private readonly UserRepository _userRepository;
-        private readonly UserManager<AuthorizedUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly WhiteListService _whiteListService;
         private readonly ApplicationSettings _applicationSettings;
 
-        public UserActionsController ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, UserRepository userRepository, UserManager<AuthorizedUser> userManager, WhiteListService whiteListService, IOptions<ApplicationSettings> applicationSettings )
+        public UserActionsController ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, UserRepository userRepository, UserManager<ApplicationUser> userManager, WhiteListService whiteListService, IOptions<ApplicationSettings> applicationSettings )
         {
             _wrapper = wrapper;
             _userRepository = userRepository;
@@ -229,7 +229,7 @@ namespace MinecraftWrapper.Controllers
             return true;
         }
 
-        private async Task<IEnumerable<string>> GetCommandsForUser ( AuthorizedUser user )
+        private async Task<IEnumerable<string>> GetCommandsForUser ( ApplicationUser user )
         {
             var roles = await _userManager.GetRolesAsync ( user );
 

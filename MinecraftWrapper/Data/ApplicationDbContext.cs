@@ -4,14 +4,13 @@ using MinecraftWrapper.Models;
 
 namespace MinecraftWrapper.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<AuthorizedUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext ( DbContextOptions<ApplicationDbContext> options )
             : base ( options )
         {
         }
 
-        public DbSet<AuthorizationKey> AuthorizationKey { get; set; }
         public DbSet<ApplicationLog> ApplicationLog { get; set; }
         public DbSet<NewsItem> NewsItem { get; set; }
         public DbSet<UserPreference> UserPreference { get; set; }

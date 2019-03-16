@@ -14,7 +14,7 @@ namespace MinecraftWrapper.Models
 
         [ForeignKey("User")]
         public virtual string UserId { get; set; }
-        public virtual AuthorizedUser User { get; set; }
+        public virtual ApplicationUser User { get; set; }
     }
 
     public enum UserPreferenceType

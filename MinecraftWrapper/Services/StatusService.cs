@@ -28,7 +28,7 @@ namespace MinecraftWrapper.Services
             using ( var scope = _serviceProvider.CreateScope () )
             {
                 var userRepository = scope.ServiceProvider.GetService<UserRepository> ();
-                var allUsers = userRepository.GetUsers ();
+                var allUsers = userRepository.GetAllUsers ();
 
                 foreach ( var user in allUsers )
                 {
@@ -52,7 +52,7 @@ namespace MinecraftWrapper.Services
             using ( var scope = _serviceProvider.CreateScope () )
             {
                 var user = scope.ServiceProvider.GetService<UserRepository> ()
-                    .GetUsers ()
+                    .GetAllUsers ()
                     .Where ( u => u.Id == userId )
                     .SingleOrDefault ();
 

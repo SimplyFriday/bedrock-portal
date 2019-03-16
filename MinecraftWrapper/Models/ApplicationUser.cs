@@ -1,17 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 
 namespace MinecraftWrapper.Models
 {
-    public class AuthorizedUser : IdentityUser
+    public class ApplicationUser : IdentityUser
     {
-        [Required]
-        public virtual AuthorizationKey AuthorizationKey { get; set; }
-        
         public string Bio { get; set; }
 
         [StringLength ( 255 )]
@@ -20,6 +14,7 @@ namespace MinecraftWrapper.Models
         [StringLength ( 255 )]
         public string DiscordId { get; set; }
 
+        public ulong xuid { get; set; }
 
         public virtual IEnumerable<UserPreference> UserPreferences { get; set; }
     }

@@ -17,16 +17,16 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class ExternalLoginModel : PageModel
     {
-        private readonly SignInManager<AuthorizedUser> _signInManager;
-        private readonly UserManager<AuthorizedUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<ExternalLoginModel> _logger;
         private readonly UserRepository _userRepository;
 
-        public ExternalLoginModel(
-            SignInManager<AuthorizedUser> signInManager,
-            UserManager<AuthorizedUser> userManager,
+        public ExternalLoginModel (
+            SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager,
             ILogger<ExternalLoginModel> logger,
-            UserRepository userRepository)
+            UserRepository userRepository )
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -51,112 +51,102 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account
             public string Email { get; set; }
 
             [Required]
-            [StringLength(16, MinimumLength = 16)]
+            [StringLength ( 16, MinimumLength = 16 )]
             public string AuthorizationToken { get; set; }
         }
 
-        public IActionResult OnGetAsync()
+        public IActionResult OnGetAsync ()
         {
-            return RedirectToPage("./Login");
+            return RedirectToPage ( "./Login" );
         }
 
-        public IActionResult OnPost(string provider, string returnUrl = null)
+        public IActionResult OnPost ( string provider, string returnUrl = null )
         {
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new { returnUrl });
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-            return new ChallengeResult(provider, properties);
+            return new ChallengeResult ( provider, properties );
         }
 
-        public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = null, string remoteError = null)
+        public async Task<IActionResult> OnGetCallbackAsync ( string returnUrl = null, string remoteError = null )
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
-            if (remoteError != null)
+            returnUrl = returnUrl ?? Url.Content ( "~/" );
+            if ( remoteError != null )
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";
-                return RedirectToPage("./Login", new {ReturnUrl = returnUrl });
+                return RedirectToPage ( "./Login", new { ReturnUrl = returnUrl } );
             }
             var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
+            if ( info == null )
             {
                 ErrorMessage = "Error loading external login information.";
-                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                return RedirectToPage ( "./Login", new { ReturnUrl = returnUrl } );
             }
 
             // Sign in the user with this external login provider if the user already has a login.
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor : true);
-            if (result.Succeeded)
+            if ( result.Succeeded )
             {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
-                return LocalRedirect(returnUrl);
+                _logger.LogInformation ( "{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider );
+                return LocalRedirect ( returnUrl );
             }
-            if (result.IsLockedOut)
+            if ( result.IsLockedOut )
             {
-                return RedirectToPage("./Lockout");
+                return RedirectToPage ( "./Lockout" );
             }
             else
             {
                 // If the user does not have an account, then ask the user to create an account.
                 ReturnUrl = returnUrl;
                 LoginProvider = info.LoginProvider;
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+                if ( info.Principal.HasClaim ( c => c.Type == ClaimTypes.Email ) )
                 {
                     Input = new InputModel
                     {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
+                        Email = info.Principal.FindFirstValue ( ClaimTypes.Email )
                     };
                 }
-                return Page();
+                return Page ();
             }
         }
 
-        public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null)
+        public async Task<IActionResult> OnPostConfirmationAsync ( string returnUrl = null )
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+            returnUrl = returnUrl ?? Url.Content ( "~/" );
             // Get the information about the user from the external login provider
             var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
+            if ( info == null )
             {
                 ErrorMessage = "Error loading external login information during confirmation.";
-                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                return RedirectToPage ( "./Login", new { ReturnUrl = returnUrl } );
             }
 
-            if (ModelState.IsValid)
+            if ( ModelState.IsValid )
             {
-                var user = new AuthorizedUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
 
-                var key = _userRepository.GetAuthorizationKeyByToken ( Input.AuthorizationToken );
-
-                if ( key != null && string.IsNullOrEmpty ( key.UserId ) )
+                var result = await _userManager.CreateAsync ( user );
+                if ( result.Succeeded )
                 {
-                    var result = await _userManager.CreateAsync ( user );
+                    result = await _userManager.AddLoginAsync ( user, info );
                     if ( result.Succeeded )
                     {
-                        result = await _userManager.AddLoginAsync ( user, info );
-                        if ( result.Succeeded )
-                        {
-                            await _signInManager.SignInAsync ( user, isPersistent: false );
-                            _userRepository.ReserveAuthorizationKey ( key, user.Id );
-                            _logger.LogInformation ( "User created an account using {Name} provider.", info.LoginProvider );
-                            return LocalRedirect ( returnUrl );
-                        }
+                        await _signInManager.SignInAsync ( user, isPersistent: false );
+                        _logger.LogInformation ( "User created an account using {Name} provider.", info.LoginProvider );
+                        return LocalRedirect ( returnUrl );
+                    }
 
-                        _userRepository.ReserveAuthorizationKey ( key, user.Id );
-                    }
-                    foreach ( var error in result.Errors )
-                    {
-                        ModelState.AddModelError ( string.Empty, error.Description );
-                    }
                 }
-                else
+                foreach ( var error in result.Errors )
                 {
-                    ModelState.AddModelError ( string.Empty, $"{Input.AuthorizationToken} is not a valid Authorization Token" );
+                    ModelState.AddModelError ( string.Empty, error.Description );
                 }
+
             }
 
             LoginProvider = info.LoginProvider;
             ReturnUrl = returnUrl;
-            return Page();
+            return Page ();
         }
     }
 }
