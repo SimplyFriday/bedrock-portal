@@ -49,10 +49,6 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account
             [Required]
             [EmailAddress]
             public string Email { get; set; }
-
-            [Required]
-            [StringLength ( 16, MinimumLength = 16 )]
-            public string AuthorizationToken { get; set; }
         }
 
         public IActionResult OnGetAsync ()
