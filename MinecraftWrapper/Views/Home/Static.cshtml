@@ -1,0 +1,16 @@
+﻿@model StaticPageViewModel
+
+@{
+    ViewData [ "Title" ] = "Community Guidelines";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if ( Model.HasContent )
+{
+    @Html.Raw( Model.Content )
+}
+else
+{
+    <h1>Not Found</h1>
+    <div>Sorry, it looks like this page doesn't exist!</div>
+}

@@ -3,16 +3,16 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Fresh Start</title>
+    <title>@ViewData [ "Title" ] - @Options.Value.ApplicationTitle</title>
 
     <environment include="Development">
-        <link rel="stylesheet" href="~/css/resets.css" asp-append-version="true"/>
+        <link rel="stylesheet" href="~/css/resets.css" asp-append-version="true" />
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/lib/summernote/dist/summernote.css"/>
+        <link rel="stylesheet" href="~/lib/summernote/dist/summernote.css" />
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="~/css/resets.min.css" asp-append-version="true"/>
+        <link rel="stylesheet" href="~/css/resets.min.css" asp-append-version="true" />
         <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
@@ -30,7 +30,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; 2018 - @SystemConstants.APPLICATION_NAME</p>
+            <p>&copy; @DateTime.Now.ToString("yyyy") - @Options.Value.ApplicationTitle</p>
         </footer>
     </div>
 
@@ -58,6 +58,6 @@
                 asp-fallback-src="~/lib/summernote/dist/summernote.js"></script>
     </environment>
 
-    @RenderSection("Scripts", required: false)
+    @RenderSection( "Scripts", required: false )
 </body>
 </html>

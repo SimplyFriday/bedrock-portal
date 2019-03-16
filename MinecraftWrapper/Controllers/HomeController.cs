@@ -94,10 +94,19 @@ namespace MinecraftWrapper.Controllers
             return _wrapper.StandardOutput;
         }
 
-        [HttpGet]
-        public IActionResult CommunityGuidelines()
+        [HttpGet( "[controller]/[action]/{pageName}" )]
+        public IActionResult Static ( string pageName )
         {
-            return View ();
+            var path = $"{_hostingEnvironment.ContentRootPath}/wwwroot/html_frag/{pageName}.html";
+            var model = new StaticPageViewModel { Title = "Content Not Found" };
+
+            if (System.IO.File.Exists( path ) )
+            {
+                model.Content = System.IO.File.ReadAllText ( path );
+                model.Title = pageName;
+            }
+
+            return View ( model );
         }
     }
 }

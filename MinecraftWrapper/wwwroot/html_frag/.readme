@@ -1,0 +1,10 @@
+﻿Any .html file in this directory can be read in by the application and displayed using /home/static/FileName
+
+e.g.
+
+You add MyStaticFile.html, whith some fancy html in it. Now all you need to do is navigate to /home/static/MyStaticFile and it will get rendered inside
+the normal application UI.
+
+If you want a navbar link, add it to the StaticMenuLinks section in appsettings.json
+
+See the sample CommunityGuidelines.html for an example
