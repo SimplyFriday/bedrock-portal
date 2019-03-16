@@ -11,8 +11,15 @@ namespace MinecraftWrapper.Models
     {
         [Required]
         public virtual AuthorizationKey AuthorizationKey { get; set; }
+        
+        public string Bio { get; set; }
 
-        public virtual AdditionalUserData AdditionalUserData { get; set; }
+        [StringLength ( 255 )]
+        public string GamerTag { get; set; }
+
+        [StringLength ( 255 )]
+        public string DiscordId { get; set; }
+
 
         public virtual IEnumerable<UserPreference> UserPreferences { get; set; }
     }

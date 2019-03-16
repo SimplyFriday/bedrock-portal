@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MinecraftWrapper.Data;
 using MinecraftWrapper.Models;
+using Serilog;
 
 namespace MinecraftWrapper.Controllers
 {
     [Authorize (Roles = "Admin")]
     public class NewsController : Controller
     {
+        // TODO refactor into service/repository
         private readonly ApplicationDbContext _context;
 
         public NewsController(ApplicationDbContext context)
@@ -63,6 +65,9 @@ namespace MinecraftWrapper.Controllers
                 newsItem.NewsItemId = Guid.NewGuid();
                 _context.Add(newsItem);
                 await _context.SaveChangesAsync();
+
+                Log.Information ( "{User} created a NewArticle with ID {NewsItemId}", HttpContext.User.Identity.Name, newsItem.NewsItemId );
+
                 return RedirectToAction(nameof(Index));
             }
             return View(newsItem);

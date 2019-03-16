@@ -47,14 +47,16 @@ namespace MinecraftWrapper.Controllers
         {
             var preferences = _userRepository.GetUserPreferencesByUserId ( user.Id )
                                              .Where ( p => p.UserPreferenceType == UserPreferenceType.SavedTickingArea )
-                                             .Select ( p => p.Value )
                                              .ToList ();
 
             var tickingAreas = new List<SavedTickingArea> ();
 
             foreach ( var p in preferences )
             {
-                tickingAreas.Add ( JsonConvert.DeserializeObject<SavedTickingArea> ( p ) );
+                var ta = JsonConvert.DeserializeObject<SavedTickingArea> ( p.Value );
+                ta.PreferenceId = p.UserPreferenceId;
+
+                tickingAreas.Add ( ta );
             }
 
             return tickingAreas;
@@ -64,16 +66,15 @@ namespace MinecraftWrapper.Controllers
         public async Task<IActionResult> UpdateTickingArea ( UpdateTickingAreaViewModel model )
         {
             var user = await _userManager.GetUserAsync ( HttpContext.User );
-            var data = _userRepository.GetAdditionalUserDataByUserId ( user.Id );
             
-            if ( string.IsNullOrEmpty ( data?.GamerTag ) )
+            if ( string.IsNullOrEmpty ( user.GamerTag ) )
             {
                 ModelState.AddModelError ( "", SystemConstants.NO_GAMERTAG_ERROR );
             }
             else
             {
-                _wrapper.SendInput ( $"tickingarea remove {data.GamerTag}", null );
-                _wrapper.SendInput ( $"tickingarea add circle {model.XCoord} 0 {model.ZCoord} 1 {data.GamerTag}", null );
+                _wrapper.SendInput ( $"tickingarea remove {user.GamerTag}", null );
+                _wrapper.SendInput ( $"tickingarea add circle {model.XCoord} 0 {model.ZCoord} 1 {user.GamerTag}", null );
 
                 if ( !string.IsNullOrEmpty ( model.Name ) )
                 {
@@ -110,9 +111,7 @@ namespace MinecraftWrapper.Controllers
 
             if ( lastUsed == null || lastUsed.Value.AddSeconds(SystemConstants.CLEAR_MOBS_COOLDOWN) < DateTime.UtcNow )
             {
-                var data = _userRepository.GetAdditionalUserDataByUserId(user.Id);
-
-                if ( data?.GamerTag != null )
+                if ( user.GamerTag != null )
                 {
                     var newRequest = new UtilityRequest { RequestTime = DateTime.UtcNow, UserId = user.Id, UtilityRequestType = UtilityRequestType.ClearMobs };
                     _userRepository.SaveUtilityRequestAsync ( newRequest );
@@ -120,9 +119,10 @@ namespace MinecraftWrapper.Controllers
 
                     foreach ( var mob in _applicationSettings.MobsToClear )
                     {
-                        var command = $"execute {data.GamerTag} ~ ~ ~ kill @e[r=65, type={mob}, name=!KEEPME]";
+                        var command = $"execute {user.GamerTag} ~ ~ ~ kill @e[r=65, type={mob}, name=!KEEPME]";
                         _wrapper.SendInput ( command, null );
 
+                        // These guys area special because they need to be killed several times, and it takes some time before the smaller ones spawn.
                         if (mob == "slime" || mob == "magma_cube" )
                         {
                             Thread.Sleep ( 1000 );
@@ -133,7 +133,7 @@ namespace MinecraftWrapper.Controllers
                 }
                 else
                 {
-                    if ( string.IsNullOrEmpty ( data?.GamerTag ) )
+                    if ( string.IsNullOrEmpty ( user.GamerTag ) )
                     {
                         ViewBag.Status = SystemConstants.NO_GAMERTAG_ERROR;
                     }
@@ -176,7 +176,29 @@ namespace MinecraftWrapper.Controllers
             return View ();
         }
 
-        [Authorize ( Roles = "Admin,Moderator" )]
+        [HttpDelete]
+        public async Task<bool> DeleteSavedTickingArea ([FromQuery] string name )
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                var tickingAreas = GetTickingAreasByUser ( user );
+
+                var itemsToRemove = tickingAreas
+                                    .Where(ta => ta.Name == name)
+                                    .Select(ta=>ta.PreferenceId);
+
+                _userRepository.DeleteUserPreferencesByIdAsync ( itemsToRemove );
+            } catch
+            {
+                // TODO log something, jackass
+                return false;
+            }
+
+            return true;
+        }
+
+        [ Authorize ( Roles = "Admin,Moderator" )]
         [HttpPost]
         public async Task<bool> SendConsoleInput ([FromBody] string input)
         {

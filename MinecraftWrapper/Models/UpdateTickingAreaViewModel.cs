@@ -15,6 +15,8 @@ namespace MinecraftWrapper.Models
 
         public class SavedTickingArea
         {
+            public Guid PreferenceId { get; set; }
+
             public float XCoord { get; set; }
             public float ZCoord { get; set; }
             public string Name { get; set; }

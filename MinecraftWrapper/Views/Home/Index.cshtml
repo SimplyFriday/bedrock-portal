@@ -39,7 +39,7 @@
         {
             var divClass = "";
 
-            @if ( !string.IsNullOrEmpty ( user?.AdditionalUserData?.GamerTag ) )
+            @if ( !string.IsNullOrEmpty ( user?.GamerTag ) )
             {
                 <div class="col-md-4">
                     @if ( statusService.GetUserStatus ( user.Id ) )
@@ -51,11 +51,11 @@
                         divClass = "panel panel-default";
                     }
                     <div class="@divClass">
-                        <button class="super-clean panel-heading headerbutton" data-toggle="collapse" href="#@user.AdditionalUserData.GamerTag">
-                            <h3 class="panel-title">@user.AdditionalUserData.GamerTag</h3>
+                        <button class="super-clean panel-heading headerbutton" data-toggle="collapse" href="#@user.GamerTag">
+                            <h3 class="panel-title">@user.GamerTag</h3>
                         </button>
-                        <div id="@user.AdditionalUserData.GamerTag" class="panel-body collapse">
-                            @user.AdditionalUserData.Bio
+                        <div id="@user.GamerTag" class="panel-body collapse">
+                            @user.Bio
                         </div>
                     </div>
                 </div>

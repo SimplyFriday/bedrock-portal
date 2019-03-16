@@ -28,31 +28,11 @@ namespace MinecraftWrapper.Data
             _context.SaveChanges ();
             return key;
         }
-
-        public AdditionalUserData GetAdditionalUserDataByUserId ( string userId )
-        {
-            return _context.AdditionalUserData.SingleOrDefault ( data => data.UserId == userId );
-        }
-
-        public IQueryable<AuthorizedUser> GetUsersWithData ()
+        
+        public IQueryable<AuthorizedUser> GetUsers ()
         {
             return _context.Users
-                .Include ( u => u.AdditionalUserData )
                 .Include ( u => u.AuthorizationKey );
-        }
-
-        public void SaveAdditionalData ( AdditionalUserData data )
-        {
-            if ( data.AdditionalUserDataId == Guid.Empty )
-            {
-                _context.AdditionalUserData.Add ( data );
-            }
-            else
-            {
-                _context.AdditionalUserData.Update ( data );
-            }
-
-            _context.SaveChanges ();
         }
 
         public async Task<bool> SaveUserPreferance ( UserPreference userPreference )
@@ -86,6 +66,25 @@ namespace MinecraftWrapper.Data
         public async void SaveUtilityRequestAsync ( UtilityRequest newRequest )
         {
             _context.UtilityRequest.Add ( newRequest );
+            await _context.SaveChangesAsync ();
+        }
+
+        public async void DeleteUserPreferencesByIdAsync ( IEnumerable<Guid> ids )
+        {
+            foreach ( var id in ids ) 
+            {
+                var preference = new UserPreference {UserPreferenceId = id};
+
+                _context.UserPreference.Attach ( preference );
+                _context.UserPreference.Remove ( preference );
+            }
+
+            await _context.SaveChangesAsync ();
+        }
+
+        public async void SaveUserAsync ( AuthorizedUser user )
+        {
+            _context.Users.Update ( user );
             await _context.SaveChangesAsync ();
         }
     }

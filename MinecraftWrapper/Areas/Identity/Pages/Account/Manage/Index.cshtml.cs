@@ -73,16 +73,14 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account.Manage
             var email = await _userManager.GetEmailAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
-            var data = _userRepository.GetAdditionalUserDataByUserId ( user.Id );
-
             Username = userName;
 
             Input = new InputModel
             {
                 Email = email,
                 PhoneNumber = phoneNumber,
-                GamerTag = data?.GamerTag,
-                Bio = data?.Bio
+                GamerTag = user.GamerTag,
+                Bio = user.Bio
             };
 
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
@@ -125,20 +123,12 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account.Manage
                 }
             }
 
-            var data = _userRepository.GetAdditionalUserDataByUserId ( user.Id );
-
-            if ( data == null )
+            if ( user.GamerTag != Input.GamerTag ||
+                 user.Bio != Input.Bio )
             {
-                data = new AdditionalUserData { UserId = user.Id };
-            }
-
-            if ( data.GamerTag != Input.GamerTag ||
-                 data.Bio != Input.Bio ||
-                 data.AdditionalUserDataId == Guid.Empty )
-            {
-                data.GamerTag = Input.GamerTag;
-                data.Bio = Input.Bio;
-                _userRepository.SaveAdditionalData ( data );
+                user.GamerTag = Input.GamerTag;
+                user.Bio = Input.Bio;
+                _userRepository.SaveUserAsync ( user );
             }
 
             await _signInManager.RefreshSignInAsync(user);
