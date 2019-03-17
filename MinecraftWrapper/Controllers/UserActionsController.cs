@@ -223,6 +223,10 @@ namespace MinecraftWrapper.Controllers
                 {
                     _wrapper.SendInput ( input, user.Id );
                 }
+                else
+                {
+                    _wrapper.AddEphemeralMessage ( $"You do not have permission to run the command '{input}'", user.Id );
+                }
                 
             }
 
@@ -246,7 +250,7 @@ namespace MinecraftWrapper.Controllers
             {
                 if (roles.Any(r=>r.ToLower() == crw.RoleName.ToLower () ) )
                 {
-                    commands.AddRange ( crw.Commands.Where ( c => !commands.Any ( x => x.ToLower () != c.ToLower () ) ) );
+                    commands.AddRange ( crw.Commands );
                 }
             }
 

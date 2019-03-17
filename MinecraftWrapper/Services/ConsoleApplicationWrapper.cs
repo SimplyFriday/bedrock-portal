@@ -21,7 +21,7 @@ namespace MinecraftWrapper.Services
         private Process _proc = null;
 
         private readonly IServiceProvider _serviceProvider;
-        public IMessageParser MessageParser { get; private set;  }
+        public IMessageParser MessageParser { get; private set; }
 
         private Queue<ApplicationLog> _standardOutputQueue = new Queue<ApplicationLog> ();
         public IEnumerable<string> StandardOutput
@@ -46,7 +46,7 @@ namespace MinecraftWrapper.Services
 
         private IMessageParser CreateMessageParser ()
         {
-            using (var scope = _serviceProvider.CreateScope () )
+            using ( var scope = _serviceProvider.CreateScope () )
             {
                 return scope.ServiceProvider.GetService<TParser> ();
             }
@@ -91,7 +91,7 @@ namespace MinecraftWrapper.Services
             _proc.BeginOutputReadLine ();
         }
 
-        private void HandleOutput(string output, ApplicationLogType type )
+        private void HandleOutput ( string output, ApplicationLogType type )
         {
             if ( !string.IsNullOrEmpty ( output ) )
             {
@@ -158,17 +158,38 @@ namespace MinecraftWrapper.Services
             _proc.Dispose ();
         }
 
-        private void LogInputOutput (ApplicationLog log )
+        private void LogInputOutput ( ApplicationLog log )
         {
             LogInputOutput ( new List<ApplicationLog> { log } );
         }
 
         private void LogInputOutput ( IEnumerable<ApplicationLog> logs )
         {
-            using (var scope = _serviceProvider.CreateScope () )
+            using ( var scope = _serviceProvider.CreateScope () )
             {
                 var repo = scope.ServiceProvider.GetService<SystemRepository> ();
                 repo.SaveApplicationLogs ( logs );
+            }
+        }
+
+        /// <summary>
+        /// This is only used to provide user feedback and is never actually sent to the underlying console application
+        /// </summary>
+        /// <param name="message">The message to add to the input/output queue</param>
+        public void AddEphemeralMessage ( string message, string userId )
+        {
+            if ( !string.IsNullOrEmpty ( message ) )
+            {
+                var log = new ApplicationLog
+                {
+                    ApplicationLogType = ApplicationLogType.Stdin,
+                    LogTime = DateTime.UtcNow,
+                    LogText = message,
+                    UserId = userId
+                };
+
+                _standardOutputQueue.Enqueue ( log );
+                LogInputOutput ( log );
             }
         }
     }
