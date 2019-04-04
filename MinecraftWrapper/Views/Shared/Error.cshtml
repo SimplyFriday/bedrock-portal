@@ -12,3 +12,11 @@
         <strong>Request ID:</strong> <code>@Model.RequestId</code>
     </p>
 }
+
+@if ( Model.ShowException )
+{
+    <p>
+        <span>@Model.Exception.Message:</span>
+        <span>@Model.Exception.StackTrace</span>
+    </p>
+}

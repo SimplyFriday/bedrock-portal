@@ -1,0 +1,56 @@
+﻿@model MinecraftWrapper.Data.Entities.StoreItem
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>StoreItem</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="StoreItemId" />
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StoreItemTypeId" class="control-label"></label>
+                <select asp-for="StoreItemTypeId" class="form-control" asp-items="Html.GetEnumSelectList<StoreItemType>()"></select>
+                <span asp-validation-for="StoreItemTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MinimumRank" class="control-label"></label>
+                <input asp-for="MinimumRank" class="form-control" />
+                <span asp-validation-for="MinimumRank" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Effect" class="control-label"></label>
+                <input asp-for="Effect" class="form-control" />
+                <span asp-validation-for="Effect" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="EditIndex">Back to List</a>
+</div>
+

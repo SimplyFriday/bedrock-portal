@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using MinecraftWrapper.Data;
-using MinecraftWrapper.Models;
+using MinecraftWrapper.Data.Entities;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace MinecraftWrapper.Areas.Identity.Pages.Account
 {
@@ -49,6 +46,17 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account
             [Required]
             [EmailAddress]
             public string Email { get; set; }
+
+
+            [Required]
+            [Display ( Name = "Discord Handle" )]
+            [MaxLength ( 255 )]
+            public string DiscordHandle { get; set; }
+
+            [Required]
+            [Display ( Name = "Gamer Tag" )]
+            [MaxLength ( 255 )]
+            public string GamerTag { get; set; }
         }
 
         public IActionResult OnGetAsync ()
@@ -119,7 +127,7 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account
 
             if ( ModelState.IsValid )
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, GamerTag = Input.GamerTag, EmailConfirmed = true, DiscordId = Input.DiscordHandle };
 
                 var result = await _userManager.CreateAsync ( user );
                 if ( result.Succeeded )

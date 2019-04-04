@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using MinecraftWrapper.Data;
+using MinecraftWrapper.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -14,12 +18,19 @@ namespace MinecraftWrapper.Services
         private readonly StatusService _statusService;
         private readonly WhiteListService _whiteListService;
         private readonly DiscordService _discordService;
+        private readonly UserRepository _userRepository;
+        private readonly MinecraftStoreService _minecraftStoreService;
+        private readonly ApplicationSettings _applicationSettings;
 
-        public MinecraftMessageParser ( StatusService statusService, WhiteListService whiteListService, DiscordService discordService )
+        public MinecraftMessageParser ( StatusService statusService, WhiteListService whiteListService, DiscordService discordService, UserRepository userRepository,
+            MinecraftStoreService minecraftStoreService, IOptions<ApplicationSettings> options)
         {
             _statusService = statusService;
             _whiteListService = whiteListService;
             _discordService = discordService;
+            _userRepository = userRepository;
+            _minecraftStoreService = minecraftStoreService;
+            _applicationSettings = options.Value;
         }
 
         public bool FilterInput ( string input )
@@ -28,10 +39,10 @@ namespace MinecraftWrapper.Services
             return true;
         }
 
-        public void HandleOutput ( string output )
+        public async void HandleOutput ( string output )
         {
-            ChangePlayerOnlineStatus ( PLAYER_CONNECTED, output, true );
-            ChangePlayerOnlineStatus ( PLAYER_DISCONNECTED, output, false );
+            await ChangePlayerOnlineStatus ( PLAYER_CONNECTED, output, true );
+            await ChangePlayerOnlineStatus ( PLAYER_DISCONNECTED, output, false );
         }
 
         /// <summary>
@@ -41,15 +52,29 @@ namespace MinecraftWrapper.Services
         /// <param name="haystack">Text to search</param>
         /// <param name="status">What to change the player's online state to - true for logged in, false for logged out</param>
         /// <returns>Returns true if the needle was found and the status was successfully updated</returns>
-        private bool ChangePlayerOnlineStatus(string needle, string haystack, bool status )
+        private async Task<bool> ChangePlayerOnlineStatus(string needle, string haystack, bool status )
         {
             Regex regex = new Regex ( $"{needle}(.+?)\\b", RegexOptions.IgnoreCase);
             var matches = regex.Matches ( haystack );
-
+            
             if ( matches.Count () > 0 )
             {
                 var gamerTag = matches[ 0 ].Groups[ 1 ].Value;
                 _statusService.UpdateUserStatus ( gamerTag, status );
+
+                var user = await _userRepository.GetUserByGamerTagAsync ( gamerTag );
+
+                if ( user != null && ( user.LastLoginReward == null || user.LastLoginReward.Value.AddDays ( 1 ) <= DateTime.UtcNow ) )
+                {
+                    // daily login bonus
+                    _minecraftStoreService.AddCurrencyForUser ( gamerTag, _applicationSettings.DailyLoginBonus );
+                    user.LastLoginReward = DateTime.UtcNow;
+                }
+
+                user.LastMinecraftLogin = DateTime.UtcNow;
+                _userRepository.SaveUserAsync ( user );
+
+
 
                 if ( status && gamerTag != null )
                 {

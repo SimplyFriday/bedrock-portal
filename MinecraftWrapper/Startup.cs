@@ -8,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MinecraftWrapper.Data;
-using MinecraftWrapper.Models;
+using MinecraftWrapper.Data.Constants;
+using MinecraftWrapper.Data.Entities;
 using MinecraftWrapper.Services;
 using Serilog;
 using Serilog.Events;
@@ -16,6 +17,8 @@ using Serilog.Sinks.MSSqlServer;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MinecraftWrapper
 {
@@ -83,11 +86,14 @@ namespace MinecraftWrapper
                     options.ClientSecret = Configuration[ "Authentication:Google:ClientSecret" ];
                 } );
 
+            // We're doing some crazy stuff with singletons, so basically everything is either transient or singleton.
             services.AddTransient<UserRepository> ();
             services.AddTransient<SystemRepository> ();
             services.AddTransient<IEmailSender, SendGridSender> ();
             services.AddTransient<WhiteListService> ();
             services.AddTransient<DiscordService> ();
+            services.AddTransient<MinecraftStoreService> ();
+            services.AddTransient<StoreRepository> ();
 
             services.AddSingleton<StatusService> ();
             services.AddSingleton<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
@@ -121,10 +127,7 @@ namespace MinecraftWrapper
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure ( IApplicationBuilder app, IHostingEnvironment env, IServiceProvider provider )
-        {
-            var wrapper = provider.GetService<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
-            wrapper.Start ();
-            
+        {            
             app.UseExceptionHandler ( "/Home/Error" );
 
             if ( !env.IsDevelopment () )
@@ -144,6 +147,30 @@ namespace MinecraftWrapper
                       name: "default",
                       template: "{controller=Home}/{action=Index}/{id?}" );
               } );
+
+            CreateDefaultRoles ( provider ).Wait ();
+
+            // Moved this to last because it takes a ton of resources
+            var wrapper = provider.GetService<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
+            wrapper.Start ();
+        }
+        
+        private async Task CreateDefaultRoles ( IServiceProvider serviceProvider )
+        {
+            var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var defaultRoles = new string[] { "Admin", "Moderator" };
+
+            foreach ( var role in defaultRoles )
+            {
+                IdentityResult roleResult;
+                var roleCheck = await RoleManager.RoleExistsAsync(role);
+
+                if ( !roleCheck )
+                {
+                    //create the roles and seed them to the database
+                    roleResult = await RoleManager.CreateAsync ( new IdentityRole ( role ) );
+                }
+            }
         }
     }
 }

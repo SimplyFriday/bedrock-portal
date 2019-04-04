@@ -1,0 +1,44 @@
+﻿@model MinecraftWrapper.Data.Entities.StoreItem
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>@Html.DisplayFor( model => model.Title )</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.StoreItemTypeId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.StoreItemTypeId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MinimumRank)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MinimumRank)
+        </dd>@if ( !string.IsNullOrEmpty ( Model.Effect ) )
+        {
+            <dt>
+                @Html.DisplayNameFor( model => model.Effect )
+            </dt>
+            <dd>
+                @Html.DisplayFor( model => model.Effect )
+            </dd>
+        }
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.StoreItemId">Edit</a> |
+    <a asp-action="EditIndex">Back to List</a>
+</div>

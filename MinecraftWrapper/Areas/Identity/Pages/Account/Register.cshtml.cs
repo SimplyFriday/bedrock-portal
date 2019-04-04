@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using MinecraftWrapper.Data;
-using MinecraftWrapper.Models;
+using MinecraftWrapper.Data.Entities;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 
 namespace MinecraftWrapper.Areas.Identity.Pages.Account
 {
@@ -59,6 +57,16 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account
             [Display ( Name = "Confirm password" )]
             [Compare ( "Password", ErrorMessage = "The password and confirmation password do not match." )]
             public string ConfirmPassword { get; set; }
+
+            [Required]
+            [Display(Name = "Discord Handle")]
+            [MaxLength(255)]
+            public string DiscordHandle { get; set; }
+
+            [Required]
+            [Display ( Name = "Gamer Tag" )]
+            [MaxLength ( 255 )]
+            public string GamerTag { get; set; }
         }
 
         public void OnGet ( string returnUrl = null )
@@ -71,7 +79,7 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account
             returnUrl = returnUrl ?? Url.Content ( "~/" );
             if ( ModelState.IsValid )
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, GamerTag = Input.GamerTag, DiscordId = Input.DiscordHandle };
                 var result = await _userManager.CreateAsync ( user, Input.Password );
                 if ( result.Succeeded )
                 {

@@ -160,3 +160,33 @@ div::-webkit-scrollbar-thumb {
     display:block;
     width:100%;
 }
+
+.store-purchase {
+    display: block;
+    width: 100%;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    text-align: center;
+    transition: background 250ms ease-in-out, transform 150ms ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+    .store-purchase:active {
+        transform: scale(0.99);
+    }
+
+.store-available{
+    background-color:gold;
+}
+    .store-available:hover,
+    .store-available:focus {
+        background-color: darkgoldenrod;
+    }
+
+.menu-text {
+    background-color: #222222;
+    color: #999999;
+    display: block;
+    padding: 3px 20px;
+}

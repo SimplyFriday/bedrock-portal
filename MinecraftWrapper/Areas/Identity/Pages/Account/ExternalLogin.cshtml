@@ -23,6 +23,17 @@
                 <input asp-for="Input.Email" class="form-control" />
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="Input.DiscordHandle"></label>
+                <input asp-for="Input.DiscordHandle" class="form-control" />
+                <span asp-validation-for="Input.DiscordHandle" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.GamerTag"></label>
+                <input asp-for="Input.GamerTag" class="form-control" />
+                <span asp-validation-for="Input.GamerTag" class="text-danger"></span>
+            </div>
             <button type="submit" class="btn btn-default">Register</button>
         </form>
     </div>

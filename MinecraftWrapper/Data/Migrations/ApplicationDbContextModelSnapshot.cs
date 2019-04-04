@@ -129,7 +129,7 @@ namespace MinecraftWrapper.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("MinecraftWrapper.Models.ApplicationLog", b =>
+            modelBuilder.Entity("MinecraftWrapper.Data.Entities.ApplicationLog", b =>
                 {
                     b.Property<Guid>("ApplicationLogId")
                         .ValueGeneratedOnAdd();
@@ -148,7 +148,7 @@ namespace MinecraftWrapper.Data.Migrations
                     b.ToTable("ApplicationLog");
                 });
 
-            modelBuilder.Entity("MinecraftWrapper.Models.ApplicationUser", b =>
+            modelBuilder.Entity("MinecraftWrapper.Data.Entities.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -171,6 +171,10 @@ namespace MinecraftWrapper.Data.Migrations
                     b.Property<string>("GamerTag")
                         .HasMaxLength(255);
 
+                    b.Property<DateTime?>("LastLoginReward");
+
+                    b.Property<DateTime?>("LastMinecraftLogin");
+
                     b.Property<bool>("LockoutEnabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd");
@@ -187,6 +191,8 @@ namespace MinecraftWrapper.Data.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed");
 
+                    b.Property<int>("Rank");
+
                     b.Property<string>("SecurityStamp");
 
                     b.Property<bool>("TwoFactorEnabled");
@@ -194,7 +200,7 @@ namespace MinecraftWrapper.Data.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
 
-                    b.Property<decimal>("xuid")
+                    b.Property<decimal>("Xuid")
                         .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
 
                     b.HasKey("Id");
@@ -210,7 +216,7 @@ namespace MinecraftWrapper.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("MinecraftWrapper.Models.NewsItem", b =>
+            modelBuilder.Entity("MinecraftWrapper.Data.Entities.NewsItem", b =>
                 {
                     b.Property<Guid>("NewsItemId")
                         .ValueGeneratedOnAdd();
@@ -229,7 +235,56 @@ namespace MinecraftWrapper.Data.Migrations
                     b.ToTable("NewsItem");
                 });
 
-            modelBuilder.Entity("MinecraftWrapper.Models.UserPreference", b =>
+            modelBuilder.Entity("MinecraftWrapper.Data.Entities.StoreItem", b =>
+                {
+                    b.Property<Guid>("StoreItemId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("Effect")
+                        .HasMaxLength(450);
+
+                    b.Property<int>("MinimumRank");
+
+                    b.Property<decimal>("Price");
+
+                    b.Property<int>("StoreItemTypeId");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(40);
+
+                    b.HasKey("StoreItemId");
+
+                    b.ToTable("StoreItem");
+                });
+
+            modelBuilder.Entity("MinecraftWrapper.Data.Entities.UserCurrency", b =>
+                {
+                    b.Property<Guid>("UserCurrencyId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<decimal>("Amount");
+
+                    b.Property<int>("CurrencyTransactionReasonId");
+
+                    b.Property<int>("CurrencyTypeId");
+
+                    b.Property<DateTime>("DateNoted");
+
+                    b.Property<string>("UserId")
+                        .IsRequired();
+
+                    b.HasKey("UserCurrencyId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserCurrency");
+                });
+
+            modelBuilder.Entity("MinecraftWrapper.Data.Entities.UserPreference", b =>
                 {
                     b.Property<Guid>("UserPreferenceId")
                         .ValueGeneratedOnAdd();
@@ -247,7 +302,7 @@ namespace MinecraftWrapper.Data.Migrations
                     b.ToTable("UserPreference");
                 });
 
-            modelBuilder.Entity("MinecraftWrapper.Models.UtilityRequest", b =>
+            modelBuilder.Entity("MinecraftWrapper.Data.Entities.UtilityRequest", b =>
                 {
                     b.Property<Guid>("UtilityRequestId")
                         .ValueGeneratedOnAdd();
@@ -274,7 +329,7 @@ namespace MinecraftWrapper.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("MinecraftWrapper.Models.ApplicationUser")
+                    b.HasOne("MinecraftWrapper.Data.Entities.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -282,7 +337,7 @@ namespace MinecraftWrapper.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("MinecraftWrapper.Models.ApplicationUser")
+                    b.HasOne("MinecraftWrapper.Data.Entities.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -295,7 +350,7 @@ namespace MinecraftWrapper.Data.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("MinecraftWrapper.Models.ApplicationUser")
+                    b.HasOne("MinecraftWrapper.Data.Entities.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -303,15 +358,23 @@ namespace MinecraftWrapper.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("MinecraftWrapper.Models.ApplicationUser")
+                    b.HasOne("MinecraftWrapper.Data.Entities.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("MinecraftWrapper.Models.UserPreference", b =>
+            modelBuilder.Entity("MinecraftWrapper.Data.Entities.UserCurrency", b =>
                 {
-                    b.HasOne("MinecraftWrapper.Models.ApplicationUser", "User")
+                    b.HasOne("MinecraftWrapper.Data.Entities.ApplicationUser", "User")
+                        .WithMany("CurrencyLog")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("MinecraftWrapper.Data.Entities.UserPreference", b =>
+                {
+                    b.HasOne("MinecraftWrapper.Data.Entities.ApplicationUser", "User")
                         .WithMany("UserPreferences")
                         .HasForeignKey("UserId");
                 });

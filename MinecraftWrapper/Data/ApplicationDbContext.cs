@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MinecraftWrapper.Models;
+using MinecraftWrapper.Data.Entities;
 
 namespace MinecraftWrapper.Data
 {
@@ -15,5 +15,7 @@ namespace MinecraftWrapper.Data
         public DbSet<NewsItem> NewsItem { get; set; }
         public DbSet<UserPreference> UserPreference { get; set; }
         public DbSet<UtilityRequest> UtilityRequest { get; set; }
+        public DbSet<UserCurrency> UserCurrency { get; set; }
+        public DbSet<StoreItem> StoreItem { get; set; }
     }
 }

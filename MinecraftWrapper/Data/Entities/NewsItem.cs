@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MinecraftWrapper.Models
+namespace MinecraftWrapper.Data.Entities
 {
     public class NewsItem
     {
