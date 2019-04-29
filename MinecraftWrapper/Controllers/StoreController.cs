@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MinecraftWrapper.Data;
+using MinecraftWrapper.Data.Constants;
 using MinecraftWrapper.Data.Entities;
 using MinecraftWrapper.Models;
 using MinecraftWrapper.Services;
@@ -176,7 +177,7 @@ namespace MinecraftWrapper.Controllers
          **************************************************************************************************************/
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> Index ()
+        public async Task<IActionResult> Index ( [FromQuery] string statusMessage )
         {
             var user = await _userManager.GetUserAsync ( HttpContext.User );
             var items = await _storeRepository.GetAvailableStoreItemsByRank ( user.Rank );
@@ -188,6 +189,11 @@ namespace MinecraftWrapper.Controllers
                 UserCurrencyTotel = currentMoney
             };
 
+            if ( !string.IsNullOrEmpty ( statusMessage ) ) 
+            {
+                ViewBag.Status = statusMessage;
+            }
+
             return View ( viewModel );
         }
 
@@ -195,6 +201,8 @@ namespace MinecraftWrapper.Controllers
         [HttpGet]
         public async Task<IActionResult> PurchaseItem ( Guid? id )
         {
+            string statusMessage = null;
+
             if ( id != null && id != Guid.Empty )
             {
                 var user = await _userManager.GetUserAsync ( HttpContext.User );
@@ -204,19 +212,50 @@ namespace MinecraftWrapper.Controllers
                 if ( currentMoney >= item.Price ) 
                 {
                     await _minecraftStoreService.PurchaseItemAsync ( item, user );
-                    ViewBag.Status = $"{item.Title} purchased!";
+                    statusMessage = $"{item.Title} purchased!";
                 }
                 else
                 {
-                    ViewBag.Status = $"{item.Title} requires {item.Price} {_applicationSettings.MinecraftCurrencyName} but you only have {currentMoney} {_applicationSettings.MinecraftCurrencyName}";
+                    statusMessage = $"{item.Title} requires {item.Price} {_applicationSettings.MinecraftCurrencyName} but you only have {currentMoney} {_applicationSettings.MinecraftCurrencyName}";
                 }
             }
             else
             {
-                ViewBag.Status = $"storeItemId is a required parameter";
+                statusMessage = $"storeItemId is a required parameter";
             }
 
-            return RedirectToAction ( nameof ( Index ) );
+            // TODO figure out how to preserve ViewBag after redirect
+            return RedirectToAction ( nameof ( Index ), "Store", new { statusMessage }, "" );
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> AddCurrencyToUser ( [FromBody] AddCurrencyToUserModel model )
+        {
+            if ( model.Secret != _applicationSettings.DiscordBotSecret ) 
+            {
+                return Unauthorized ();
+            }
+
+            var user = await _userManager.Users.SingleOrDefaultAsync ( u => u.DiscordId == model.DiscordId );
+
+            if ( user == null ) 
+            {
+                return NotFound ( $"No user was found for DiscordId: {model.DiscordId}" );
+            }
+
+            var uc = new UserCurrency
+            {
+                Amount = model.Amount,
+                CurrencyTransactionReasonId = model.CurrencyTransactionReason,
+                CurrencyTypeId = CurrencyType.Normal,
+                DateNoted = DateTime.UtcNow,
+                UserId = user.Id
+            };
+
+            await _storeRepository.SaveUserCurrency ( uc );
+
+            return Ok ();
         }
     }
 }

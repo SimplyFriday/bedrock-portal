@@ -20,19 +20,19 @@ namespace MinecraftWrapper.Services
         public StatusService ( IServiceProvider serviceProvider )
         {
             _serviceProvider = serviceProvider;
-            RefreshUserList ();
+            _ = RefreshUserList ();
         }
 
-        private void RefreshUserList ()
+        private async Task RefreshUserList ()
         {
             using ( var scope = _serviceProvider.CreateScope () )
             {
                 var userRepository = scope.ServiceProvider.GetService<UserRepository> ();
-                var allUsers = userRepository.GetAllUsers ();
+                var allUsers = await userRepository.GetAllUsersAsync ();
 
                 foreach ( var user in allUsers )
                 {
-                    if ( user.GamerTag != null && !_onlineUsers.ContainsKey ( user.GamerTag ) )
+                    if ( user.GamerTag != null && !_onlineUsers.ContainsKey ( user.GamerTag ) && user.MembershipExpirationTime >= DateTime.UtcNow )
                     {
                         _onlineUsers.Add ( user.GamerTag, false );
                     }
@@ -42,18 +42,18 @@ namespace MinecraftWrapper.Services
             }
         }
 
-        public bool GetUserStatus ( string userId )
+        public async Task<bool> GetUserStatus ( string userId )
         {
             if ( _refreshTime.AddMinutes ( MINUTES_TO_CACHE ) > DateTime.UtcNow )
             {
-                RefreshUserList ();
+                await RefreshUserList ();
             }
 
             using ( var scope = _serviceProvider.CreateScope () )
             {
-                var user = scope.ServiceProvider.GetService<UserRepository> ()
-                    .GetAllUsers ()
-                    .Where ( u => u.Id == userId )
+                var userList = await scope.ServiceProvider.GetService<UserRepository> ()
+                    .GetAllUsersAsync ();
+                var user = userList.Where ( u => u.Id == userId )
                     .SingleOrDefault ();
 
                 var gamerTag = user?.GamerTag;
@@ -69,7 +69,7 @@ namespace MinecraftWrapper.Services
 
         public void UpdateUserStatus ( string gamerTag, bool isOnline )
         {
-            RefreshUserList ();
+            _ = RefreshUserList ();
 
             if ( gamerTag != null && _onlineUsers.ContainsKey ( gamerTag ) )
             {

@@ -98,6 +98,7 @@ namespace MinecraftWrapper
             services.AddSingleton<StatusService> ();
             services.AddSingleton<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
             services.AddSingleton<MinecraftMessageParser> ();
+            services.AddSingleton<ScheduledTaskService> ();
         }
 
         private void ConfigureSerilog ()
@@ -149,12 +150,20 @@ namespace MinecraftWrapper
               } );
 
             CreateDefaultRoles ( provider ).Wait ();
+            RegisterTasks ( provider );
 
             // Moved this to last because it takes a ton of resources
             var wrapper = provider.GetService<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
             wrapper.Start ();
         }
-        
+
+        private void RegisterTasks ( IServiceProvider provider )
+        {
+            var taskService = provider.GetRequiredService<ScheduledTaskService> ();
+            taskService.RegisterTasks ();
+            taskService.Start ();
+        }
+
         private async Task CreateDefaultRoles ( IServiceProvider serviceProvider )
         {
             var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();

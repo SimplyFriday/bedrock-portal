@@ -260,3 +260,4 @@ paket-files/
 __pycache__/
 *.pyc
 /MinecraftWrapper/appsettings.json
+/MinecraftWrapper/wwwroot/images/desktop_menu.png

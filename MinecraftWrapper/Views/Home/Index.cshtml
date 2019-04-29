@@ -39,10 +39,11 @@
         {
             var divClass = "";
 
-            @if ( !string.IsNullOrEmpty ( user?.GamerTag ) )
+            @if ( !string.IsNullOrEmpty ( user?.GamerTag ) && user.MembershipExpirationTime.HasValue && 
+                user.MembershipExpirationTime >= DateTime.UtcNow && user.IsActive )
             {
                 <div class="col-md-4">
-                    @if ( statusService.GetUserStatus ( user.Id ) )
+                    @if ( await statusService.GetUserStatus ( user.Id ) )
                     {
                         divClass = "panel panel-success";
                     }

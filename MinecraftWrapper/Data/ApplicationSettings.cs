@@ -15,6 +15,7 @@ namespace MinecraftWrapper.Data
         public string WhiteListPath { get; set; }
         public string DiscordWebhookUrl { get; set; }
         public string DiscordUserName { get; set; }
+        public string DiscordBotSecret { get; set; }
         public ConsoleRoleWhitelist [] CommandWhitelistByRole { get; set; }
         public string [] MobsToClear { get; set; }
         public string ApplicationTitle { get; set; }

@@ -86,7 +86,8 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account.Manage
                 Email = email,
                 PhoneNumber = phoneNumber,
                 GamerTag = user.GamerTag,
-                Bio = user.Bio
+                Bio = user.Bio,
+                DiscordHandle = user.DiscordId
             };
 
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
@@ -130,11 +131,13 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account.Manage
             }
 
             if ( user.GamerTag != Input.GamerTag ||
-                 user.Bio != Input.Bio )
+                 user.Bio != Input.Bio ||
+                 user.DiscordId != Input.DiscordHandle )
             {
                 user.GamerTag = Input.GamerTag;
                 user.Bio = Input.Bio;
-                _userRepository.SaveUserAsync ( user );
+                user.DiscordId = Input.DiscordHandle;
+                await _userRepository.SaveUserAsync ( user );
             }
 
             await _signInManager.RefreshSignInAsync(user);

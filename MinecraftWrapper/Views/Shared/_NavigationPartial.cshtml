@@ -25,16 +25,10 @@
                             Utilities
                         </a>
                         <ul class="dropdown-menu">
-                            <li>
-                                <a asp-area="" asp-controller="UserActions" asp-action="UpdateTickingArea">Ticking Area</a>
-                            </li>
-                            <li>
-                                <a asp-area="" asp-controller="UserActions" asp-action="ClearMobs">Clear Mobs</a>
-                            </li>
                             @if ( ViewContext.HttpContext.User.IsInRole ( "Admin" ) || ViewContext.HttpContext.User.IsInRole ( "Moderator" ) )
                             {
                                 <li>
-                                    <a asp-area="" asp-controller="UserActions" asp-action="ManageWhiteList">White List</a>
+                                    <a asp-area="" asp-controller="UserActions" asp-action="ManageUsers">Manage Users</a>
                                 </li>
                                 <li>
                                     <a asp-area="" asp-controller="UserActions" asp-action="Console">Console</a>

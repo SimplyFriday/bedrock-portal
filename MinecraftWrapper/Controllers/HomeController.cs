@@ -30,11 +30,11 @@ namespace MinecraftWrapper.Controllers
             _hostingEnvironment = env;
         }
 
-        public IActionResult Index ()
+        public async Task<IActionResult> Index ()
         {
             var model = new HomeIndexViewModel
             {
-                Users = _userRepository.GetAllUsers (),
+                Users = await _userRepository.GetAllUsersAsync (),
                 NewsItems = _systemRepository.GetRecentNewsItems ( 5 ),
             };
 

@@ -9,17 +9,37 @@
     // Get all the async stuff we need because I don't know how to pass it in from a controller...
     var appUser = await UserManager.GetUserAsync ( User );
     var currency = await StoreRepository.GetCurrencyTotalForUser ( appUser.Id );
- 
+    var hoursLeft = ((appUser.MembershipExpirationTime ?? DateTime.UtcNow).Ticks - DateTime.UtcNow.Ticks) / 36000000000;
+    var nextLoginBonus = ((appUser.LastLoginReward.HasValue ? appUser.LastLoginReward.Value.AddDays(1).Ticks : DateTime.UtcNow.Ticks) - DateTime.UtcNow.Ticks) / 36000000000;
+
     <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
                 <a class="dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     @appUser.GamerTag
                 </a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu dropdown-wide">
+                    <li class="menu-text">
+                        Rank @appUser.Rank
+                    </li>
                     <li class="menu-text">
                         Wallet: @currency.ToString( "F2" ) @Options.Value.MinecraftCurrencyName
                     </li>
+                    <li class="menu-text">
+                        Membership: @hoursLeft Hours
+                    </li>
+                    @if ( nextLoginBonus > 0 )
+                    {
+                        <li class="menu-text">
+                            Bonus In: @nextLoginBonus Hours
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="menu-text">
+                            Bonus Available!
+                        </li>
+                    }
                     <li class="divider"></li>
                     <li>
                         <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">My Account</a>

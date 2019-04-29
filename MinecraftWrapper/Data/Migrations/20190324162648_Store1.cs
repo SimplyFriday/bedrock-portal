@@ -11,7 +11,7 @@ namespace MinecraftWrapper.Data.Migrations
                 name: "Rank",
                 table: "AspNetUsers",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 1);
 
             migrationBuilder.CreateTable(
                 name: "StoreItem",

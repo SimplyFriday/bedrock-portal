@@ -17,9 +17,9 @@ namespace MinecraftWrapper.Data
             _context = context;
         }
 
-        public IQueryable<ApplicationUser> GetAllUsers ()
+        public async Task<IList<ApplicationUser>> GetAllUsersAsync ()
         {
-            return _context.Users;
+            return await _context.Users.ToListAsync ();
         }
 
         public async Task<bool> SaveUserPreferance ( UserPreference userPreference )
@@ -75,7 +75,7 @@ namespace MinecraftWrapper.Data
             await _context.SaveChangesAsync ();
         }
 
-        public async void SaveUserAsync ( ApplicationUser user )
+        public async Task SaveUserAsync ( ApplicationUser user )
         {
             _context.Users.Update ( user );
             await _context.SaveChangesAsync ();

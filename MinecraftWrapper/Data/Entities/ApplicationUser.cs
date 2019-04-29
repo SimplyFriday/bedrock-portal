@@ -19,12 +19,13 @@ namespace MinecraftWrapper.Data.Entities
         public string DiscordId { get; set; }
 
         [PersonalData]
-        public ulong Xuid { get; set; }
+        public ulong? Xuid { get; set; }
 
         public DateTime? LastMinecraftLogin { get; set; }
 
         public DateTime? LastLoginReward { get; set; }
-
+        public DateTime? MembershipExpirationTime { get; set; }
+        public bool IsActive { get; set; }
         public int Rank { get; set; }
 
         public virtual IEnumerable<UserPreference> UserPreferences { get; set; }

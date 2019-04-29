@@ -36,6 +36,7 @@ namespace MinecraftWrapper.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "NotAvailable")]
         public async Task<IActionResult> UpdateTickingArea ()
         {
             var user = await _userManager.GetUserAsync ( HttpContext.User );
@@ -64,6 +65,7 @@ namespace MinecraftWrapper.Controllers
         }
 
         [HttpPost]
+        [Authorize ( Roles = "NotAvailable" )]
         public async Task<IActionResult> UpdateTickingArea ( UpdateTickingAreaViewModel model )
         {
             var user = await _userManager.GetUserAsync ( HttpContext.User );
@@ -104,6 +106,7 @@ namespace MinecraftWrapper.Controllers
         }
 
         [HttpPost]
+        [Authorize ( Roles = "NotAvailable" )]
         public async Task<IActionResult> ClearMobs (string needDifferentSignature)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -178,6 +181,7 @@ namespace MinecraftWrapper.Controllers
         }
 
         [HttpDelete]
+        [Authorize ( Roles = "NotAvailable" )]
         public async Task<bool> DeleteSavedTickingArea ([FromQuery] string name )
         {
             try
@@ -232,6 +236,46 @@ namespace MinecraftWrapper.Controllers
             }
 
             return true;
+        }
+
+        [HttpGet]
+        [Authorize(Roles ="Admin,Moderator")]
+        public async Task<IActionResult> ManageUsers ()
+        {
+            var users = await _userRepository.GetAllUsersAsync();
+            return View ( users );
+        }
+
+        [HttpGet]
+        [Authorize ( Roles = "Admin,Moderator" )]
+        public async Task<IActionResult> ToggleUserActiveState (string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null )
+            {
+                return NotFound ();
+            }
+
+            user.IsActive = !user.IsActive;
+            await _userRepository.SaveUserAsync ( user );
+
+            return RedirectToAction ( "ManageUsers" );
+        }
+
+        [HttpGet]
+        [Authorize ( Roles = "Admin,Moderator" )]
+        public async Task<IActionResult> ToggleUserActive ( [FromBody] string userId )
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if ( user != null )
+            {
+                user.IsActive = !user.IsActive;
+                await _userRepository.SaveUserAsync ( user );
+            }
+
+            return RedirectToAction ( "ManageUsers" );
         }
 
         private async Task<IEnumerable<string>> GetCommandsForUser ( ApplicationUser user )

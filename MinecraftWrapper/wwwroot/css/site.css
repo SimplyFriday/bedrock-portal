@@ -190,3 +190,7 @@ div::-webkit-scrollbar-thumb {
     display: block;
     padding: 3px 20px;
 }
+
+.dropdown-wide{
+    min-width:320px;
+}
