@@ -47,7 +47,7 @@ namespace MinecraftWrapper.Services
             switch ( item.StoreItemTypeId )
             {
                 case StoreItemType.Command:
-                    _wrapper.SendInput ( item.Effect, null );
+                    _wrapper.SendInput ( ParseCommand ( item.Effect, user ), null );
                     break;
                 case StoreItemType.Membership:
                     int hours;
@@ -81,6 +81,12 @@ namespace MinecraftWrapper.Services
             }
 
             await _storeRepository.SaveUserCurrency ( uc );
+        }
+
+        private string ParseCommand ( string effect, ApplicationUser user )
+        {
+            return effect.Replace ( "{GamerTag}", user.GamerTag, StringComparison.CurrentCultureIgnoreCase )
+                         .Replace ( "{Rank}", user.Rank.ToString (), StringComparison.CurrentCultureIgnoreCase );
         }
     }
 }
