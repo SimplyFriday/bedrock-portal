@@ -1,8 +1,7 @@
-﻿using System;
+﻿using MinecraftWrapper.Data.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using MinecraftWrapper.Models;
 
 namespace MinecraftWrapper.Data
 {

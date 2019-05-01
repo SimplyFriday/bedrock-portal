@@ -1,19 +1,19 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using MinecraftWrapper.Models;
+using MinecraftWrapper.Data.Entities;
+using System.Threading.Tasks;
 
 namespace MinecraftWrapper.Areas.Identity.Pages.Account.Manage
 {
     public class PersonalDataModel : PageModel
     {
-        private readonly UserManager<AuthorizedUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<PersonalDataModel> _logger;
 
         public PersonalDataModel(
-            UserManager<AuthorizedUser> userManager,
+            UserManager<ApplicationUser> userManager,
             ILogger<PersonalDataModel> logger)
         {
             _userManager = userManager;

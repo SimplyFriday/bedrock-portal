@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using MinecraftWrapper.Data.Constants;
+using MinecraftWrapper.Data.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using MinecraftWrapper.Data.Constants;
-using MinecraftWrapper.Models;
 
 namespace MinecraftWrapper.Data
 {
@@ -17,42 +17,9 @@ namespace MinecraftWrapper.Data
             _context = context;
         }
 
-        public AuthorizationKey GetAuthorizationKeyByToken ( string authorizationToken )
+        public async Task<IList<ApplicationUser>> GetAllUsersAsync ()
         {
-            return _context.AuthorizationKey.SingleOrDefault ( key => key.AuthorizationToken == authorizationToken );
-        }
-
-        public AuthorizationKey ReserveAuthorizationKey ( AuthorizationKey key, string userId )
-        {
-            key.UserId = userId;
-            _context.SaveChanges ();
-            return key;
-        }
-
-        public AdditionalUserData GetAdditionalUserDataByUserId ( string userId )
-        {
-            return _context.AdditionalUserData.SingleOrDefault ( data => data.UserId == userId );
-        }
-
-        public IQueryable<AuthorizedUser> GetUsersWithData ()
-        {
-            return _context.Users
-                .Include ( u => u.AdditionalUserData )
-                .Include ( u => u.AuthorizationKey );
-        }
-
-        public void SaveAdditionalData ( AdditionalUserData data )
-        {
-            if ( data.AdditionalUserDataId == Guid.Empty )
-            {
-                _context.AdditionalUserData.Add ( data );
-            }
-            else
-            {
-                _context.AdditionalUserData.Update ( data );
-            }
-
-            _context.SaveChanges ();
+            return await _context.Users.ToListAsync ();
         }
 
         public async Task<bool> SaveUserPreferance ( UserPreference userPreference )
@@ -87,6 +54,64 @@ namespace MinecraftWrapper.Data
         {
             _context.UtilityRequest.Add ( newRequest );
             await _context.SaveChangesAsync ();
+        }
+
+        public async Task<ApplicationUser> GetUserByDiscordIdAsync ( string discordId )
+        {
+            return await _context.Users.SingleOrDefaultAsync ( u => u.DiscordId == discordId );
+            
+        }
+
+        public async void DeleteUserPreferencesByIdAsync ( IEnumerable<Guid> ids )
+        {
+            foreach ( var id in ids ) 
+            {
+                var preference = new UserPreference {UserPreferenceId = id};
+
+                _context.UserPreference.Attach ( preference );
+                _context.UserPreference.Remove ( preference );
+            }
+
+            await _context.SaveChangesAsync ();
+        }
+
+        public async Task SaveUserAsync ( ApplicationUser user )
+        {
+            _context.Users.Update ( user );
+            await _context.SaveChangesAsync ();
+        }
+        
+        public async void InsertUserCurrencyAsync ( UserCurrency userCurrency )
+        {
+            if (userCurrency.UserCurrencyId != Guid.Empty )
+            {
+                throw new InvalidOperationException ( "UserCurrency objects can only be inserted, not updated." );
+            }
+
+            _context.UserCurrency.Add ( userCurrency );
+            await _context.SaveChangesAsync ();
+        }
+
+        public async Task<ApplicationUser> GetUserByGamerTagAsync ( string gamerTag )
+        {
+            return await _context.Users.SingleOrDefaultAsync ( u => u.GamerTag == gamerTag );
+        }
+
+        public async Task PurchaseItem ( StoreItem item, ApplicationUser user )
+        {
+            var uc = new UserCurrency
+            {
+                Amount = -item.Price,
+                CurrencyTransactionReasonId = CurrencyTransactionReason.Purchase,
+                CurrencyTypeId = CurrencyType.Normal,
+                User = user,
+                DateNoted = DateTime.UtcNow
+            };
+
+            _context.UserCurrency.Add ( uc );
+            await _context.SaveChangesAsync ();
+
+            return;
         }
     }
 }

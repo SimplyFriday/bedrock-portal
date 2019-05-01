@@ -10,7 +10,7 @@
     <div class="col-md-6">
         <form id="profile-form" method="post">
             <div asp-validation-summary="All" class="text-danger"></div>
-            
+
             <div class="form-group">
                 <label asp-for="Input.Email"></label>
                 @if ( Model.IsEmailConfirmed )
@@ -31,6 +31,11 @@
                 <label asp-for="Input.GamerTag"></label>
                 <input asp-for="Input.GamerTag" class="form-control" />
                 <span asp-validation-for="Input.GamerTag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.DiscordHandle"></label>
+                <input asp-for="Input.DiscordHandle" class="form-control" />
+                <span asp-validation-for="Input.DiscordHandle" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Input.Bio"></label>

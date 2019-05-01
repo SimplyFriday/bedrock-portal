@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MinecraftWrapper.Data;
-using MinecraftWrapper.Models;
+using MinecraftWrapper.Data.Entities;
+using Serilog;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MinecraftWrapper.Controllers
 {
     [Authorize (Roles = "Admin")]
     public class NewsController : Controller
     {
+        // TODO refactor into service/repository
         private readonly ApplicationDbContext _context;
 
         public NewsController(ApplicationDbContext context)
@@ -63,6 +63,9 @@ namespace MinecraftWrapper.Controllers
                 newsItem.NewsItemId = Guid.NewGuid();
                 _context.Add(newsItem);
                 await _context.SaveChangesAsync();
+
+                Log.Information ( "{User} created a NewArticle with ID {NewsItemId}", HttpContext.User.Identity.Name, newsItem.NewsItemId );
+
                 return RedirectToAction(nameof(Index));
             }
             return View(newsItem);

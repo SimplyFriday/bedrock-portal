@@ -2,3 +2,8 @@
 @using MinecraftWrapper.Models
 @using MinecraftWrapper.Data.Constants
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@using MinecraftWrapper.Data
+@using MinecraftWrapper.Data.Entities
+@using Microsoft.Extensions.Options
+@inject IOptions<ApplicationSettings> Options

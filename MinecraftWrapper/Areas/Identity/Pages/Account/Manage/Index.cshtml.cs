@@ -1,28 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MinecraftWrapper.Data;
-using MinecraftWrapper.Models;
+using MinecraftWrapper.Data.Entities;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 
 namespace MinecraftWrapper.Areas.Identity.Pages.Account.Manage
 {
     public partial class IndexModel : PageModel
     {
-        private readonly UserManager<AuthorizedUser> _userManager;
-        private readonly SignInManager<AuthorizedUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly UserRepository _userRepository;
 
         public IndexModel(
-            UserManager<AuthorizedUser> userManager,
-            SignInManager<AuthorizedUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             UserRepository userRepository)
         {
@@ -56,6 +54,14 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
 
+            [Required]
+            [Display ( Name = "Discord Handle" )]
+            [MaxLength ( 255 )]
+            public string DiscordHandle { get; set; }
+
+            [Required]
+            [Display ( Name = "Gamer Tag" )]
+            [MaxLength ( 255 )]
             public string GamerTag { get; set; }
 
             public string Bio { get; set; }
@@ -73,16 +79,15 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account.Manage
             var email = await _userManager.GetEmailAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
-            var data = _userRepository.GetAdditionalUserDataByUserId ( user.Id );
-
             Username = userName;
 
             Input = new InputModel
             {
                 Email = email,
                 PhoneNumber = phoneNumber,
-                GamerTag = data?.GamerTag,
-                Bio = data?.Bio
+                GamerTag = user.GamerTag,
+                Bio = user.Bio,
+                DiscordHandle = user.DiscordId
             };
 
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
@@ -125,20 +130,14 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account.Manage
                 }
             }
 
-            var data = _userRepository.GetAdditionalUserDataByUserId ( user.Id );
-
-            if ( data == null )
+            if ( user.GamerTag != Input.GamerTag ||
+                 user.Bio != Input.Bio ||
+                 user.DiscordId != Input.DiscordHandle )
             {
-                data = new AdditionalUserData { UserId = user.Id };
-            }
-
-            if ( data.GamerTag != Input.GamerTag ||
-                 data.Bio != Input.Bio ||
-                 data.AdditionalUserDataId == Guid.Empty )
-            {
-                data.GamerTag = Input.GamerTag;
-                data.Bio = Input.Bio;
-                _userRepository.SaveAdditionalData ( data );
+                user.GamerTag = Input.GamerTag;
+                user.Bio = Input.Bio;
+                user.DiscordId = Input.DiscordHandle;
+                await _userRepository.SaveUserAsync ( user );
             }
 
             await _signInManager.RefreshSignInAsync(user);

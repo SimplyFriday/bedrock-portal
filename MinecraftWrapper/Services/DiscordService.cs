@@ -26,17 +26,19 @@ namespace MinecraftWrapper.Services
         {
             try
             {
-                if (_client == null )
+                if ( !string.IsNullOrEmpty ( _applicationSettings.DiscordWebhookUrl ) )
                 {
-                    _client = HttpClientFactory.Create ();
+                    if ( _client == null )
+                    {
+                        _client = HttpClientFactory.Create ();
+                    }
+
+                    _client.DefaultRequestHeaders.Accept.Clear ();
+                    _client.DefaultRequestHeaders.Accept.Add ( new MediaTypeWithQualityHeaderValue ( "application/json" ) );
+
+                    var body = JsonConvert.SerializeObject ( new { username = _applicationSettings.DiscordUserName, embeds = new List<object> { new { description = message } } } );
+                    var response = await _client.PostAsync ( _applicationSettings.DiscordWebhookUrl, new StringContent ( body, Encoding.UTF8, "application/json" ) );
                 }
-
-                _client.DefaultRequestHeaders.Accept.Clear ();
-                _client.DefaultRequestHeaders.Accept.Add ( new MediaTypeWithQualityHeaderValue ( "application/json" ) );
-
-                var body = JsonConvert.SerializeObject ( new { username = _applicationSettings.DiscordUserName, embeds = new List<object> { new { description = message } } } );
-                var response = await _client.PostAsync ( _applicationSettings.DiscordWebhookUrl, new StringContent ( body, Encoding.UTF8, "application/json" ) );
-                
             }
             catch ( Exception ex )
             {

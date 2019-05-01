@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
 
-@inject SignInManager<AuthorizedUser> SignInManager
-@inject UserManager<AuthorizedUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -13,46 +13,48 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">@SystemConstants.APPLICATION_NAME</a>
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">@Options.Value.ApplicationTitle</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                 @if ( SignInManager.IsSignedIn ( User ) )
                 {
-                <li class="dropdown">
-                    <a class="dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Utilities
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a asp-area="" asp-controller="UserActions" asp-action="UpdateTickingArea">Ticking Area</a>
-                        </li>
-                        <li>
-                            <a asp-area="" asp-controller="UserActions" asp-action="ClearMobs">Clear Mobs</a>
-                        </li>
-                        @if ( ViewContext.HttpContext.User.IsInRole ( "Admin" ) || ViewContext.HttpContext.User.IsInRole ( "Moderator" ) )
-                        {
-                            <li>
-                                <a asp-area="" asp-controller="UserActions" asp-action="ManageWhiteList">White List</a>
-                            </li>
-                            <li>
-                                <a asp-area="" asp-controller="AuthorizationKeys" asp-action="Index">Manage Auth Keys</a>
-                            </li>
-                            <li>
-                                <a asp-area="" asp-controller="UserActions" asp-action="Console">Console</a>
-                            </li>
-                        }
-                        @if ( ViewContext.HttpContext.User.IsInRole ( "Admin" ) )
-                        {
-                            <li>
-                                <a asp-area="" asp-controller="News" asp-action="Index">Manage News Articles</a>
-                            </li>
-                        }
-                    </ul>
-                </li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Utilities
+                        </a>
+                        <ul class="dropdown-menu">
+                            @if ( ViewContext.HttpContext.User.IsInRole ( "Admin" ) || ViewContext.HttpContext.User.IsInRole ( "Moderator" ) )
+                            {
+                                <li>
+                                    <a asp-area="" asp-controller="UserActions" asp-action="ManageUsers">Manage Users</a>
+                                </li>
+                                <li>
+                                    <a asp-area="" asp-controller="UserActions" asp-action="Console">Console</a>
+                                </li>
+                            }
+                            @if ( ViewContext.HttpContext.User.IsInRole ( "Admin" ) )
+                            {
+                                <li>
+                                    <a asp-area="" asp-controller="News" asp-action="Index">Manage News Articles</a>
+                                </li>
+                                <li>
+                                    <a asp-area="" asp-controller="Store" asp-action="EditIndex">Edit Store</a>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="Store" asp-action="Index">Store</a>
+                    </li>
                 }
-                <li><a asp-area="" asp-controller="Home" asp-action="CommunityGuidelines">Community Guidelines</a></li>
+                @foreach ( var linkData in Options.Value.StaticMenuLinks )
+                {
+                    <li>
+                        <a asp-area="" asp-controller="Home" asp-action="Static" asp-route-pageName="@linkData.FileName">@linkData.Display</a>
+                    </li>
+                }
             </ul>
             <partial name="_LoginPartial" />
         </div>

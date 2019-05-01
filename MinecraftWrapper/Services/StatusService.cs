@@ -17,24 +17,24 @@ namespace MinecraftWrapper.Services
 
         private const int MINUTES_TO_CACHE = 20;
 
-        public StatusService (IServiceProvider serviceProvider)
+        public StatusService ( IServiceProvider serviceProvider )
         {
             _serviceProvider = serviceProvider;
-            RefreshUserList ();
+            _ = RefreshUserList ();
         }
 
-        private void RefreshUserList ()
+        private async Task RefreshUserList ()
         {
             using ( var scope = _serviceProvider.CreateScope () )
             {
                 var userRepository = scope.ServiceProvider.GetService<UserRepository> ();
-                var allUsers = userRepository.GetUsersWithData ();
+                var allUsers = await userRepository.GetAllUsersAsync ();
 
-                foreach (var user in allUsers )
+                foreach ( var user in allUsers )
                 {
-                    if ( user.AdditionalUserData?.MinecraftId != null && !_onlineUsers.ContainsKey ( user.AdditionalUserData.MinecraftId ) )
+                    if ( user.GamerTag != null && !_onlineUsers.ContainsKey ( user.GamerTag ) && user.MembershipExpirationTime >= DateTime.UtcNow )
                     {
-                        _onlineUsers.Add ( user.AdditionalUserData.MinecraftId, false );
+                        _onlineUsers.Add ( user.GamerTag, false );
                     }
                 }
 
@@ -42,47 +42,40 @@ namespace MinecraftWrapper.Services
             }
         }
 
-        public bool GetUserStatus ( string userId )
+        public async Task<bool> GetUserStatus ( string userId )
         {
             if ( _refreshTime.AddMinutes ( MINUTES_TO_CACHE ) > DateTime.UtcNow )
             {
-                RefreshUserList ();
+                await RefreshUserList ();
             }
 
             using ( var scope = _serviceProvider.CreateScope () )
             {
-                var user = scope.ServiceProvider.GetService<UserRepository> ()
-                    .GetUsersWithData ()
-                    .Where ( u => u.Id == userId )
+                var userList = await scope.ServiceProvider.GetService<UserRepository> ()
+                    .GetAllUsersAsync ();
+                var user = userList.Where ( u => u.Id == userId )
                     .SingleOrDefault ();
 
-                var id = user?.AdditionalUserData?.MinecraftId;
+                var gamerTag = user?.GamerTag;
 
-                if ( id != null && _onlineUsers.ContainsKey ( id ) )
+                if ( gamerTag != null && _onlineUsers.ContainsKey ( gamerTag ) )
                 {
-                    return _onlineUsers[ id ];
+                    return _onlineUsers [ gamerTag ];
                 }
             }
 
             return false;
         }
 
-        public void UpdateUserStatus (string minecraftId, bool isOnline)
+        public void UpdateUserStatus ( string gamerTag, bool isOnline )
         {
-            RefreshUserList ();
+            _ = RefreshUserList ();
 
-            using ( var scope = _serviceProvider.CreateScope () )
+            if ( gamerTag != null && _onlineUsers.ContainsKey ( gamerTag ) )
             {
-                var id = scope.ServiceProvider.GetService<UserRepository> ()
-                    .GetUsersWithData ()
-                    .Where ( u => u.AdditionalUserData.MinecraftId == minecraftId )
-                    .SingleOrDefault ()?.AdditionalUserData?.MinecraftId;
-
-                if ( id != null && _onlineUsers.ContainsKey ( id ) )
-                {
-                    _onlineUsers[ minecraftId ] = isOnline;
-                }
+                _onlineUsers [ gamerTag ] = isOnline;
             }
+
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 
 namespace MinecraftWrapper.Data
 {
@@ -14,8 +15,20 @@ namespace MinecraftWrapper.Data
         public string WhiteListPath { get; set; }
         public string DiscordWebhookUrl { get; set; }
         public string DiscordUserName { get; set; }
+        public string DiscordBotSecret { get; set; }
         public ConsoleRoleWhitelist [] CommandWhitelistByRole { get; set; }
         public string [] MobsToClear { get; set; }
+        public string ApplicationTitle { get; set; }
+        public string MinecraftCurrencyName { get; set; }
+        public List<MenuLink> StaticMenuLinks{ get; set; }
+        public int DailyLoginBonus { get; set; }
+        public string StoreWebhookKey { get; set; }
+    }
+
+    public class MenuLink
+    {
+        public string Display { get; set; }
+        public string FileName { get; set; }
     }
 
     public class ConsoleRoleWhitelist

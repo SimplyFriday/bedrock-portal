@@ -4,11 +4,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MinecraftWrapper.Data;
 using MinecraftWrapper.Models;
 using MinecraftWrapper.Services;
+using Serilog;
 
 namespace MinecraftWrapper.Controllers
 {
@@ -17,19 +20,21 @@ namespace MinecraftWrapper.Controllers
         private readonly ConsoleApplicationWrapper<MinecraftMessageParser> _wrapper;
         private readonly UserRepository _userRepository;
         private readonly SystemRepository _systemRepository;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public HomeController ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, UserRepository userRepository, SystemRepository systemRepository )
+        public HomeController ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, UserRepository userRepository, SystemRepository systemRepository, IHostingEnvironment env )
         {
             _wrapper = wrapper;
             _userRepository = userRepository;
             _systemRepository = systemRepository;
+            _hostingEnvironment = env;
         }
 
-        public IActionResult Index ()
+        public async Task<IActionResult> Index ()
         {
             var model = new HomeIndexViewModel
             {
-                Users = _userRepository.GetUsersWithData (),
+                Users = await _userRepository.GetAllUsersAsync (),
                 NewsItems = _systemRepository.GetRecentNewsItems ( 5 ),
             };
 
@@ -58,7 +63,28 @@ namespace MinecraftWrapper.Controllers
         [ResponseCache ( Duration = 0, Location = ResponseCacheLocation.None, NoStore = true )]
         public IActionResult Error ()
         {
-            return View ( new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier } );
+            var exceptionFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+            var viewModel = new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier };
+
+            if ( exceptionFeature != null )
+            {
+                if ( _hostingEnvironment.IsDevelopment () )
+                {
+                    viewModel.Exception = exceptionFeature.Error;
+                }
+
+                try
+                {
+                    // TODO break out TraceIdentifier into its own column so that we can index it.
+                    Log.Error ( exceptionFeature.Error, "Unhandled exception occurred from URL {Url} with {TraceIdentifier}", exceptionFeature.Path, HttpContext.TraceIdentifier );
+                }
+                catch
+                {
+                    // Nothing left to do here, I guess :(
+                }
+            }
+
+            return View ( viewModel );
         }
 
         [Authorize ( Roles = "Admin,Moderator" )]
@@ -68,10 +94,19 @@ namespace MinecraftWrapper.Controllers
             return _wrapper.StandardOutput;
         }
 
-        [HttpGet]
-        public IActionResult CommunityGuidelines()
+        [HttpGet( "[controller]/[action]/{pageName}" )]
+        public IActionResult Static ( string pageName )
         {
-            return View ();
+            var path = $"{_hostingEnvironment.ContentRootPath}/wwwroot/html_frag/{pageName}.html";
+            var model = new StaticPageViewModel { Title = "Content Not Found" };
+
+            if (System.IO.File.Exists( path ) )
+            {
+                model.Content = System.IO.File.ReadAllText ( path );
+                model.Title = pageName;
+            }
+
+            return View ( model );
         }
     }
 }

@@ -1,0 +1,45 @@
+﻿@model IEnumerable<MinecraftWrapper.Data.Entities.ApplicationUser>
+
+@{
+    ViewData["Title"] = "ManageUsers";
+}
+
+<h2>ManageUsers</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor( model => model.GamerTag )
+            </th>
+            <th>
+                @Html.DisplayNameFor( model => model.DiscordId )
+            </th>
+            <th>
+                @Html.DisplayNameFor( model => model.IsActive )
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Where ( u => !string.IsNullOrEmpty ( u.GamerTag ) ) ) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.GamerTag)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DiscordId)
+            </td>
+            <td>
+                @item.IsActive
+            </td>
+            <td>
+                <a asp-action="ToggleUserActiveState" asp-route-id="@item.Id">Toggle Active</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

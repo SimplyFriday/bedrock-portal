@@ -1,0 +1,44 @@
+﻿@model StoreIndexViewModel
+@{
+    ViewData [ "Title" ] = "Index";
+}
+
+<h2>Store</h2>
+
+<hr />
+<form>
+    <div class="container">
+        <div class="row">
+            @foreach ( var item in Model.StoreItems.OrderBy ( si => si.Title ) ) 
+            {
+                <div class="col-md-3">
+                    @{
+                        var canPurchase = item.Price <= Model.UserCurrencyTotel;
+                        var buttonClass = canPurchase ? "store-available" : "store-unavailable";
+                    }
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">@item.Title</div>
+                        </div>
+                        <div class="panel-body">
+                            <p>
+                                <b>Price: </b> @item.Price @Options.Value.MinecraftCurrencyName
+                            </p>
+                            <p>
+                                @item.Description
+                            </p>
+                        </div>
+                        @if ( canPurchase )
+                        {
+                        <button asp-controller="Store" asp-action="PurchaseItem" asp-route-id="@item.StoreItemId" class="store-purchase @buttonClass">Purchase</button>
+                        }
+                        else
+                        {
+                            <button class="store-purchase @buttonClass">Purchase</button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</form>

@@ -1,7 +1,7 @@
 ﻿@model UpdateTickingAreaViewModel
 
 @{
-    ViewData[ "Title" ] = "Update Ticking Area";
+    ViewData [ "Title" ] = "Update Ticking Area";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -46,15 +46,16 @@
                 <th>XCoord</th>
                 <th>ZCoord</th>
                 <th></th>
+                <th></th>
             </tr>
             @foreach ( var ta in Model.SavedTickingAreas )
             {
-
                 <tr>
                     <td>@ta.Name</td>
                     <td>@ta.XCoord</td>
                     <td>@ta.ZCoord</td>
                     <td><button onclick="loadForm(@ta.XCoord, @ta.ZCoord)">Load</button></td>
+                    <td><button onclick="deleteItem(@ta.Name)"><span class="glyphicon glyphicon-trash"></span></button></td>
                 </tr>
             }
         </table>
@@ -63,9 +64,34 @@
 
 @section Scripts{
     <script type="text/javascript">
-        function loadForm(x,z) {
+        function loadForm(x, z) {
             $("#XCoord").val(x);
             $("#ZCoord").val(z);
+            $("#name").val("");
+        }
+
+        function deleteItem( name ) {
+            var deleteURL = '/UserActions/DeleteSavedTickingArea';
+
+            $.ajax({
+                type: "DELETE",
+                url: deleteURL,
+                data: JSON.stringify(inputText),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+
+            function successFunc(data, status) {
+                // Wait for update, I guess... I'm lazy
+                alert(name + " deleted");
+                window.location.replace("/UserActions/UpdateTickingArea");
+            }
+
+            function errorFunc() {
+                // Something, probably. I'm lazy. 
+            }
         }
     </script>
 }
