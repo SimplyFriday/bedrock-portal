@@ -237,7 +237,7 @@ namespace MinecraftWrapper.Controllers
                 return Unauthorized ();
             }
 
-            var user = await _userManager.Users.SingleOrDefaultAsync ( u => u.DiscordId == model.DiscordId );
+            var user = await _userManager.Users.SingleOrDefaultAsync ( u => u.DiscordId.StartsWith ( model.DiscordId ) );
 
             if ( user == null ) 
             {
