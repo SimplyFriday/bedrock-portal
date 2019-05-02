@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MinecraftWrapper.Data;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,21 +83,34 @@ namespace MinecraftWrapper.Services
 
         private async Task UpdateWhiteList ()
         {
+            Log.Debug ( "Attempting to update whitelist." );
+
             using ( var scope = _serviceProvider.CreateScope () )
             {
                 var entries = _whiteListService.GetWhiteListEntries();
                 var users = await scope.ServiceProvider.GetRequiredService<UserRepository>().GetAllUsersAsync ();
 
+                Log.Debug ( $"Found {users.Count} users. Starting iteration." );
+
                 foreach ( var user in users )
                 {
-                    if ( user.MembershipExpirationTime > DateTime.UtcNow && !entries.Any ( e => e.name == user.GamerTag ) && user.IsActive)
+                    Log.Debug ($"Checking {user.GamerTag} for membership");
+                    try
                     {
-                        _whiteListService.AddWhiteListEntry ( user.GamerTag );
-                    }
+                        if ( user.MembershipExpirationTime > DateTime.UtcNow && !entries.Any ( e => e.name == user.GamerTag ) && user.IsActive )
+                        {
+                            Log.Information ( $"Adding {user.GamerTag} to the whitelist." );
+                            _whiteListService.AddWhiteListEntry ( user.GamerTag );
+                        }
 
-                    if ( ( user.MembershipExpirationTime < DateTime.UtcNow || !user.IsActive ) && entries.Any ( e => e.name == user.GamerTag ) ) 
+                        if ( (user.MembershipExpirationTime == null || user.MembershipExpirationTime < DateTime.UtcNow || !user.IsActive) && entries.Any ( e => e.name == user.GamerTag ) )
+                        {
+                            Log.Information ( $"Removing {user.GamerTag} from the whitelist." );
+                            _whiteListService.DeleteWhiteListEntry ( user.GamerTag );
+                        }
+                    } catch (Exception ex )
                     {
-                        _whiteListService.DeleteWhiteListEntry ( user.GamerTag );
+                        Log.Error ( ex, $"An exception occurred while trying to update the whitelist for user {user.GamerTag}" );
                     }
                 }
             }

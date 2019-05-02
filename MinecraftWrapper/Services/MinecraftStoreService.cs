@@ -15,22 +15,30 @@ namespace MinecraftWrapper.Services
         private readonly ConsoleApplicationWrapper<MinecraftMessageParser> _wrapper;
         private readonly StoreRepository _storeRepository;
         private readonly UserRepository _userRepository;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public MinecraftStoreService ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, StoreRepository storeRepository, UserRepository userRepository )
+        public MinecraftStoreService ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, StoreRepository storeRepository, UserRepository userRepository, UserManager<ApplicationUser> userManager )
         {
             _wrapper = wrapper;
             _storeRepository = storeRepository;
             _userRepository = userRepository;
+            _userManager = userManager;
         }
 
-        public int GetMinecraftCurrencyForUser ( string gamerTag )
+        public async Task AddCurrencyForUser ( string gamerTag, int amount, CurrencyTransactionReason currencyTransactionReason )
         {
-            throw new NotImplementedException();
-        }
+            var user = _userManager.Users.SingleOrDefault ( u => string.Equals ( gamerTag, u.GamerTag, StringComparison.CurrentCultureIgnoreCase ) );
 
-        public void AddCurrencyForUser ( string gamerTag, int amount )
-        {
-            throw new NotImplementedException ();
+            var uc = new UserCurrency
+            {
+                Amount = amount,
+                CurrencyTransactionReasonId = currencyTransactionReason,
+                CurrencyTypeId = CurrencyType.Normal,
+                DateNoted = DateTime.UtcNow,
+                UserId = user.Id
+            };
+
+            await _storeRepository.SaveUserCurrency ( uc );
         }
 
         public async Task PurchaseItemAsync ( StoreItem item, ApplicationUser user )

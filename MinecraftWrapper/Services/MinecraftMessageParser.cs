@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using MinecraftWrapper.Data;
+using MinecraftWrapper.Data.Constants;
 using MinecraftWrapper.Models;
 using System;
 using System.Collections.Generic;
@@ -67,12 +68,12 @@ namespace MinecraftWrapper.Services
                 if ( user != null && ( user.LastLoginReward == null || user.LastLoginReward.Value.AddDays ( 1 ) <= DateTime.UtcNow ) )
                 {
                     // daily login bonus
-                    _minecraftStoreService.AddCurrencyForUser ( gamerTag, _applicationSettings.DailyLoginBonus );
+                    await _minecraftStoreService.AddCurrencyForUser ( gamerTag, _applicationSettings.DailyLoginBonus, CurrencyTransactionReason.DailyLogin );
                     user.LastLoginReward = DateTime.UtcNow;
                 }
 
                 user.LastMinecraftLogin = DateTime.UtcNow;
-                _userRepository.SaveUserAsync ( user );
+                await _userRepository.SaveUserAsync ( user );
 
 
 
