@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using MinecraftWrapper.Data.Constants;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace MinecraftWrapper.Data.Entities
 {
@@ -30,5 +33,8 @@ namespace MinecraftWrapper.Data.Entities
 
         public virtual IEnumerable<UserPreference> UserPreferences { get; set; }
         public virtual IEnumerable<UserCurrency> CurrencyLog { get; internal set; }
+
+        [NotMapped]
+        public decimal? CurrentMoney => CurrencyLog?.Where ( c => c.CurrencyTypeId == CurrencyType.Normal )?.Sum ( c => c.Amount );
     }
 }
