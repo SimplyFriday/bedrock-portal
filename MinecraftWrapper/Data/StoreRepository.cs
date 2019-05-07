@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MinecraftWrapper.Data.Constants;
 using MinecraftWrapper.Data.Entities;
 using System;
 using System.Collections.Generic;
@@ -83,6 +84,13 @@ namespace MinecraftWrapper.Data
             }
 
             await _context.SaveChangesAsync ();
+        }
+
+        public UserCurrency GetMostRecentUserCurrencyByUserIdAndReason ( string id, CurrencyTransactionReason currencyTransactionReason )
+        {
+            return _context.UserCurrency
+                .OrderBy ( uc => uc.DateNoted )
+                .LastOrDefault ( uc => uc.UserId == id && uc.CurrencyTransactionReasonId == currencyTransactionReason );
         }
     }
 }

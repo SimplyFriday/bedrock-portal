@@ -26,7 +26,7 @@ namespace MinecraftWrapper.Services
             _serviceProvider = serviceProvider;
         }
 
-        public async Task AddCurrencyForUser ( string gamerTag, int amount, CurrencyTransactionReason currencyTransactionReason )
+        public async Task AddCurrencyForUser ( string gamerTag, decimal amount, CurrencyTransactionReason currencyTransactionReason )
         {
             using ( var scope = _serviceProvider.CreateScope () )
             using ( var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>> () ) 
@@ -54,7 +54,8 @@ namespace MinecraftWrapper.Services
                 CurrencyTransactionReasonId = CurrencyTransactionReason.Purchase,
                 CurrencyTypeId = CurrencyType.Normal,
                 DateNoted = DateTime.UtcNow,
-                UserId = user.Id
+                UserId = user.Id,
+                StoreItemId = item.StoreItemId
             };
             
             switch ( item.StoreItemTypeId )
@@ -98,7 +99,7 @@ namespace MinecraftWrapper.Services
 
         private string ParseCommand ( string effect, ApplicationUser user )
         {
-            return effect.Replace ( "{GamerTag}", user.GamerTag, StringComparison.CurrentCultureIgnoreCase )
+            return effect.Replace ( "{GamerTag}", $"\"{user.GamerTag}\"", StringComparison.CurrentCultureIgnoreCase )
                          .Replace ( "{Rank}", user.Rank.ToString (), StringComparison.CurrentCultureIgnoreCase );
         }
     }

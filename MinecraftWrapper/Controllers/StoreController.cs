@@ -250,16 +250,21 @@ namespace MinecraftWrapper.Controllers
                 return NotFound ( $"No user was found for DiscordId: {model.DiscordId}" );
             }
 
-            var uc = new UserCurrency
-            {
-                Amount = model.Amount,
-                CurrencyTransactionReasonId = model.CurrencyTransactionReason,
-                CurrencyTypeId = CurrencyType.Normal,
-                DateNoted = DateTime.UtcNow,
-                UserId = user.Id
-            };
+            var lastMessage = _storeRepository.GetMostRecentUserCurrencyByUserIdAndReason (user.Id, model.CurrencyTransactionReason);
 
-            await _storeRepository.SaveUserCurrency ( uc );
+            if ( lastMessage == null || (lastMessage.DateNoted - DateTime.UtcNow).TotalSeconds >= _applicationSettings.DiscordPointCooldownInSeconds ) 
+            {
+                var uc = new UserCurrency
+                {
+                    Amount = model.Amount,
+                    CurrencyTransactionReasonId = model.CurrencyTransactionReason,
+                    CurrencyTypeId = CurrencyType.Normal,
+                    DateNoted = DateTime.UtcNow,
+                    UserId = user.Id
+                };
+
+                await _storeRepository.SaveUserCurrency ( uc );
+            }
 
             return Ok ();
         }

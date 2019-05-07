@@ -22,6 +22,8 @@ namespace MinecraftWrapper.Data
         public string MinecraftCurrencyName { get; set; }
         public List<MenuLink> StaticMenuLinks{ get; set; }
         public int DailyLoginBonus { get; set; }
+        public decimal PointsPerSecond { get; set; }
+        public int DiscordPointCooldownInSeconds { get; set; }
     }
 
     public class MenuLink
