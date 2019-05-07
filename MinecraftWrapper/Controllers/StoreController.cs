@@ -252,7 +252,7 @@ namespace MinecraftWrapper.Controllers
 
             var lastMessage = _storeRepository.GetMostRecentUserCurrencyByUserIdAndReason (user.Id, model.CurrencyTransactionReason);
 
-            if ( lastMessage == null || (lastMessage.DateNoted - DateTime.UtcNow).TotalSeconds >= _applicationSettings.DiscordPointCooldownInSeconds ) 
+            if ( lastMessage == null || (DateTime.UtcNow - lastMessage.DateNoted).TotalSeconds >= _applicationSettings.DiscordPointCooldownInSeconds ) 
             {
                 var uc = new UserCurrency
                 {

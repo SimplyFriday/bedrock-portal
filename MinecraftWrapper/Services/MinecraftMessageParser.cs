@@ -90,7 +90,7 @@ namespace MinecraftWrapper.Services
                             // Player has logged out
                             if ( user.LastMinecraftLogin.HasValue )
                             {
-                                var seconds = (user.LastMinecraftLogin.Value - DateTime.UtcNow).TotalSeconds;
+                                var seconds = (DateTime.UtcNow - user.LastMinecraftLogin.Value).TotalSeconds;
                                 await _minecraftStoreService.AddCurrencyForUser ( gamerTag, (decimal) seconds * _applicationSettings.PointsPerSecond, CurrencyTransactionReason.TimePlayed );
                             }
                         }
