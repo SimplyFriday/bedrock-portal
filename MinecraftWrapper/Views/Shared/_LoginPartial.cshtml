@@ -10,7 +10,7 @@
     var appUser = await UserManager.GetUserAsync ( User );
     var currency = await StoreRepository.GetCurrencyTotalForUser ( appUser.Id );
     var hoursLeft = ((appUser.MembershipExpirationTime ?? DateTime.UtcNow).Ticks - DateTime.UtcNow.Ticks) / 36000000000;
-    var nextLoginBonus = ((appUser.LastLoginReward.HasValue ? appUser.LastLoginReward.Value.AddDays(1).Ticks : DateTime.UtcNow.Ticks) - DateTime.UtcNow.Ticks) / 36000000000;
+    var nextLoginBonus = Math.Ceiling(((appUser.LastLoginReward.HasValue ? appUser.LastLoginReward.Value.AddDays(1).Ticks : DateTime.UtcNow.Ticks) - DateTime.UtcNow.Ticks) / 36000000000.0);
 
     <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right">

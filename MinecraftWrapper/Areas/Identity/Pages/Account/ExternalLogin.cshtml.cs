@@ -127,7 +127,7 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account
 
             if ( ModelState.IsValid )
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, GamerTag = Input.GamerTag, EmailConfirmed = true, DiscordId = Input.DiscordHandle };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, GamerTag = Input.GamerTag, EmailConfirmed = true, DiscordId = Input.DiscordHandle, Rank = 1, IsActive = true };
 
                 var result = await _userManager.CreateAsync ( user );
                 if ( result.Succeeded )

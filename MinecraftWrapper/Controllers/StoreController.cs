@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace MinecraftWrapper.Controllers
 {
-    [Authorize ( Roles = "Admin" )]
+    [Authorize]
     public class StoreController : Controller
     {
         private readonly UserRepository _userRepository;
@@ -31,7 +31,7 @@ namespace MinecraftWrapper.Controllers
             _minecraftStoreService = minecraftStoreService;
         }
 
-        // GET: Store
+        [Authorize ( Roles = "Admin" )]
         public async Task<IActionResult> EditIndex ()
         {
             var items = await _storeRepository.GetAllItems ();
@@ -39,7 +39,7 @@ namespace MinecraftWrapper.Controllers
             return View ( items );
         }
 
-        // GET: Store/Details/5
+        [Authorize ( Roles = "Admin" )]
         public async Task<IActionResult> Details ( Guid? id )
         {
             if ( id == null )
@@ -57,7 +57,7 @@ namespace MinecraftWrapper.Controllers
             return View ( storeItem );
         }
 
-        // GET: Store/Create
+        [Authorize ( Roles = "Admin" )]
         public IActionResult Create ()
         {
             return View ();
@@ -68,6 +68,7 @@ namespace MinecraftWrapper.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize ( Roles = "Admin" )]
         public async Task<IActionResult> Create ( [Bind ( "StoreItemId,Description,StoreItemTypeId,MinimumRank,Price,Title,Effect" )] StoreItem storeItem )
         {
             if ( ModelState.IsValid )
@@ -78,7 +79,7 @@ namespace MinecraftWrapper.Controllers
             return View ( storeItem );
         }
 
-        // GET: Store/Edit/5
+        [Authorize ( Roles = "Admin" )]
         public async Task<IActionResult> Edit ( Guid? id )
         {
             if ( id == null )
@@ -99,6 +100,7 @@ namespace MinecraftWrapper.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize ( Roles = "Admin" )]
         public async Task<IActionResult> Edit ( Guid id, [Bind ( "StoreItemId,Description,StoreItemTypeId,MinimumRank,Price,Title,Effect" )] StoreItem storeItem )
         {
             if ( id != storeItem.StoreItemId )
@@ -128,6 +130,7 @@ namespace MinecraftWrapper.Controllers
             return View ( storeItem );
         }
 
+        [Authorize ( Roles = "Admin" )]
         [HttpGet]
         public async Task<IActionResult> Delete ( Guid? id )
         {
@@ -148,6 +151,7 @@ namespace MinecraftWrapper.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost, ActionName ( "Delete" )]
+        [Authorize ( Roles = "Admin" )]
         public async Task<IActionResult> DeleteConfirmed (Guid? id)
         {
             if ( id == null )
@@ -175,9 +179,11 @@ namespace MinecraftWrapper.Controllers
          ********************************************** NON ADMIN METHODS *********************************************
          **************************************************************************************************************
          **************************************************************************************************************/
-        [Authorize]
+         
+
         [HttpGet]
-        public async Task<IActionResult> Index ( [FromQuery] string statusMessage )
+        [Authorize]
+        public async Task<IActionResult> Index ( [FromQuery] string statusMessage = "" )
         {
             var user = await _userManager.GetUserAsync ( HttpContext.User );
             var items = await _storeRepository.GetAvailableStoreItemsByRank ( user.Rank );
@@ -197,8 +203,8 @@ namespace MinecraftWrapper.Controllers
             return View ( viewModel );
         }
 
-        [Authorize]
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> PurchaseItem ( Guid? id )
         {
             string statusMessage = null;
@@ -244,16 +250,21 @@ namespace MinecraftWrapper.Controllers
                 return NotFound ( $"No user was found for DiscordId: {model.DiscordId}" );
             }
 
-            var uc = new UserCurrency
-            {
-                Amount = model.Amount,
-                CurrencyTransactionReasonId = model.CurrencyTransactionReason,
-                CurrencyTypeId = CurrencyType.Normal,
-                DateNoted = DateTime.UtcNow,
-                UserId = user.Id
-            };
+            var lastMessage = _storeRepository.GetMostRecentUserCurrencyByUserIdAndReason (user.Id, model.CurrencyTransactionReason);
 
-            await _storeRepository.SaveUserCurrency ( uc );
+            if ( lastMessage == null || (DateTime.UtcNow - lastMessage.DateNoted).TotalSeconds >= _applicationSettings.DiscordPointCooldownInSeconds ) 
+            {
+                var uc = new UserCurrency
+                {
+                    Amount = model.Amount,
+                    CurrencyTransactionReasonId = model.CurrencyTransactionReason,
+                    CurrencyTypeId = CurrencyType.Normal,
+                    DateNoted = DateTime.UtcNow,
+                    UserId = user.Id
+                };
+
+                await _storeRepository.SaveUserCurrency ( uc );
+            }
 
             return Ok ();
         }

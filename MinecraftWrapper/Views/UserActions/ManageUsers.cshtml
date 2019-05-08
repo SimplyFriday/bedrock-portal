@@ -19,6 +19,9 @@
                 @Html.DisplayNameFor( model => model.DiscordId )
             </th>
             <th>
+                @Html.DisplayNameFor( model => model.CurrentMoney )
+            </th>
+            <th>
                 @Html.DisplayNameFor( model => model.IsActive )
             </th>
             <th></th>
@@ -32,6 +35,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.DiscordId)
+            </td>
+            <td>
+                @Html.DisplayFor( modelItem => item.CurrentMoney )
             </td>
             <td>
                 @item.IsActive

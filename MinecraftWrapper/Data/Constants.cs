@@ -20,7 +20,8 @@ namespace MinecraftWrapper.Data.Constants
         DiscordMessage = 1,
         Purchase = 2,
         DailyLogin = 3,
-        Gift = 4
+        Gift = 4,
+        TimePlayed = 5
     }
 
     public enum CurrencyType
