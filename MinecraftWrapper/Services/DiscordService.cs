@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using MinecraftWrapper.Data;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace MinecraftWrapper.Services
 {
@@ -42,7 +43,7 @@ namespace MinecraftWrapper.Services
             }
             catch ( Exception ex )
             {
-                // TODO add logging
+                Log.Error ( ex, "An error occurred while trying to send Discord webhook" );
             }
         }
     }

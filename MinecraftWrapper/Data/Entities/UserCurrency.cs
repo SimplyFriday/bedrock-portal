@@ -21,5 +21,10 @@ namespace MinecraftWrapper.Data.Entities
 
         [ForeignKey(nameof(User))]
         public virtual string UserId { get; set; }
+
+        public virtual StoreItem StoreItem { get; set; }
+
+        [ForeignKey(nameof(StoreItem))]
+        public virtual Guid? StoreItemId { get; set; }
     }
 }

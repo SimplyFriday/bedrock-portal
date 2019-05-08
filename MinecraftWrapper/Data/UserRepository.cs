@@ -19,7 +19,9 @@ namespace MinecraftWrapper.Data
 
         public async Task<IList<ApplicationUser>> GetAllUsersAsync ()
         {
-            return await _context.Users.ToListAsync ();
+            return await _context.Users
+                         .Include(u=>u.CurrencyLog)        
+                         .ToListAsync ();
         }
 
         public async Task<bool> SaveUserPreferance ( UserPreference userPreference )

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using MinecraftWrapper.Data;
+using MinecraftWrapper.Data.Constants;
 using MinecraftWrapper.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,35 +56,51 @@ namespace MinecraftWrapper.Services
         /// <returns>Returns true if the needle was found and the status was successfully updated</returns>
         private async Task<bool> ChangePlayerOnlineStatus(string needle, string haystack, bool status )
         {
-            Regex regex = new Regex ( $"{needle}(.+?)\\b", RegexOptions.IgnoreCase);
+            Regex regex = new Regex ( $"{needle}(.+?),", RegexOptions.IgnoreCase);
             var matches = regex.Matches ( haystack );
             
             if ( matches.Count () > 0 )
             {
-                var gamerTag = matches[ 0 ].Groups[ 1 ].Value;
-                _statusService.UpdateUserStatus ( gamerTag, status );
-
-                var user = await _userRepository.GetUserByGamerTagAsync ( gamerTag );
-
-                if ( user != null && ( user.LastLoginReward == null || user.LastLoginReward.Value.AddDays ( 1 ) <= DateTime.UtcNow ) )
+                try
                 {
-                    // daily login bonus
-                    _minecraftStoreService.AddCurrencyForUser ( gamerTag, _applicationSettings.DailyLoginBonus );
-                    user.LastLoginReward = DateTime.UtcNow;
-                }
+                    var gamerTag = matches[ 0 ].Groups[ 1 ].Value;
 
-                user.LastMinecraftLogin = DateTime.UtcNow;
-                _userRepository.SaveUserAsync ( user );
+                    if ( gamerTag != null )
+                    {
+                        _statusService.UpdateUserStatus ( gamerTag, status );
+                        var user = await _userRepository.GetUserByGamerTagAsync ( gamerTag );
 
+                        if ( status )
+                        {
+                            // Player has logged in
+                            if ( user != null && (user.LastLoginReward == null || user.LastLoginReward.Value.AddDays ( 1 ) <= DateTime.UtcNow) )
+                            {
+                                // daily login bonus
+                                await _minecraftStoreService.AddCurrencyForUser ( gamerTag, _applicationSettings.DailyLoginBonus, CurrencyTransactionReason.DailyLogin );
+                                user.LastLoginReward = DateTime.UtcNow;
+                            }
 
+                            user.LastMinecraftLogin = DateTime.UtcNow;
+                            await _userRepository.SaveUserAsync ( user );
 
-                if ( status && gamerTag != null )
+                            _discordService.SendWebhookMessage ( $"{gamerTag} has logged in!" );
+                        }
+                        else
+                        {
+                            // Player has logged out
+                            if ( user.LastMinecraftLogin.HasValue )
+                            {
+                                var seconds = (DateTime.UtcNow - user.LastMinecraftLogin.Value).TotalSeconds;
+                                await _minecraftStoreService.AddCurrencyForUser ( gamerTag, (decimal) seconds * _applicationSettings.PointsPerSecond, CurrencyTransactionReason.TimePlayed );
+                            }
+                        }
+                    }
+
+                    return true;
+                } catch (Exception ex)
                 {
-                    // Player has logged in, notify Discord
-                    _discordService.SendWebhookMessage ( $"{gamerTag} has logged in!" );
+                    Log.Error ( ex, $"An error occurred in ChangePlayerOnlineStatus({needle},{haystack},{status})" );
                 }
-
-                return true;
             }
 
             return false;

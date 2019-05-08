@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using MinecraftWrapper.Data;
 using MinecraftWrapper.Data.Constants;
 using MinecraftWrapper.Data.Entities;
@@ -15,22 +16,34 @@ namespace MinecraftWrapper.Services
         private readonly ConsoleApplicationWrapper<MinecraftMessageParser> _wrapper;
         private readonly StoreRepository _storeRepository;
         private readonly UserRepository _userRepository;
+        private readonly IServiceProvider _serviceProvider;
 
-        public MinecraftStoreService ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, StoreRepository storeRepository, UserRepository userRepository )
+        public MinecraftStoreService ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, StoreRepository storeRepository, UserRepository userRepository, IServiceProvider serviceProvider )
         {
             _wrapper = wrapper;
             _storeRepository = storeRepository;
             _userRepository = userRepository;
+            _serviceProvider = serviceProvider;
         }
 
-        public int GetMinecraftCurrencyForUser ( string gamerTag )
+        public async Task AddCurrencyForUser ( string gamerTag, decimal amount, CurrencyTransactionReason currencyTransactionReason )
         {
-            throw new NotImplementedException();
-        }
+            using ( var scope = _serviceProvider.CreateScope () )
+            using ( var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>> () ) 
+            {
+                var user = userManager.Users.SingleOrDefault ( u => string.Equals ( gamerTag, u.GamerTag, StringComparison.CurrentCultureIgnoreCase ) );
 
-        public void AddCurrencyForUser ( string gamerTag, int amount )
-        {
-            throw new NotImplementedException ();
+                var uc = new UserCurrency
+                {
+                    Amount = amount,
+                    CurrencyTransactionReasonId = currencyTransactionReason,
+                    CurrencyTypeId = CurrencyType.Normal,
+                    DateNoted = DateTime.UtcNow,
+                    UserId = user.Id
+                };
+
+                await _storeRepository.SaveUserCurrency ( uc );
+            }
         }
 
         public async Task PurchaseItemAsync ( StoreItem item, ApplicationUser user )
@@ -41,13 +54,14 @@ namespace MinecraftWrapper.Services
                 CurrencyTransactionReasonId = CurrencyTransactionReason.Purchase,
                 CurrencyTypeId = CurrencyType.Normal,
                 DateNoted = DateTime.UtcNow,
-                UserId = user.Id
+                UserId = user.Id,
+                StoreItemId = item.StoreItemId
             };
             
             switch ( item.StoreItemTypeId )
             {
                 case StoreItemType.Command:
-                    _wrapper.SendInput ( item.Effect, null );
+                    _wrapper.SendInput ( ParseCommand ( item.Effect, user ), null );
                     break;
                 case StoreItemType.Membership:
                     int hours;
@@ -81,6 +95,12 @@ namespace MinecraftWrapper.Services
             }
 
             await _storeRepository.SaveUserCurrency ( uc );
+        }
+
+        private string ParseCommand ( string effect, ApplicationUser user )
+        {
+            return effect.Replace ( "{GamerTag}", $"\"{user.GamerTag}\"", StringComparison.CurrentCultureIgnoreCase )
+                         .Replace ( "{Rank}", user.Rank.ToString (), StringComparison.CurrentCultureIgnoreCase );
         }
     }
 }
