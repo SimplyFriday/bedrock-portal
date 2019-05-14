@@ -30,6 +30,7 @@ namespace MinecraftWrapper.Services
             _whiteListService = whiteListService;
             _discordService = discordService;
             _applicationSettings = options.Value;
+            _serviceProvider = serviceProvider;
         }
 
         public bool FilterInput ( string input )
