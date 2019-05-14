@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MinecraftWrapper.Data;
 using MinecraftWrapper.Data.Constants;
@@ -20,19 +21,16 @@ namespace MinecraftWrapper.Services
         private readonly StatusService _statusService;
         private readonly WhiteListService _whiteListService;
         private readonly DiscordService _discordService;
-        private readonly UserRepository _userRepository;
-        private readonly MinecraftStoreService _minecraftStoreService;
         private readonly ApplicationSettings _applicationSettings;
+        private readonly IServiceProvider _serviceProvider;
 
-        public MinecraftMessageParser ( StatusService statusService, WhiteListService whiteListService, DiscordService discordService, UserRepository userRepository,
-            MinecraftStoreService minecraftStoreService, IOptions<ApplicationSettings> options)
+        public MinecraftMessageParser ( StatusService statusService, WhiteListService whiteListService, DiscordService discordService, IOptions<ApplicationSettings> options, IServiceProvider serviceProvider)
         {
             _statusService = statusService;
             _whiteListService = whiteListService;
             _discordService = discordService;
-            _userRepository = userRepository;
-            _minecraftStoreService = minecraftStoreService;
             _applicationSettings = options.Value;
+            _serviceProvider = serviceProvider;
         }
 
         public bool FilterInput ( string input )
@@ -67,31 +65,37 @@ namespace MinecraftWrapper.Services
 
                     if ( gamerTag != null )
                     {
-                        _statusService.UpdateUserStatus ( gamerTag, status );
-                        var user = await _userRepository.GetUserByGamerTagAsync ( gamerTag );
-
-                        if ( status )
+                        using ( var scope = _serviceProvider.CreateScope () )
                         {
-                            // Player has logged in
-                            if ( user != null && (user.LastLoginReward == null || user.LastLoginReward.Value.AddDays ( 1 ) <= DateTime.UtcNow) )
+                            var userRepository = scope.ServiceProvider.GetRequiredService<UserRepository>();
+                            var minecraftStoreService = scope.ServiceProvider.GetRequiredService<MinecraftStoreService>();
+
+                            _statusService.UpdateUserStatus ( gamerTag, status );
+                            var user = await userRepository.GetUserByGamerTagAsync ( gamerTag );
+
+                            if ( status )
                             {
-                                // daily login bonus
-                                await _minecraftStoreService.AddCurrencyForUser ( gamerTag, _applicationSettings.DailyLoginBonus, CurrencyTransactionReason.DailyLogin );
-                                user.LastLoginReward = DateTime.UtcNow;
+                                // Player has logged in
+                                if ( user != null && (user.LastLoginReward == null || user.LastLoginReward.Value.AddDays ( 1 ) <= DateTime.UtcNow) )
+                                {
+                                    // daily login bonus
+                                    await minecraftStoreService.AddCurrencyForUser ( gamerTag, _applicationSettings.DailyLoginBonus, CurrencyTransactionReason.DailyLogin );
+                                    user.LastLoginReward = DateTime.UtcNow;
+                                }
+
+                                user.LastMinecraftLogin = DateTime.UtcNow;
+                                await userRepository.SaveUserAsync ( user );
+
+                                _discordService.SendWebhookMessage ( $"{gamerTag} has logged in!" );
                             }
-
-                            user.LastMinecraftLogin = DateTime.UtcNow;
-                            await _userRepository.SaveUserAsync ( user );
-
-                            _discordService.SendWebhookMessage ( $"{gamerTag} has logged in!" );
-                        }
-                        else
-                        {
-                            // Player has logged out
-                            if ( user.LastMinecraftLogin.HasValue )
+                            else
                             {
-                                var seconds = (DateTime.UtcNow - user.LastMinecraftLogin.Value).TotalSeconds;
-                                await _minecraftStoreService.AddCurrencyForUser ( gamerTag, (decimal) seconds * _applicationSettings.PointsPerSecond, CurrencyTransactionReason.TimePlayed );
+                                // Player has logged out
+                                if ( user.LastMinecraftLogin.HasValue )
+                                {
+                                    var seconds = (DateTime.UtcNow - user.LastMinecraftLogin.Value).TotalSeconds;
+                                    await minecraftStoreService.AddCurrencyForUser ( gamerTag, (decimal) seconds * _applicationSettings.PointsPerSecond, CurrencyTransactionReason.TimePlayed );
+                                }
                             }
                         }
                     }
