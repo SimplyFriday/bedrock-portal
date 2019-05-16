@@ -22,6 +22,9 @@
                 @Html.DisplayNameFor( model => model.CurrentMoney )
             </th>
             <th>
+                Hours Left
+            </th>
+            <th>
                 @Html.DisplayNameFor( model => model.IsActive )
             </th>
             <th></th>
@@ -29,23 +32,28 @@
     </thead>
     <tbody>
 @foreach (var item in Model.Where ( u => !string.IsNullOrEmpty ( u.GamerTag ) ) ) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.GamerTag)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DiscordId)
-            </td>
-            <td>
-                @Html.DisplayFor( modelItem => item.CurrentMoney )
-            </td>
-            <td>
-                @item.IsActive
-            </td>
-            <td>
-                <a asp-action="ToggleUserActiveState" asp-route-id="@item.Id">Toggle Active</a>
-            </td>
-        </tr>
+    var membershipLeft = ((item.MembershipExpirationTime ?? DateTime.UtcNow) - DateTime.UtcNow);
+    membershipLeft = membershipLeft.TotalHours > 0 ? membershipLeft : new TimeSpan(0);
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.GamerTag)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DiscordId)
+        </td>
+        <td>
+            @Html.DisplayFor( modelItem => item.CurrentMoney )
+        </td>
+        <td>
+            @membershipLeft.TotalHours.ToString("F2")
+        </td>
+        <td>
+            @item.IsActive
+        </td>
+        <td>
+            <a asp-action="ToggleUserActiveState" asp-route-id="@item.Id">Toggle Active</a>
+        </td>
+    </tr>
 }
     </tbody>
 </table>
