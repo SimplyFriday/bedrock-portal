@@ -21,12 +21,15 @@ namespace MinecraftWrapper.Data
         {
             return await _context.StoreItem
                 .Where ( s => s.MinimumRank <= rank )
+                .AsNoTracking ()
                 .ToListAsync ();
         }
 
         public async Task<IEnumerable<StoreItem>> GetAllItems ()
         {
-            return await _context.StoreItem.ToListAsync ();
+            return await _context.StoreItem
+                .AsNoTracking ()
+                .ToListAsync ();
         }
 
         public async Task<StoreItem> GetStoreItemByIdAsync ( Guid? id )

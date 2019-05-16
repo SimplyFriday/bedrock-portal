@@ -191,6 +191,14 @@ namespace MinecraftWrapper.Controllers
             var items = await _storeRepository.GetAvailableStoreItemsByRank ( user.Rank );
             var currentMoney = await _storeRepository.GetCurrencyTotalForUserAsync ( user.Id, CurrencyType.Normal );
 
+            var multiplier = user.Rank * _applicationSettings.DiscountPercentPerRank;
+            multiplier = multiplier > _applicationSettings.DiscountRankCap ? _applicationSettings.DiscountRankCap : multiplier;
+
+            foreach (var item in items )
+            {
+                item.Price *= 1 - multiplier;
+            }
+
             var viewModel = new StoreIndexViewModel
             {
                 StoreItems = items,
