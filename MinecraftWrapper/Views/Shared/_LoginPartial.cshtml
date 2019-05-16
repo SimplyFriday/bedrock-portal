@@ -8,7 +8,7 @@
 {
     // Get all the async stuff we need because I don't know how to pass it in from a controller...
     var appUser = await UserManager.GetUserAsync ( User );
-    var currency = await StoreRepository.GetCurrencyTotalForUser ( appUser.Id );
+    var currency = await StoreRepository.GetCurrencyTotalForUserAsync ( appUser.Id, CurrencyType.Normal );
     var hoursLeft = ((appUser.MembershipExpirationTime ?? DateTime.UtcNow).Ticks - DateTime.UtcNow.Ticks) / 36000000000;
     var nextLoginBonus = Math.Ceiling(((appUser.LastLoginReward.HasValue ? appUser.LastLoginReward.Value.AddDays(1).Ticks : DateTime.UtcNow.Ticks) - DateTime.UtcNow.Ticks) / 36000000000.0);
 

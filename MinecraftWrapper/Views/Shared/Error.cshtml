@@ -1,4 +1,5 @@
-﻿@model ErrorViewModel
+﻿
+@model ErrorViewModel
 @{
     ViewData["Title"] = "Error";
 }
@@ -15,8 +16,5 @@
 
 @if ( Model.ShowException )
 {
-    <p>
-        <span>@Model.Exception.Message:</span>
-        <span>@Model.Exception.StackTrace</span>
-    </p>
+    @Html.Raw(@Model.ExceptionHtml)
 }

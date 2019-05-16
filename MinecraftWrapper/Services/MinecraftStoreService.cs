@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MinecraftWrapper.Data;
 using MinecraftWrapper.Data.Constants;
 using MinecraftWrapper.Data.Entities;
@@ -17,16 +18,19 @@ namespace MinecraftWrapper.Services
         private readonly StoreRepository _storeRepository;
         private readonly UserRepository _userRepository;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ApplicationSettings _applicationSettings;
 
-        public MinecraftStoreService ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, StoreRepository storeRepository, UserRepository userRepository, IServiceProvider serviceProvider )
+        public MinecraftStoreService ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, StoreRepository storeRepository, UserRepository userRepository, 
+            IServiceProvider serviceProvider, IOptions<ApplicationSettings> options )
         {
             _wrapper = wrapper;
             _storeRepository = storeRepository;
             _userRepository = userRepository;
             _serviceProvider = serviceProvider;
+            _applicationSettings = options.Value;
         }
 
-        public async Task AddCurrencyForUser ( string gamerTag, decimal amount, CurrencyTransactionReason currencyTransactionReason )
+        public async Task AddCurrencyForUser ( string gamerTag, decimal amount, CurrencyTransactionReason currencyTransactionReason, CurrencyType currencyType = CurrencyType.Normal )
         {
             using ( var scope = _serviceProvider.CreateScope () )
             using ( var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>> () ) 
@@ -37,7 +41,7 @@ namespace MinecraftWrapper.Services
                 {
                     Amount = amount,
                     CurrencyTransactionReasonId = currencyTransactionReason,
-                    CurrencyTypeId = CurrencyType.Normal,
+                    CurrencyTypeId = currencyType,
                     DateNoted = DateTime.UtcNow,
                     UserId = user.Id
                 };
@@ -48,7 +52,7 @@ namespace MinecraftWrapper.Services
 
         public async Task PurchaseItemAsync ( StoreItem item, ApplicationUser user )
         {
-            var uc = new UserCurrency
+            var payment = new UserCurrency
             {
                 Amount = -item.Price,
                 CurrencyTransactionReasonId = CurrencyTransactionReason.Purchase,
@@ -94,7 +98,19 @@ namespace MinecraftWrapper.Services
                     throw new NotImplementedException ( $"You have tried using an unsupported StoreItemTypeId of {item.StoreItemTypeId}" );
             }
 
-            await _storeRepository.SaveUserCurrency ( uc );
+            await _storeRepository.SaveUserCurrency ( payment );
+
+            var gift = new UserCurrency
+            {
+                Amount = item.Price * _applicationSettings.GiftPointPercentage,
+                CurrencyTransactionReasonId = CurrencyTransactionReason.Gift,
+                CurrencyTypeId = CurrencyType.Gift,
+                DateNoted = DateTime.UtcNow,
+                UserId = user.Id,
+                StoreItemId = null
+            };
+
+            await _storeRepository.SaveUserCurrency ( gift );
         }
 
         private string ParseCommand ( string effect, ApplicationUser user )

@@ -68,10 +68,10 @@ namespace MinecraftWrapper.Data
             await _context.SaveChangesAsync ();
         }
 
-        public async Task<decimal> GetCurrencyTotalForUser ( string userId )
+        public async Task<decimal> GetCurrencyTotalForUserAsync ( string userId, CurrencyType currencyType )
         {
             return await _context.UserCurrency
-                .Where ( c => c.User.Id == userId )
+                .Where ( c => c.User.Id == userId && c.CurrencyTypeId == currencyType )
                 .Select ( c => c.Amount )
                 .SumAsync ();
         }

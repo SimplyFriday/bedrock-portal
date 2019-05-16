@@ -24,6 +24,7 @@ namespace MinecraftWrapper.Data
         public int DailyLoginBonus { get; set; }
         public decimal PointsPerSecond { get; set; }
         public int DiscordPointCooldownInSeconds { get; set; }
+        public decimal GiftPointPercentage { get; set; }
     }
 
     public class MenuLink
