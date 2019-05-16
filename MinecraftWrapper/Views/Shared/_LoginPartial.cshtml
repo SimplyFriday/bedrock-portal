@@ -8,9 +8,9 @@
 {
     // Get all the async stuff we need because I don't know how to pass it in from a controller...
     var appUser = await UserManager.GetUserAsync ( User );
-    var currency = await StoreRepository.GetCurrencyTotalForUser ( appUser.Id );
-    var hoursLeft = ((appUser.MembershipExpirationTime ?? DateTime.UtcNow).Ticks - DateTime.UtcNow.Ticks) / 36000000000;
-    var nextLoginBonus = Math.Ceiling(((appUser.LastLoginReward.HasValue ? appUser.LastLoginReward.Value.AddDays(1).Ticks : DateTime.UtcNow.Ticks) - DateTime.UtcNow.Ticks) / 36000000000.0);
+    var currency = await StoreRepository.GetCurrencyTotalForUserAsync ( appUser.Id, CurrencyType.Normal );
+    var membershipLeft = ((appUser.MembershipExpirationTime ?? DateTime.UtcNow) - DateTime.UtcNow);
+    var nextLoginBonus = ((appUser.LastLoginReward.HasValue ? appUser.LastLoginReward.Value.AddDays(1) : DateTime.UtcNow) - DateTime.UtcNow);
 
     <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right">
@@ -26,12 +26,12 @@
                         Wallet: @currency.ToString( "F2" ) @Options.Value.MinecraftCurrencyName
                     </li>
                     <li class="menu-text">
-                        Membership: @hoursLeft Hours
+                        Membership: @membershipLeft.TotalHours.ToString( "F2" ) hours
                     </li>
-                    @if ( nextLoginBonus > 0 )
+                    @if ( nextLoginBonus.TotalMilliseconds > 0 )
                     {
                         <li class="menu-text">
-                            Bonus In: @nextLoginBonus Hours
+                            Bonus In: @nextLoginBonus.TotalHours.ToString( "F2" ) hours
                         </li>
                     }
                     else

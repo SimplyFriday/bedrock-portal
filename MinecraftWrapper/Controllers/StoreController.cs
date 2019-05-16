@@ -8,7 +8,10 @@ using MinecraftWrapper.Data.Constants;
 using MinecraftWrapper.Data.Entities;
 using MinecraftWrapper.Models;
 using MinecraftWrapper.Services;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MinecraftWrapper.Controllers
@@ -182,12 +185,19 @@ namespace MinecraftWrapper.Controllers
          
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> Index ( [FromQuery] string statusMessage = "" )
         {
             var user = await _userManager.GetUserAsync ( HttpContext.User );
             var items = await _storeRepository.GetAvailableStoreItemsByRank ( user.Rank );
-            var currentMoney = await _storeRepository.GetCurrencyTotalForUser ( user.Id );
+            var currentMoney = await _storeRepository.GetCurrencyTotalForUserAsync ( user.Id, CurrencyType.Normal );
+
+            var multiplier = user.Rank * _applicationSettings.DiscountPercentPerRank;
+            multiplier = multiplier > _applicationSettings.DiscountRankCap ? _applicationSettings.DiscountRankCap : multiplier;
+
+            foreach (var item in items )
+            {
+                item.Price *= 1 - multiplier;
+            }
 
             var viewModel = new StoreIndexViewModel
             {
@@ -204,7 +214,6 @@ namespace MinecraftWrapper.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> PurchaseItem ( Guid? id )
         {
             string statusMessage = null;
@@ -213,7 +222,7 @@ namespace MinecraftWrapper.Controllers
             {
                 var user = await _userManager.GetUserAsync ( HttpContext.User );
                 var item = await _storeRepository.GetStoreItemByIdAsync( id );
-                var currentMoney = await _storeRepository.GetCurrencyTotalForUser ( user.Id );
+                var currentMoney = await _storeRepository.GetCurrencyTotalForUserAsync ( user.Id, CurrencyType.Normal );
 
                 if ( currentMoney >= item.Price ) 
                 {
@@ -267,6 +276,91 @@ namespace MinecraftWrapper.Controllers
             }
 
             return Ok ();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GiftCurrency ()
+        {
+            if ( !string.IsNullOrEmpty ( TempData["Status"]?.ToString () ) ) 
+            {
+                ViewBag.Status = TempData["Status"];
+            }
+
+            var user = await _userManager.GetUserAsync ( HttpContext.User );
+            var giftCurrency = await _storeRepository.GetCurrencyTotalForUserAsync ( user.Id, CurrencyType.Gift );
+            var activeUsers = await _userManager.Users.Where ( u => u.IsActive && u.Id != user.Id ).ToListAsync ();
+
+            var model = new GiftCurrencyViewModel
+            {
+                GiftCurrancy = giftCurrency,
+                Users = activeUsers
+            };
+
+            return View ( model );
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SendGift (string id)
+        {
+            if ( !string.IsNullOrEmpty ( TempData["Status"]?.ToString () ) )
+            {
+                ViewBag.Status = TempData["Status"];
+            }
+
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            var model = new SendGiftViewModel
+            {
+                Amount = 0,
+                CurrentGiftCurrency = await _storeRepository.GetCurrencyTotalForUserAsync ( user.Id, CurrencyType.Gift ),
+                GamerTag = id
+            };
+
+            return View ( model );
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendGift ( SendGiftViewModel model )
+        {
+            var currentUser = await _userManager.GetUserAsync ( HttpContext.User );
+            var targetUser = await _userRepository.GetUserByGamerTagAsync ( model.GamerTag );
+            var currentUserCurrency = await _storeRepository.GetCurrencyTotalForUserAsync(currentUser.Id, CurrencyType.Gift);
+            
+            if (model.Amount > currentUserCurrency )
+            {
+                ModelState.AddModelError ( "NotEnoughMoney", "You don't have enough gift currency to send that much!" );
+            }
+
+            if (targetUser == null )
+            {
+                ModelState.AddModelError ( "GamerTagNotFound", $"{model.GamerTag} doesn't exist!" );
+            }
+
+            if (targetUser?.Id == currentUser.Id )
+            {
+                ModelState.AddModelError ( "SelfishBastard", "You cannot send gifts to yourself!" );
+            }
+
+            if ( model.Amount <= 0 )
+            {
+                ModelState.AddModelError ( "TooLittle", "Amount must be a positive number!" );
+            }
+
+            if ( ModelState.IsValid )
+            {
+                await _minecraftStoreService.AddCurrencyForUser ( currentUser.GamerTag, -model.Amount, CurrencyTransactionReason.Gift, CurrencyType.Gift );
+                await _minecraftStoreService.AddCurrencyForUser ( targetUser.GamerTag, model.Amount, CurrencyTransactionReason.Gift, CurrencyType.Normal );
+
+                TempData["Status"] = $"{model.Amount} was sent to {model.GamerTag}!";
+
+                return RedirectToAction ( nameof ( GiftCurrency ) );
+            }
+
+            TempData["Status"] = "ERROR: " + string.Join(Environment.NewLine,ModelState.Values
+                .SelectMany(state => state.Errors)
+                .Select(error => error.ErrorMessage));
+
+            return RedirectToAction ( nameof ( SendGift ), "Store", "id", model.GamerTag );
         }
     }
 }
