@@ -25,6 +25,8 @@ namespace MinecraftWrapper.Data
         public decimal PointsPerSecond { get; set; }
         public int DiscordPointCooldownInSeconds { get; set; }
         public decimal GiftPointPercentage { get; set; }
+        public decimal DiscountPercentPerRank { get; set; }
+        public decimal DiscountRankCap { get; set; }
     }
 
     public class MenuLink

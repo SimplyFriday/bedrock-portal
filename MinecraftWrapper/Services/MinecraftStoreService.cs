@@ -52,9 +52,12 @@ namespace MinecraftWrapper.Services
 
         public async Task PurchaseItemAsync ( StoreItem item, ApplicationUser user )
         {
+            var multiplier = user.Rank * _applicationSettings.DiscountPercentPerRank;
+            multiplier = multiplier > _applicationSettings.DiscountRankCap ? _applicationSettings.DiscountRankCap : multiplier;
+
             var payment = new UserCurrency
             {
-                Amount = -item.Price,
+                Amount = -item.Price * (1 - multiplier),
                 CurrencyTransactionReasonId = CurrencyTransactionReason.Purchase,
                 CurrencyTypeId = CurrencyType.Normal,
                 DateNoted = DateTime.UtcNow,
