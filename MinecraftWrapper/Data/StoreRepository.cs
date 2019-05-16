@@ -21,12 +21,15 @@ namespace MinecraftWrapper.Data
         {
             return await _context.StoreItem
                 .Where ( s => s.MinimumRank <= rank )
+                .AsNoTracking ()
                 .ToListAsync ();
         }
 
         public async Task<IEnumerable<StoreItem>> GetAllItems ()
         {
-            return await _context.StoreItem.ToListAsync ();
+            return await _context.StoreItem
+                .AsNoTracking ()
+                .ToListAsync ();
         }
 
         public async Task<StoreItem> GetStoreItemByIdAsync ( Guid? id )
@@ -68,10 +71,10 @@ namespace MinecraftWrapper.Data
             await _context.SaveChangesAsync ();
         }
 
-        public async Task<decimal> GetCurrencyTotalForUser ( string userId )
+        public async Task<decimal> GetCurrencyTotalForUserAsync ( string userId, CurrencyType currencyType )
         {
             return await _context.UserCurrency
-                .Where ( c => c.User.Id == userId )
+                .Where ( c => c.User.Id == userId && c.CurrencyTypeId == currencyType )
                 .Select ( c => c.Amount )
                 .SumAsync ();
         }

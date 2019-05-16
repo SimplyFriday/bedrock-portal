@@ -1,0 +1,59 @@
+﻿@model MinecraftWrapper.Models.GiftCurrencyViewModel
+
+@{
+    ViewData["Title"] = "GiftCurrency";
+}
+
+<h2>Send Gift</h2>
+
+@*<input type="text" id="searchBox" onkeyup="filter()" placeholder="Search for names..">*@
+
+<table class="table" id="users">
+    <thead>
+        <tr>
+            <th>
+                GamerTag
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ( var user in Model.Users )
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor( u => user.GamerTag )
+                </td>
+                <td>
+                    <a asp-action="SendGift" asp-route-id="@user.GamerTag">Send @Options.Value.MinecraftCurrencyName</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@*@section Scripts{
+    <script>
+        function filter() {
+            // Declare variables
+            var input, filter, table, tr, a, i, txtValue;
+            input = document.getElementById('searchBox');
+            filter = input.value.toUpperCase();
+            table = document.getElementById("users");
+            tr = table.getElementsByTagName('tr');
+
+            // Loop through all list items, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+                a = tr[i].getElementsByTagName("td")[0];
+                txtValue = a.textContent || a.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+}*@

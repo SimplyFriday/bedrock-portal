@@ -13,7 +13,7 @@ namespace MinecraftWrapper.Data.Migrations
                 {
                     AdditionalUserDataId = table.Column<Guid>(nullable: false),
                     Bio = table.Column<string>(nullable: true),
-                    GamerTag = table.Column<string>(nullable: true),
+                    GamerTag = table.Column<string>(nullable: true, maxLength: 255),
                     UserId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
