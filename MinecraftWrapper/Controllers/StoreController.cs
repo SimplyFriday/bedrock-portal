@@ -190,13 +190,10 @@ namespace MinecraftWrapper.Controllers
             var user = await _userManager.GetUserAsync ( HttpContext.User );
             var items = await _storeRepository.GetAvailableStoreItemsByRank ( user.Rank );
             var currentMoney = await _storeRepository.GetCurrencyTotalForUserAsync ( user.Id, CurrencyType.Normal );
-
-            var multiplier = user.Rank * _applicationSettings.DiscountPercentPerRank;
-            multiplier = multiplier > _applicationSettings.DiscountRankCap ? _applicationSettings.DiscountRankCap : multiplier;
-
+            
             foreach (var item in items )
             {
-                item.Price *= 1 - multiplier;
+                item.Price = _minecraftStoreService.GetDiscountedValueForUser ( item.Price, user );
             }
 
             var viewModel = new StoreIndexViewModel
@@ -216,15 +213,16 @@ namespace MinecraftWrapper.Controllers
         [HttpGet]
         public async Task<IActionResult> PurchaseItem ( Guid? id )
         {
-            string statusMessage = null;
+            string statusMessage;
 
             if ( id != null && id != Guid.Empty )
             {
                 var user = await _userManager.GetUserAsync ( HttpContext.User );
                 var item = await _storeRepository.GetStoreItemByIdAsync( id );
                 var currentMoney = await _storeRepository.GetCurrencyTotalForUserAsync ( user.Id, CurrencyType.Normal );
+                var realPrice = _minecraftStoreService.GetDiscountedValueForUser(item.Price, user);
 
-                if ( currentMoney >= item.Price ) 
+                if ( currentMoney >= realPrice ) 
                 {
                     await _minecraftStoreService.PurchaseItemAsync ( item, user );
                     statusMessage = $"{item.Title} purchased!";

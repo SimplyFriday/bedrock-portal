@@ -50,14 +50,18 @@ namespace MinecraftWrapper.Services
             }
         }
 
-        public async Task PurchaseItemAsync ( StoreItem item, ApplicationUser user )
+        public decimal GetDiscountedValueForUser (decimal value, ApplicationUser user)
         {
             var multiplier = user.Rank * _applicationSettings.DiscountPercentPerRank;
             multiplier = multiplier > _applicationSettings.DiscountRankCap ? _applicationSettings.DiscountRankCap : multiplier;
+            return value * ( 1 - multiplier );
+        }
 
+        public async Task PurchaseItemAsync ( StoreItem item, ApplicationUser user )
+        {
             var payment = new UserCurrency
             {
-                Amount = -item.Price * (1 - multiplier),
+                Amount = GetDiscountedValueForUser(-item.Price, user) ,
                 CurrencyTransactionReasonId = CurrencyTransactionReason.Purchase,
                 CurrencyTypeId = CurrencyType.Normal,
                 DateNoted = DateTime.UtcNow,
