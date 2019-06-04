@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MinecraftWrapper.Data;
+using MinecraftWrapper.Data.Entities;
 using MinecraftWrapper.Models;
 
 namespace MinecraftWrapper.Services
@@ -44,17 +47,11 @@ namespace MinecraftWrapper.Services
 
         public async Task<bool> GetUserStatus ( string userId )
         {
-            if ( _refreshTime.AddMinutes ( MINUTES_TO_CACHE ) > DateTime.UtcNow )
-            {
-                await RefreshUserList ();
-            }
-
             using ( var scope = _serviceProvider.CreateScope () )
             {
-                var userList = await scope.ServiceProvider.GetService<UserRepository> ()
-                    .GetAllUsersAsync ();
-                var user = userList.Where ( u => u.Id == userId )
-                    .SingleOrDefault ();
+                var user = await scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>> ()
+                    .Users
+                    .SingleOrDefaultAsync (u => u.Id == userId);
 
                 var gamerTag = user?.GamerTag;
 
