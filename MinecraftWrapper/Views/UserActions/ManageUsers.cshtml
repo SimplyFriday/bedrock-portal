@@ -25,6 +25,9 @@
                 Hours Left
             </th>
             <th>
+                Rank
+            </th>
+            <th>
                 @Html.DisplayNameFor( model => model.IsActive )
             </th>
             <th></th>
@@ -46,6 +49,9 @@
         </td>
         <td>
             @membershipLeft.TotalHours.ToString("F2")
+        </td>
+        <td>
+            @Html.DisplayFor( modelItem => item.Rank )
         </td>
         <td>
             @item.IsActive
