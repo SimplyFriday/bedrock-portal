@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Options;
 using MinecraftWrapper.Data;
 using MinecraftWrapper.Data.Entities;
+using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -63,15 +65,31 @@ namespace MinecraftWrapper.Services
                 MessageParser = CreateMessageParser ();
             }
 
+            Log.Information ($"_exePath='{_exePath}'");
+            var args =  _exePath.Replace ( "\"", "\\\"" );
+
             _proc = new Process ();
 
             _proc.EnableRaisingEvents = true;
-            _proc.StartInfo = new ProcessStartInfo ( "cmd.exe", "/c " + _exePath );
-            _proc.StartInfo.CreateNoWindow = true;
-            _proc.StartInfo.RedirectStandardOutput = true;
-            _proc.StartInfo.RedirectStandardError = true;
-            _proc.StartInfo.RedirectStandardInput = true;
-            _proc.StartInfo.WorkingDirectory = _startDirectory;
+            _proc.StartInfo = new ProcessStartInfo
+            {
+                FileName = "/bin/bash",
+                Arguments = $"-c \"{args}\"",
+                WorkingDirectory = _startDirectory,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                RedirectStandardInput = true,
+                UseShellExecute = false
+            };
+
+
+            //_proc.StartInfo.CreateNoWindow = true;
+            //_proc.StartInfo.RedirectStandardOutput = true;
+            //_proc.StartInfo.RedirectStandardError = true;
+            //_proc.StartInfo.RedirectStandardInput = true;
+            //_proc.StartInfo.UseShellExecute = false;
+            //_proc.StartInfo.
 
             _proc.OutputDataReceived += new DataReceivedEventHandler ( ( s, e ) =>
             {
