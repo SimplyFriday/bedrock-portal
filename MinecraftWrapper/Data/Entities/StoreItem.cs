@@ -26,5 +26,8 @@ namespace MinecraftWrapper.Data.Entities
         [MaxLength(450)]
         [Display(Name = "Effect", Prompt = "Enter console command to execute")]
         public string Effect { get; set; }
+        
+        [Required]
+        public bool RequiresLogin { get; set; }
     }
 }

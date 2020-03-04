@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace MinecraftWrapper.Services
@@ -65,16 +66,13 @@ namespace MinecraftWrapper.Services
                 MessageParser = CreateMessageParser ();
             }
 
-            Log.Information ($"_exePath='{_exePath}'");
-            var args =  _exePath.Replace ( "\"", "\\\"" );
+            Log.Information ($"Starting with _exePath='{_exePath}'");
 
             _proc = new Process ();
 
             _proc.EnableRaisingEvents = true;
-            _proc.StartInfo = new ProcessStartInfo
+            var procStartInfo = new ProcessStartInfo
             {
-                FileName = "/bin/bash",
-                Arguments = $"-c \"{args}\"",
                 WorkingDirectory = _startDirectory,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
@@ -83,13 +81,22 @@ namespace MinecraftWrapper.Services
                 UseShellExecute = false
             };
 
+            if ( RuntimeInformation.IsOSPlatform ( OSPlatform.Linux ) ) 
+            {
+                var args =  _exePath.Replace ( "\"", "\\\"" );
 
-            //_proc.StartInfo.CreateNoWindow = true;
-            //_proc.StartInfo.RedirectStandardOutput = true;
-            //_proc.StartInfo.RedirectStandardError = true;
-            //_proc.StartInfo.RedirectStandardInput = true;
-            //_proc.StartInfo.UseShellExecute = false;
-            //_proc.StartInfo.
+                procStartInfo.FileName = "/bin/bash";
+                procStartInfo.Arguments = $"-c \"{args}\"";
+            } else if ( RuntimeInformation.IsOSPlatform ( OSPlatform.Windows ) )
+            {
+                procStartInfo.FileName = _exePath;
+            }
+            else
+            {
+                throw new InvalidOperationException ( $"{RuntimeInformation.OSDescription} is not supported!" );
+            }
+
+            _proc.StartInfo = procStartInfo;
 
             _proc.OutputDataReceived += new DataReceivedEventHandler ( ( s, e ) =>
             {

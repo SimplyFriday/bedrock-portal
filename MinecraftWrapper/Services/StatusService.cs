@@ -26,6 +26,11 @@ namespace MinecraftWrapper.Services
             _ = RefreshUserList ();
         }
 
+        public bool IsUserOnline (string gametag )
+        {
+            return _onlineUsers.Any ( ou => ou.Key == gametag && ou.Value );
+        }
+
         private async Task RefreshUserList ()
         {
             using ( var scope = _serviceProvider.CreateScope () )
