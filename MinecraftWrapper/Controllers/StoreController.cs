@@ -24,14 +24,17 @@ namespace MinecraftWrapper.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationSettings _applicationSettings;
         private readonly MinecraftStoreService _minecraftStoreService;
+        private readonly StatusService _statusService;
 
-        public StoreController ( UserRepository userRepository, UserManager<ApplicationUser> userManager, IOptions<ApplicationSettings> options, StoreRepository storeRepository, MinecraftStoreService minecraftStoreService )
+        public StoreController ( UserRepository userRepository, UserManager<ApplicationUser> userManager, IOptions<ApplicationSettings> options, 
+            StoreRepository storeRepository, MinecraftStoreService minecraftStoreService, StatusService statusService )
         {
             _userRepository = userRepository;
             _userManager = userManager;
             _applicationSettings = options.Value;
             _storeRepository = storeRepository;
             _minecraftStoreService = minecraftStoreService;
+            _statusService = statusService;
         }
 
         [Authorize ( Roles = "Admin" )]
@@ -224,17 +227,24 @@ namespace MinecraftWrapper.Controllers
 
                 if ( currentMoney >= realPrice ) 
                 {
-                    await _minecraftStoreService.PurchaseItemAsync ( item, user );
-                    statusMessage = $"{item.Title} purchased!";
+                    if ( !item.RequiresLogin || _statusService.IsUserOnline ( user.GamerTag ) ) 
+                    {
+                        await _minecraftStoreService.PurchaseItemAsync ( item, user );
+                        statusMessage = $"{item.Title} purchased!";
+                    }
+                    else
+                    {
+                        statusMessage = $"ERROR: {item.Title} can only be purchased while you are logged in!";
+                    }                    
                 }
                 else
                 {
-                    statusMessage = $"{item.Title} requires {item.Price} {_applicationSettings.MinecraftCurrencyName} but you only have {currentMoney} {_applicationSettings.MinecraftCurrencyName}";
+                    statusMessage = $"ERROR: {item.Title} requires {item.Price} {_applicationSettings.MinecraftCurrencyName} but you only have {currentMoney} {_applicationSettings.MinecraftCurrencyName}";
                 }
             }
             else
             {
-                statusMessage = $"storeItemId is a required parameter";
+                statusMessage = $"ERROR: storeItemId is a required parameter";
             }
 
             // TODO figure out how to preserve ViewBag after redirect
