@@ -354,6 +354,11 @@ namespace MinecraftWrapper.Controllers
                 ModelState.AddModelError ( "TooLittle", "Amount must be a positive number!" );
             }
 
+            if (targetUser.MembershipExpirationTime == null)
+            {
+                ModelState.AddModelError ( "SkippingLegDay", "This member is not eligible for gifts until they purchase membership for the first time." );
+            }
+
             if ( ModelState.IsValid )
             {
                 await _minecraftStoreService.AddCurrencyForUser ( currentUser.GamerTag, -model.Amount, CurrencyTransactionReason.Gift, CurrencyType.Gift );
