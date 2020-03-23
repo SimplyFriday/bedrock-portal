@@ -13,9 +13,22 @@ namespace MinecraftWrapper.Data.Entities
         [PersonalData]
         public string Bio { get; set; }
 
+
+        private string _gamerTag;
         [PersonalData]
         [StringLength ( 255 )]
-        public string GamerTag { get; set; }
+        public string GamerTag 
+        { 
+            get
+            {
+                return _gamerTag;
+            }
+
+            set
+            {
+                _gamerTag = _gamerTag.Trim ();
+            }
+        }
 
         [PersonalData]
         [StringLength ( 255 )]
