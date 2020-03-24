@@ -26,7 +26,7 @@ namespace MinecraftWrapper.Data.Entities
 
             set
             {
-                _gamerTag = _gamerTag.Trim ();
+                _gamerTag = value.Trim ();
             }
         }
 
