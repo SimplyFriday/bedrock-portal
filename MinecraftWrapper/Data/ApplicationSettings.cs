@@ -27,6 +27,8 @@ namespace MinecraftWrapper.Data
         public decimal GiftPointPercentage { get; set; }
         public decimal DiscountPercentPerRank { get; set; }
         public decimal DiscountRankCap { get; set; }
+        public bool MembershipEnabled { get; set; }
+        public bool StoreEnabled { get; set; }
     }
 
     public class MenuLink

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MinecraftWrapper.Data;
 using MinecraftWrapper.Data.Entities;
 using MinecraftWrapper.Models;
@@ -17,13 +18,15 @@ namespace MinecraftWrapper.Services
         private DateTime _refreshTime;
 
         private readonly IServiceProvider _serviceProvider;
+        private readonly ApplicationSettings _applicationSettings;
 
         private const int MINUTES_TO_CACHE = 20;
 
-        public StatusService ( IServiceProvider serviceProvider )
+        public StatusService ( IServiceProvider serviceProvider, IOptions<ApplicationSettings> options )
         {
             _serviceProvider = serviceProvider;
             _ = RefreshUserList ();
+            _applicationSettings = options.Value;
         }
 
         public bool IsUserOnline (string gametag )
@@ -40,7 +43,8 @@ namespace MinecraftWrapper.Services
 
                 foreach ( var user in allUsers )
                 {
-                    if ( user.GamerTag != null && !_onlineUsers.ContainsKey ( user.GamerTag ) && user.MembershipExpirationTime >= DateTime.UtcNow )
+                    if ( user.GamerTag != null && !_onlineUsers.ContainsKey ( user.GamerTag ) 
+                        && (user.MembershipExpirationTime >= DateTime.UtcNow || !_applicationSettings.MembershipEnabled ) )
                     {
                         _onlineUsers.Add ( user.GamerTag, false );
                     }

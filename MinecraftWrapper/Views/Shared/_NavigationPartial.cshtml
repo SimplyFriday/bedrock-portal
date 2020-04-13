@@ -39,18 +39,24 @@
                                 <li>
                                     <a asp-area="" asp-controller="News" asp-action="Index">Manage News Articles</a>
                                 </li>
-                                <li>
-                                    <a asp-area="" asp-controller="Store" asp-action="EditIndex">Edit Store</a>
-                                </li>
+                                if ( Options.Value.StoreEnabled )
+                                {
+                                    <li>
+                                        <a asp-area="" asp-controller="Store" asp-action="EditIndex">Edit Store</a>
+                                    </li>
+                                }
                             }
                             <li>
                                 <a asp-area="" asp-controller="Store" asp-action="GiftCurrency">Send @Options.Value.MinecraftCurrencyName</a>
                             </li>
                         </ul>
                     </li>
-                    <li>
-                        <a asp-area="" asp-controller="Store" asp-action="Index">Store</a>
-                    </li>
+                    if ( Options.Value.StoreEnabled )
+                    {
+                        <li>
+                            <a asp-area="" asp-controller="Store" asp-action="Index">Store</a>
+                        </li>
+                    }
                 }
                 @foreach ( var linkData in Options.Value.StaticMenuLinks )
                 {
