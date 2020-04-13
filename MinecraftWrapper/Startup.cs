@@ -128,7 +128,9 @@ namespace MinecraftWrapper
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure ( IApplicationBuilder app, IHostingEnvironment env, IServiceProvider provider )
-        {            
+        {
+            UpdateDatabase ( app );
+
             app.UseExceptionHandler ( "/Home/Error" );
 
             if ( !env.IsDevelopment () )
@@ -157,6 +159,18 @@ namespace MinecraftWrapper
             wrapper.Start ();
         }
 
+        private static void UpdateDatabase ( IApplicationBuilder app )
+        {
+            using ( var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory> ()
+                .CreateScope () )
+            {
+                using ( var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext> () )
+                {
+                    context.Database.Migrate ();
+                }
+            }
+        }
         private void RegisterTasks ( IServiceProvider provider )
         {
             var taskService = provider.GetRequiredService<ScheduledTaskService> ();
