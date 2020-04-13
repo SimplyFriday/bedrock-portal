@@ -17,7 +17,7 @@ This project aims to create a fully featured and customizable web portal that ca
 
 # Basic Setup (no store)
 
-This software requires both .NET Core and an instance of Microsoft SQL Server Express. You'll need to create a database for the application to use.
+This software requires both .NET Core and an instance of Microsoft SQL Server Express. You'll need to create a database for the application to use. Also, the most up to date BDS software from Mojang.
 
 ## SQL Server
 
@@ -50,7 +50,7 @@ The following sections are a little more complicated.
 
 ### StaticMenuLinks
 
-Anything in here will show up on the top nav menu. You can add custom pages here. Anything placed in ~/wwwroot/html_frag can be used here.
+Anything in here will show up on the top nav menu. You can add custom pages here. Anything placed in ~/wwwroot/html_frag can be used here. The install zip contains a community guidelines file. Feel free to edit or remove it, as well as any other content that you wish to add.
 
 ### CommandWhitelistByRole
 
@@ -66,3 +66,11 @@ Set this to an empty MS SQL Server database. It should look like this:
 ### Authentication
 
 If you want to enable Google community login, you can use this section.
+
+# Usage
+
+Once the site is up and running, create your first user. This user will automatically be promoted to Admin.
+
+Under the Utilities menu, you'll see your new user as well as anybody else who registers. Each user has an IsActive flag. Admins and Moderators can toggle the active status of players. Players who are not active will be automatically removed from the whitelist, and toggling a player active will add them to the whitelist. The whitelist checks for user changes every 120 seconds, and refreshes automatically.
+
+Each user can be promoted or demoted as well, using the Toggle Admin or Toggle Moderator buttons. Only Admins can use this feature. Changes to a user's permission level will only take effect after they log out then back in.
