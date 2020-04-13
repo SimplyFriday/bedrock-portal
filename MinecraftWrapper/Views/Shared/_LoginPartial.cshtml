@@ -20,35 +20,38 @@
                     @appUser.GamerTag
                 </a>
                 <ul class="dropdown-menu dropdown-wide">
-                    <li class="menu-text">
-                        Rank @appUser.Rank
-                    </li>
-                    <li class="menu-text">
-                        Wallet: @currency.ToString( "F2" ) @Options.Value.MinecraftCurrencyName
-                    </li>
-                    <li class="menu-text">
-                        @{
-                            var hourString = "0.00";
-                            if ( membershipLeft.TotalHours > 0 )
-                            {
-                                hourString = membershipLeft.TotalHours.ToString ( "F2" );
+                    @if ( Options.Value.StoreEnabled && Options.Value.MembershipEnabled )
+                    {
+                        <li class="menu-text">
+                            Rank @appUser.Rank
+                        </li>
+                        <li class="menu-text">
+                            Wallet: @currency.ToString( "F2" ) @Options.Value.MinecraftCurrencyName
+                        </li>
+                        <li class="menu-text">
+                            @{
+                                var hourString = "0.00";
+                                if ( membershipLeft.TotalHours > 0 )
+                                {
+                                    hourString = membershipLeft.TotalHours.ToString( "F2" );
+                                }
                             }
+                            Membership: @hourString hours
+                        </li>
+                        @if ( nextLoginBonus.TotalMilliseconds > 0 )
+                        {
+                            <li class="menu-text">
+                                Bonus In: @nextLoginBonus.TotalHours.ToString( "F2" ) hours
+                            </li>
                         }
-                        Membership: @hourString hours
-                    </li>
-                    @if ( nextLoginBonus.TotalMilliseconds > 0 )
-                    {
-                        <li class="menu-text">
-                            Bonus In: @nextLoginBonus.TotalHours.ToString( "F2" ) hours
-                        </li>
+                        else
+                        {
+                            <li class="menu-text">
+                                Bonus Available!
+                            </li>
+                        }
+                        <li class="divider"></li>
                     }
-                    else
-                    {
-                        <li class="menu-text">
-                            Bonus Available!
-                        </li>
-                    }
-                    <li class="divider"></li>
                     <li>
                         <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">My Account</a>
                     </li>

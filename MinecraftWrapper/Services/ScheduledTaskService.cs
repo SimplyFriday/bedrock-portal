@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MinecraftWrapper.Data;
 using Serilog;
 using System;
@@ -19,10 +20,12 @@ namespace MinecraftWrapper.Services
 
         private readonly WhiteListService _whiteListService;
         private readonly IServiceProvider _serviceProvider;
-        public ScheduledTaskService (WhiteListService whiteListService, IServiceProvider serviceProvider )
+        private readonly ApplicationSettings _applicationSettings;
+        public ScheduledTaskService (WhiteListService whiteListService, IServiceProvider serviceProvider, IOptions<ApplicationSettings> options )
         {
             _whiteListService = whiteListService;
             _serviceProvider = serviceProvider;
+            _applicationSettings = options.Value;
         }
 
         public void Start ()
@@ -97,13 +100,22 @@ namespace MinecraftWrapper.Services
                     Log.Debug ($"Checking {user.GamerTag} for membership");
                     try
                     {
-                        if ( user.MembershipExpirationTime > DateTime.UtcNow && !entries.Any ( e => e.name == user.GamerTag ) && user.IsActive )
+                        bool ignoreMembership = false;
+
+                        if ( !_applicationSettings.MembershipEnabled || !_applicationSettings.StoreEnabled ) 
+                        {
+                            ignoreMembership = true;
+                        }
+
+                        if ( (user.MembershipExpirationTime > DateTime.UtcNow || ignoreMembership) && !entries.Any ( e => e.name == user.GamerTag ) && user.IsActive )
                         {
                             Log.Information ( $"Adding {user.GamerTag} to the whitelist." );
                             _whiteListService.AddWhiteListEntry ( user.GamerTag );
                         }
 
-                        if ( (user.MembershipExpirationTime == null || user.MembershipExpirationTime < DateTime.UtcNow || !user.IsActive) && entries.Any ( e => e.name == user.GamerTag ) )
+                        if ( ( ( user.MembershipExpirationTime == null || user.MembershipExpirationTime < DateTime.UtcNow && !ignoreMembership )
+                            || !user.IsActive) 
+                            && entries.Any ( e => e.name == user.GamerTag ) )
                         {
                             Log.Information ( $"Removing {user.GamerTag} from the whitelist." );
                             _whiteListService.DeleteWhiteListEntry ( user.GamerTag );

@@ -39,8 +39,8 @@
         {
             var divClass = "";
 
-            @if ( !string.IsNullOrEmpty ( user?.GamerTag ) && user.MembershipExpirationTime.HasValue && 
-                user.MembershipExpirationTime >= DateTime.UtcNow && user.IsActive )
+            @if ( !string.IsNullOrEmpty ( user?.GamerTag ) && (user.MembershipExpirationTime.HasValue && 
+                user.MembershipExpirationTime >= DateTime.UtcNow || !Options.Value.MembershipEnabled) && user.IsActive )
             {
                 <div class="col-md-4">
                     @if ( await statusService.GetUserStatus ( user.Id ) )
