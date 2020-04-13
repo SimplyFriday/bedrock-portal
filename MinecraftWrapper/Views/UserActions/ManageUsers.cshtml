@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MinecraftWrapper.Data.Entities.ApplicationUser>
+﻿@model ManageUsersViewModel
 
 @{
     ViewData["Title"] = "ManageUsers";
@@ -13,13 +13,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor( model => model.GamerTag )
+                Gamertag
             </th>
             <th>
-                @Html.DisplayNameFor( model => model.DiscordId )
+                Discord Handle
             </th>
             <th>
-                @Html.DisplayNameFor( model => model.CurrentMoney )
+                Current Money
             </th>
             <th>
                 Hours Left
@@ -27,16 +27,13 @@
             <th>
                 Rank
             </th>
-            <th>
-                @Html.DisplayNameFor( model => model.IsActive )
-            </th>
-            <th></th>
+            <th style="min-width:140px"></th>
+            <th style="min-width:140px"></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Where ( u => !string.IsNullOrEmpty ( u.GamerTag ) ) ) {
-    var membershipLeft = ((item.MembershipExpirationTime ?? DateTime.UtcNow) - DateTime.UtcNow);
-    membershipLeft = membershipLeft.TotalHours > 0 ? membershipLeft : new TimeSpan(0);
+@foreach (var item in Model.Users ) {
+
     <tr>
         <td>
             @Html.DisplayFor(modelItem => item.GamerTag)
@@ -48,16 +45,20 @@
             @Html.DisplayFor( modelItem => item.CurrentMoney )
         </td>
         <td>
-            @membershipLeft.TotalHours.ToString("F2")
+            @item.MembershipLeft.TotalHours.ToString("F2")
         </td>
         <td>
             @Html.DisplayFor( modelItem => item.Rank )
         </td>
         <td>
-            @item.IsActive
+            Active: @item.IsActive <br />
+            Moderator: @item.IsModerator <br />
+            Admin: @item.IsAdmin <br />
         </td>
         <td>
-            <a asp-action="ToggleUserActiveState" asp-route-id="@item.Id">Toggle Active</a>
+            <a asp-action="ToggleUserActiveState" asp-route-id="@item.UserId">Toggle Active</a>
+            <a asp-action="ToggleModerator" asp-route-id="@item.UserId">Toggle Moderator</a>
+            <a asp-action="ToggleAdmin" asp-route-id="@item.UserId">Toggle Admin</a>
         </td>
     </tr>
 }

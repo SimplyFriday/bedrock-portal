@@ -95,8 +95,16 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account
                     await _emailSender.SendEmailAsync ( Input.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode ( callbackUrl )}'>clicking here</a>." );
 
-                    await _signInManager.SignInAsync ( user, isPersistent: false );
+                    // If there are no admins, add the next create user as an admin
+                    var adminUsers = await _userManager.GetUsersInRoleAsync ( "Admin" );
+                    if ( adminUsers.Count == 0 )
+                    {
+                        await _userManager.AddToRoleAsync ( user, "Admin" );
+                        await _userManager.UpdateAsync ( user );
+                    }
 
+                    await _signInManager.SignInAsync ( user, isPersistent: false );
+                    
                     return LocalRedirect ( returnUrl );
                 }
                 foreach ( var error in result.Errors )

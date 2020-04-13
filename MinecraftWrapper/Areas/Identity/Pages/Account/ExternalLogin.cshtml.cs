@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MinecraftWrapper.Data;
 using MinecraftWrapper.Data.Entities;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -18,17 +19,20 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<ExternalLoginModel> _logger;
         private readonly UserRepository _userRepository;
+        private readonly RoleManager<ApplicationUser> _roleManager;
 
         public ExternalLoginModel (
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
             ILogger<ExternalLoginModel> logger,
-            UserRepository userRepository )
+            UserRepository userRepository,
+            RoleManager<ApplicationUser> roleManager)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
             _userRepository = userRepository;
+            _roleManager = roleManager;
         }
 
         [BindProperty]
@@ -137,6 +141,15 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account
                     {
                         await _signInManager.SignInAsync ( user, isPersistent: false );
                         _logger.LogInformation ( "User created an account using {Name} provider.", info.LoginProvider );
+
+                        // If there are no admins, add the next create user as an admin
+                        var adminUsers = await _userManager.GetUsersInRoleAsync ( "Admin" );
+                        if ( adminUsers.Count == 0 )
+                        {
+                            await _userManager.AddToRoleAsync ( user, "Admin" );
+                            await _userManager.UpdateAsync ( user );
+                        }
+
                         return LocalRedirect ( returnUrl );
                     }
 

@@ -243,7 +243,27 @@ namespace MinecraftWrapper.Controllers
         public async Task<IActionResult> ManageUsers ()
         {
             var users = await _userRepository.GetAllUsersAsync();
-            return View ( users );
+            var model = new ManageUsersViewModel ();
+
+            foreach (var user in users )
+            {
+                var item = new ManageUsersViewModel.ManageUserItem
+                {
+                    UserId = user.Id,
+                    IsAdmin = await _userManager.IsInRoleAsync(user, "Admin"),
+                    IsModerator = await _userManager.IsInRoleAsync (user,"Moderator"),
+                    CurrentMoney = user.CurrentMoney,
+                    DiscordId = user.DiscordId,
+                    GamerTag = user.GamerTag,
+                    IsActive = user.IsActive,
+                    MembershipExpirationTime = user.MembershipExpirationTime,
+                    Rank = user.Rank
+                };
+
+                model.Users.Add ( item );
+            }
+
+            return View ( model );
         }
 
         [HttpGet]
@@ -273,6 +293,61 @@ namespace MinecraftWrapper.Controllers
             {
                 user.IsActive = !user.IsActive;
                 await _userRepository.SaveUserAsync ( user );
+            }
+
+            return RedirectToAction ( "ManageUsers" );
+        }
+
+        [HttpGet]
+        [Authorize ( Roles = "Admin" )]
+        public async Task<IActionResult> ToggleAdmin (string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if ( user == null )
+            {
+                return NotFound ();
+            }
+
+            var wasInRole = await _userManager.IsInRoleAsync (user, "Admin");
+
+            var remainingAdmins = await _userManager.GetUsersInRoleAsync ( "Admin" );
+
+            // Can't remove last admin... safety first...
+            if ( remainingAdmins.Count == 1 && remainingAdmins.Single ().Id == id )
+            {
+                return RedirectToAction ( "ManageUsers" );
+            }
+
+            await _userManager.RemoveFromRolesAsync ( user, new string[] { "Admin", "Moderator" } );
+
+            if ( !wasInRole ) 
+            {
+                await _userManager.AddToRoleAsync ( user, "Admin" );
+            }
+
+            await _userManager.UpdateAsync ( user );
+
+            return RedirectToAction ( "ManageUsers" );
+        }
+
+        [HttpGet]
+        [Authorize ( Roles = "Admin" )]
+        public async Task<IActionResult> ToggleModerator ( string id )
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if ( user == null )
+            {
+                return NotFound ();
+            }
+
+            var wasInRole = await _userManager.IsInRoleAsync (user, "Moderator");
+            await _userManager.RemoveFromRolesAsync ( user, new string[] { "Admin", "Moderator" } );
+
+            if ( !wasInRole )
+            {
+                await _userManager.AddToRoleAsync ( user, "Moderator" );
             }
 
             return RedirectToAction ( "ManageUsers" );
