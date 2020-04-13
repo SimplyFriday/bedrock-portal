@@ -59,7 +59,9 @@ Currently the only roles are "Admin" and "Moderator". Admins can use all console
 ### ConnectionStrings
 
 Set this to an empty MS SQL Server database. It should look like this:
-```"DefaultConnection": "Server=localhost\\dev;Database=PortalTest;User ID=PortalUser;Password=Strong Password Goes Here"```
+```
+"DefaultConnection": "Server=localhost\\dev;Database=PortalTest;User ID=PortalUser;Password=Strong Password Goes Here"
+```
 
 ### Authentication
 
