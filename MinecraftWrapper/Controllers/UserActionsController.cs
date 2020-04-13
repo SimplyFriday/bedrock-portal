@@ -343,6 +343,15 @@ namespace MinecraftWrapper.Controllers
             }
 
             var wasInRole = await _userManager.IsInRoleAsync (user, "Moderator");
+
+            var remainingAdmins = await _userManager.GetUsersInRoleAsync ( "Admin" );
+
+            // Can't remove last admin... safety first...
+            if ( remainingAdmins.Count == 1 && remainingAdmins.Single ().Id == id )
+            {
+                return RedirectToAction ( "ManageUsers" );
+            }
+
             await _userManager.RemoveFromRolesAsync ( user, new string[] { "Admin", "Moderator" } );
 
             if ( !wasInRole )

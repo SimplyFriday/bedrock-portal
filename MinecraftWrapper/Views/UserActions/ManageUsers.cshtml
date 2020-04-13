@@ -56,9 +56,9 @@
             Admin: @item.IsAdmin <br />
         </td>
         <td>
-            <a asp-action="ToggleUserActiveState" asp-route-id="@item.UserId">Toggle Active</a>
-            <a asp-action="ToggleModerator" asp-route-id="@item.UserId">Toggle Moderator</a>
-            <a asp-action="ToggleAdmin" asp-route-id="@item.UserId">Toggle Admin</a>
+            <a asp-action="ToggleUserActiveState" asp-route-id="@item.UserId">Toggle Active</a><br />
+            <a asp-action="ToggleModerator" asp-route-id="@item.UserId">Toggle Moderator</a><br />
+            <a asp-action="ToggleAdmin" asp-route-id="@item.UserId">Toggle Admin</a><br />
         </td>
     </tr>
 }
