@@ -71,6 +71,11 @@ If you want to enable Google community login, you can use this section.
 
 Once the site is up and running, create your first user. This user will automatically be promoted to Admin.
 
-Under the Utilities menu, you'll see your new user as well as anybody else who registers. Each user has an IsActive flag. Admins and Moderators can toggle the active status of players. Players who are not active will be automatically removed from the whitelist, and toggling a player active will add them to the whitelist. The whitelist checks for user changes every 120 seconds, and refreshes automatically.
+## Manage Users
+Under the Utilities menu, you'll see a "Manage Users" option. This will show you your new user as well as anybody else who registers. Each user has an IsActive flag. Admins and Moderators can toggle the active status of players. Players who are not active will be automatically removed from the whitelist, and toggling a player active will add them to the whitelist. The whitelist checks for user changes every 120 seconds, and refreshes automatically.
 
 Each user can be promoted or demoted as well, using the Toggle Admin or Toggle Moderator buttons. Only Admins can use this feature. Changes to a user's permission level will only take effect after they log out then back in.
+
+## Console
+
+This provides direct access to the BDS console. Admins can run any command here, Moderators can run any commands that are made available to them in the appsettings.json file. The bedrock server software will be restarted on failure (graceful or otherwise) so you can safely restart your server by issues the "stop" command.
