@@ -1,5 +1,5 @@
 # Bedrock Portal
-This project aims to create a fully featured and customizable web portal that can be used to host Minecraft Bedrock Edition dedicated servers. It is written in .Net Core which should allow it to run both on Windows and Linux systems, though it is developed and tested against windows.
+This project aims to create a fully featured and customizable web portal that can be used to host Minecraft Bedrock Edition dedicated servers. It is written in .Net Core which can run both on Windows and Linux systems.
 
 # Features
 * Multiple user tiers (regular user, moderator, admin)
