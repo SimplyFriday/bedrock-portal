@@ -113,8 +113,8 @@ namespace MinecraftWrapper.Services
                             _whiteListService.AddWhiteListEntry ( user.GamerTag );
                         }
 
-                        if ( ( ( user.MembershipExpirationTime == null || user.MembershipExpirationTime < DateTime.UtcNow && !ignoreMembership )
-                            || !user.IsActive) 
+                        if ( ( ( ( user.MembershipExpirationTime == null || user.MembershipExpirationTime < DateTime.UtcNow ) && !ignoreMembership )
+                            || !user.IsActive ) 
                             && entries.Any ( e => e.name == user.GamerTag ) )
                         {
                             Log.Information ( $"Removing {user.GamerTag} from the whitelist." );
