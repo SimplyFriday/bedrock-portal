@@ -18,21 +18,15 @@ namespace MinecraftWrapper.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<ExternalLoginModel> _logger;
-        private readonly UserRepository _userRepository;
-        private readonly RoleManager<ApplicationUser> _roleManager;
 
         public ExternalLoginModel (
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
-            ILogger<ExternalLoginModel> logger,
-            UserRepository userRepository,
-            RoleManager<ApplicationUser> roleManager)
+            ILogger<ExternalLoginModel> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
-            _userRepository = userRepository;
-            _roleManager = roleManager;
         }
 
         [BindProperty]
