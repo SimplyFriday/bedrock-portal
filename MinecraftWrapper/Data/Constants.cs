@@ -37,4 +37,10 @@ namespace MinecraftWrapper.Data.Constants
         Rank = 3,
         ScheduledCommand = 4
     }
+
+    public enum ScheduledTaskType
+    {
+        Backup = 1,
+        Command = 2
+    }
 }

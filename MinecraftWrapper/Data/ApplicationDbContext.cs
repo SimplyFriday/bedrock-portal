@@ -17,5 +17,7 @@ namespace MinecraftWrapper.Data
         public DbSet<UtilityRequest> UtilityRequest { get; set; }
         public DbSet<UserCurrency> UserCurrency { get; set; }
         public DbSet<StoreItem> StoreItem { get; set; }
+        public DbSet<ScheduledTask> ScheduledTask { get; set; }
+        public DbSet<ScheduledTaskLog> ScheduledTaskLog { get; set; }
     }
 }

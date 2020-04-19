@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MinecraftWrapper.Data;
 
 namespace MinecraftWrapper.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200418201955_Enums")]
+    partial class Enums
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -239,52 +241,6 @@ namespace MinecraftWrapper.Data.Migrations
                     b.ToTable("NewsItem");
                 });
 
-            modelBuilder.Entity("MinecraftWrapper.Data.Entities.ScheduledTask", b =>
-                {
-                    b.Property<Guid>("ScheduledTaskId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Command")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("CronString")
-                        .IsRequired()
-                        .HasMaxLength(30);
-
-                    b.Property<bool>("Enabled");
-
-                    b.Property<int>("ScheduledTaskType");
-
-                    b.Property<string>("TaskName")
-                        .IsRequired()
-                        .HasMaxLength(50);
-
-                    b.HasKey("ScheduledTaskId");
-
-                    b.ToTable("ScheduledTask");
-                });
-
-            modelBuilder.Entity("MinecraftWrapper.Data.Entities.ScheduledTaskLog", b =>
-                {
-                    b.Property<Guid>("ScheduledTaskLogId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime?>("CompletedTime");
-
-                    b.Property<string>("CompletionStatus")
-                        .HasMaxLength(30);
-
-                    b.Property<Guid>("ScheduledTaskId");
-
-                    b.Property<DateTime>("StartTime");
-
-                    b.HasKey("ScheduledTaskLogId");
-
-                    b.HasIndex("ScheduledTaskId");
-
-                    b.ToTable("ScheduledTaskLog");
-                });
-
             modelBuilder.Entity("MinecraftWrapper.Data.Entities.StoreItem", b =>
                 {
                     b.Property<Guid>("StoreItemId")
@@ -417,14 +373,6 @@ namespace MinecraftWrapper.Data.Migrations
                     b.HasOne("MinecraftWrapper.Data.Entities.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("MinecraftWrapper.Data.Entities.ScheduledTaskLog", b =>
-                {
-                    b.HasOne("MinecraftWrapper.Data.Entities.ScheduledTask", "ScheduledTask")
-                        .WithMany()
-                        .HasForeignKey("ScheduledTaskId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
