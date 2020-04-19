@@ -1,0 +1,48 @@
+﻿@model MinecraftWrapper.Data.Entities.ScheduledTask
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>ScheduledTask</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TaskName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TaskName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CronString)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CronString)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Enabled)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Enabled)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ScheduledTaskType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ScheduledTaskType)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Command)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Command)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.ScheduledTaskId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

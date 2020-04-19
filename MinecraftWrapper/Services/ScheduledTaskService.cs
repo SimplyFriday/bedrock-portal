@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MinecraftWrapper.Data;
+using MinecraftWrapper.Data.Constants;
+using MinecraftWrapper.Data.Entities;
+using NCrontab;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -10,18 +13,20 @@ using System.Threading.Tasks;
 
 namespace MinecraftWrapper.Services
 {
-    public class ScheduledTaskService
+    public partial class ScheduledTaskService
     {
         public Dictionary<string,Delegate> RapidTasks = new Dictionary<string, Delegate> ();
         public Dictionary<string,Delegate> Tasks = new Dictionary<string, Delegate>  ();
         public Dictionary<string,Delegate> SlowTasks = new Dictionary<string, Delegate>  ();
 
         private bool _stopRequested = false;
+        private IEnumerable<ScheduledTask> _scheduledTasks = new List<ScheduledTask> ();
 
         private readonly WhiteListService _whiteListService;
         private readonly IServiceProvider _serviceProvider;
         private readonly ApplicationSettings _applicationSettings;
-        public ScheduledTaskService (WhiteListService whiteListService, IServiceProvider serviceProvider, IOptions<ApplicationSettings> options )
+
+        public ScheduledTaskService ( WhiteListService whiteListService, IServiceProvider serviceProvider, IOptions<ApplicationSettings> options )
         {
             _whiteListService = whiteListService;
             _serviceProvider = serviceProvider;
@@ -39,10 +44,10 @@ namespace MinecraftWrapper.Services
         {
             do
             {
-                foreach (var t in RapidTasks )
+                foreach ( var t in RapidTasks )
                 {
                     t.Value.DynamicInvoke ();
-                }   
+                }
 
                 await Task.Delay ( 10000 );
             } while ( !_stopRequested );
@@ -74,57 +79,94 @@ namespace MinecraftWrapper.Services
             } while ( !_stopRequested );
         }
 
-        public void Stop()
+        public void Stop ()
         {
             _stopRequested = true;
         }
 
         public void RegisterTasks ()
         {
-            Tasks.Add ( "UpdateWhiteList", new Action( async () => await UpdateWhiteList() ) );
+            Tasks.Add ( "UpdateWhiteList", new Action ( async () => await UpdateWhiteList () ) );
+            SlowTasks.Add ( "RefreshDbTasks", new Action ( async () => await RefreshDbTasks () ) );
+            RapidTasks.Add ( "RunDbTasks", new Action ( async () => await RunDbTasks () ) );
         }
 
-        private async Task UpdateWhiteList ()
+        private async Task RunDbTasks ()
         {
-            Log.Debug ( "Attempting to update whitelist." );
-
             using ( var scope = _serviceProvider.CreateScope () )
             {
-                var entries = _whiteListService.GetWhiteListEntries();
-                var users = await scope.ServiceProvider.GetRequiredService<UserRepository>().GetAllUsersAsync ();
+                var taskRepository = scope.ServiceProvider.GetRequiredService<ScheduledTaskRepository> ();
+                var applicationWrapper = scope.ServiceProvider.GetRequiredService<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
 
-                Log.Debug ( $"Found {users.Count} users. Starting iteration." );
-
-                foreach ( var user in users )
+                foreach ( var task in _scheduledTasks )
                 {
-                    Log.Debug ($"Checking {user.GamerTag} for membership");
+                    CrontabSchedule schedule = null;
+
                     try
                     {
-                        bool ignoreMembership = false;
-
-                        if ( !_applicationSettings.MembershipEnabled || !_applicationSettings.StoreEnabled ) 
-                        {
-                            ignoreMembership = true;
-                        }
-
-                        if ( (user.MembershipExpirationTime > DateTime.UtcNow || ignoreMembership) && !entries.Any ( e => e.name == user.GamerTag ) && user.IsActive )
-                        {
-                            Log.Information ( $"Adding {user.GamerTag} to the whitelist." );
-                            _whiteListService.AddWhiteListEntry ( user.GamerTag );
-                        }
-
-                        if ( ( ( ( user.MembershipExpirationTime == null || user.MembershipExpirationTime < DateTime.UtcNow ) && !ignoreMembership )
-                            || !user.IsActive ) 
-                            && entries.Any ( e => e.name == user.GamerTag ) )
-                        {
-                            Log.Information ( $"Removing {user.GamerTag} from the whitelist." );
-                            _whiteListService.DeleteWhiteListEntry ( user.GamerTag );
-                        }
-                    } catch (Exception ex )
+                        schedule = CrontabSchedule.Parse ( task.CronString );
+                    } catch (CrontabException ex)
                     {
-                        Log.Error ( ex, $"An exception occurred while trying to update the whitelist for user {user.GamerTag}" );
+                        Log.Error ( ex, $"Error occurred while running ScheduledTaskId={task.ScheduledTaskId}" );
+                        continue;
+                    }
+
+                    // In this one instance we're going to use server local time, because that's
+                    // how an end user would expect the app to work and timezones are hard.
+                    var next = schedule.GetNextOccurrence ( DateTime.Now.AddMinutes(-1) );
+
+                    if ( DateTime.Now >= next )
+                    {
+                        var lastLog = await taskRepository.GetLastLogForTask ( task.ScheduledTaskId );
+
+                        if ( lastLog == null || lastLog.StartTime < next )
+                        {
+                            var nextLog = new ScheduledTaskLog
+                            {
+                                StartTime = DateTime.Now,
+                                ScheduledTaskId = task.ScheduledTaskId
+                            };
+
+                            await taskRepository.SaveScheduledTaskLogAsync ( nextLog );
+
+                            try
+                            {
+                                switch ( task.ScheduledTaskType )
+                                {
+                                    case ScheduledTaskType.Backup:
+                                        // TODO
+                                        break;
+                                    case ScheduledTaskType.Command:
+                                        applicationWrapper.SendInput ( task.Command, null );
+                                        break;
+                                }
+
+                                nextLog.CompletedTime = DateTime.Now;
+                                nextLog.CompletionStatus = "SUCCESS";
+
+                                await taskRepository.SaveScheduledTaskLogAsync ( nextLog );
+                            }
+                            catch ( Exception ex )
+                            {
+                                Log.Error ( ex, $"Exception occurred while running ScheduledTaskId={task.ScheduledTaskId}" );
+                                
+                                nextLog.CompletedTime = DateTime.Now;
+                                nextLog.CompletionStatus = "FAILED";
+
+                                await taskRepository.SaveScheduledTaskLogAsync ( nextLog );
+                            }
+                        }
                     }
                 }
+            }
+        }
+
+        public async Task RefreshDbTasks ()
+        {
+            using ( var scope = _serviceProvider.CreateScope () )
+            {
+                var taskRepository = scope.ServiceProvider.GetRequiredService<ScheduledTaskRepository> ();
+                _scheduledTasks = await taskRepository.GetAllScheduledTasksAsync ();
             }
         }
     }

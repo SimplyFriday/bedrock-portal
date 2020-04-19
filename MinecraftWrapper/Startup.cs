@@ -94,6 +94,7 @@ namespace MinecraftWrapper
             services.AddTransient<DiscordService> ();
             services.AddTransient<MinecraftStoreService> ();
             services.AddTransient<StoreRepository> ();
+            services.AddTransient<ScheduledTaskRepository> ();
 
             services.AddSingleton<StatusService> ();
             services.AddSingleton<ConsoleApplicationWrapper<MinecraftMessageParser>> ();

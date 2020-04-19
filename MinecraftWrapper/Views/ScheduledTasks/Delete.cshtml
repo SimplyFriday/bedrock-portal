@@ -1,0 +1,51 @@
+﻿@model MinecraftWrapper.Data.Entities.ScheduledTask
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>ScheduledTask</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TaskName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TaskName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CronString)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CronString)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Enabled)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Enabled)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ScheduledTaskType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ScheduledTaskType)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Command)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Command)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="ScheduledTaskId" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>
