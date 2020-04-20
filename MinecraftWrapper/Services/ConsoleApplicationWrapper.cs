@@ -21,6 +21,7 @@ namespace MinecraftWrapper.Services
         private readonly bool _restartOnFailure;
         private readonly int _maxOutputRetained;
         private Process _proc = null;
+        private bool _wasDisposed = false;
 
         private readonly IServiceProvider _serviceProvider;
         public IMessageParser MessageParser { get; private set; }
@@ -56,7 +57,7 @@ namespace MinecraftWrapper.Services
 
         public void Start ()
         {
-            if ( _proc != null && !_proc.HasExited )
+            if ( _proc != null && !_wasDisposed && !_proc.HasExited )
             {
                 return;
             }
@@ -66,6 +67,8 @@ namespace MinecraftWrapper.Services
                 MessageParser = CreateMessageParser ();
             }
 
+            _wasDisposed = false;
+            _stopRequested = false;
             _proc = new Process ();
 
             _proc.EnableRaisingEvents = true;
@@ -173,11 +176,20 @@ namespace MinecraftWrapper.Services
         {
             _stopRequested = true;
 
-            // Try to stop properly
-            SendInput ( "stop", null );
-            Thread.Sleep ( 2000 );
-            _proc.Kill ();
-            _proc.Dispose ();
+            if ( !_wasDisposed && !_proc.HasExited )
+            {
+                // Try to stop properly
+                SendInput ( "stop", null );
+                Thread.Sleep ( 2000 );
+
+                if ( !_proc.HasExited )
+                {
+                    _proc.Kill ();
+                }
+
+                _proc.Dispose ();
+                _wasDisposed = true;
+            }
         }
 
         private void LogInputOutput ( ApplicationLog log )

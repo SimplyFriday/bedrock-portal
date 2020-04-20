@@ -27,33 +27,39 @@
                         <ul class="dropdown-menu">
                             @if ( ViewContext.HttpContext.User.IsInRole ( "Admin" ) || ViewContext.HttpContext.User.IsInRole ( "Moderator" ) )
                             {
-                                <li>
-                                    <a asp-area="" asp-controller="UserActions" asp-action="ManageUsers">Manage Users</a>
-                                </li>
-                                <li>
-                                    <a asp-area="" asp-controller="UserActions" asp-action="Console">Console</a>
-                                </li>
+                            <li>
+                                <a asp-area="" asp-controller="UserActions" asp-action="ManageUsers">Manage Users</a>
+                            </li>
+                            <li>
+                                <a asp-area="" asp-controller="UserActions" asp-action="Console">Console</a>
+                            </li>
+                            <li>
+                                <a asp-area="" asp-controller="McFiles" asp-action="Index">Backups</a>
+                            </li>
+                            <li>
+                                <a asp-area="" asp-controller="McFiles" asp-action="UploadFile">Upload File</a>
+                            </li>
                             }
                             @if ( ViewContext.HttpContext.User.IsInRole ( "Admin" ) )
                             {
-                                <li>
-                                    <a asp-area="" asp-controller="News" asp-action="Index">Manage News Articles</a>
-                                </li>
-                                <li>
-                                    <a asp-area="" asp-controller="ScheduledTasks" asp-action="Index">Scheduled Tasks</a>
-                                </li>
+                            <li>
+                                <a asp-area="" asp-controller="News" asp-action="Index">Manage News Articles</a>
+                            </li>
+                            <li>
+                                <a asp-area="" asp-controller="ScheduledTasks" asp-action="Index">Scheduled Tasks</a>
+                            </li>
                                 if ( Options.Value.StoreEnabled )
                                 {
-                                    <li>
-                                        <a asp-area="" asp-controller="Store" asp-action="EditIndex">Edit Store</a>
-                                    </li>
+                            <li>
+                                <a asp-area="" asp-controller="Store" asp-action="EditIndex">Edit Store</a>
+                            </li>
                                 }
                             }
                             @if ( Options.Value.StoreEnabled )
                             {
-                                <li>
-                                    <a asp-area="" asp-controller="Store" asp-action="GiftCurrency">Send @Options.Value.MinecraftCurrencyName</a>
-                                </li>
+                            <li>
+                                <a asp-area="" asp-controller="Store" asp-action="GiftCurrency">Send @Options.Value.MinecraftCurrencyName</a>
+                            </li>
                             }
                         </ul>
                     </li>
