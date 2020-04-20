@@ -5,14 +5,12 @@ namespace MinecraftWrapper.Data
 {
     public class ApplicationSettings
     {
-        //string exePath, string startDirectory, bool restartOnFailure, int maxOutputRetained
-        public string ExePath { get; set; }
+        public string BdsPath { get; set; }
         public string StartDirectory { get; set; }
         public bool RestartOnFailure { get; set; }
         public int MaxOutputRetained { get; set; }
         public string SendGridApiKey { get; set; }
         public string SystemFromEmailAddress { get; set; }
-        public string WhiteListPath { get; set; }
         public string DiscordWebhookUrl { get; set; }
         public string DiscordUserName { get; set; }
         public string DiscordBotSecret { get; set; }
@@ -29,6 +27,10 @@ namespace MinecraftWrapper.Data
         public decimal DiscountRankCap { get; set; }
         public bool MembershipEnabled { get; set; }
         public bool StoreEnabled { get; set; }
+        public uint BackupsToKeep { get; set; }
+        public string ArchivePath { get; set; }
+        public string TempPath { get; set; }
+        public string WorldName { get; set; }
     }
 
     public class MenuLink

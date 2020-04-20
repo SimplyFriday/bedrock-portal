@@ -16,7 +16,7 @@ namespace MinecraftWrapper.Services
     public class ConsoleApplicationWrapper<TParser> : IDisposable where TParser : IMessageParser
     {
         private bool _stopRequested = false;
-        private readonly string _exePath;
+        private readonly string _bdsDirectory;
         private readonly string _startDirectory;
         private readonly bool _restartOnFailure;
         private readonly int _maxOutputRetained;
@@ -39,7 +39,7 @@ namespace MinecraftWrapper.Services
 
         public ConsoleApplicationWrapper ( IOptions<ApplicationSettings> options, SystemRepository systemRepository, IServiceProvider serviceProvider )
         {
-            _exePath = options.Value.ExePath;
+            _bdsDirectory = options.Value.BdsPath;
             _startDirectory = options.Value.StartDirectory;
             _restartOnFailure = options.Value.RestartOnFailure;
             _maxOutputRetained = options.Value.MaxOutputRetained;
@@ -66,8 +66,6 @@ namespace MinecraftWrapper.Services
                 MessageParser = CreateMessageParser ();
             }
 
-            Log.Information ($"Starting with _exePath='{_exePath}'");
-
             _proc = new Process ();
 
             _proc.EnableRaisingEvents = true;
@@ -83,13 +81,11 @@ namespace MinecraftWrapper.Services
 
             if ( RuntimeInformation.IsOSPlatform ( OSPlatform.Linux ) ) 
             {
-                var args =  _exePath.Replace ( "\"", "\\\"" );
-
-                procStartInfo.FileName = "/bin/bash";
-                procStartInfo.Arguments = $"-c \"{args}\"";
+                procStartInfo.FileName = $@"{_bdsDirectory}/bedrock_server";
+                procStartInfo.EnvironmentVariables.Add ( "LD_LIBRARY_PATH", _bdsDirectory );
             } else if ( RuntimeInformation.IsOSPlatform ( OSPlatform.Windows ) )
             {
-                procStartInfo.FileName = _exePath;
+                procStartInfo.FileName = $@"{_bdsDirectory}\bedrock_server.exe";
             }
             else
             {
@@ -109,6 +105,8 @@ namespace MinecraftWrapper.Services
             } );
 
             _proc.Exited += _proc_Exited;
+
+            Console.WriteLine ( $"Starting dbs server from {_proc.StartInfo.FileName}" );
 
             _proc.Start ();
             _proc.BeginErrorReadLine ();
@@ -215,6 +213,14 @@ namespace MinecraftWrapper.Services
                 _standardOutputQueue.Enqueue ( log );
                 LogInputOutput ( log );
             }
+        }
+
+        public List<string> GetStdoutSinceTime ( DateTime cutoff )
+        {
+            return _standardOutputQueue
+                .Where ( item => item.LogTime >= cutoff )
+                .Select ( item => item.LogText ).ToList ();
+
         }
     }
 }

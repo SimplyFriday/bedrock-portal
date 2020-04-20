@@ -98,7 +98,7 @@ namespace MinecraftWrapper.Services
                 var taskRepository = scope.ServiceProvider.GetRequiredService<ScheduledTaskRepository> ();
                 var applicationWrapper = scope.ServiceProvider.GetRequiredService<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
 
-                foreach ( var task in _scheduledTasks )
+                foreach ( var task in _scheduledTasks.Where ( task => task.Enabled ) )
                 {
                     CrontabSchedule schedule = null;
 
@@ -134,7 +134,7 @@ namespace MinecraftWrapper.Services
                                 switch ( task.ScheduledTaskType )
                                 {
                                     case ScheduledTaskType.Backup:
-                                        // TODO
+                                        await CreateBackup ( false );
                                         break;
                                     case ScheduledTaskType.Command:
                                         applicationWrapper.SendInput ( task.Command, null );

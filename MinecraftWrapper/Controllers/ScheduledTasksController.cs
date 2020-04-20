@@ -148,7 +148,7 @@ namespace MinecraftWrapper.Controllers
                 return NotFound();
             }
 
-            var scheduledTask = _scheduledTaskRepository.GetScheduledTaskByIdAsync(id.Value);
+            var scheduledTask = await _scheduledTaskRepository.GetScheduledTaskByIdAsync(id.Value);
 
             if (scheduledTask == null)
             {
