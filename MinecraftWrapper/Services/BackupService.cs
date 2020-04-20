@@ -40,7 +40,16 @@ namespace MinecraftWrapper.Services
         public async Task ReplaceFiles ( bool fullBds, IFormFile file )
         {
             // Make a backup first
-            await _scheduledTaskService.CreateBackup ( fullBds );
+            try
+            {
+                await _scheduledTaskService.CreateBackup ( fullBds );
+            }
+            catch 
+            {
+                // Nothing really to do here... Windows backups are broken. We could test for Windows before
+                // backing up, but I don't want to publish a new release just to address this.
+            }
+
             try
             {
                 var tmpZipLocation = Path.GetTempFileName ();
