@@ -45,6 +45,10 @@ Rename **appsettings_template.json** to **appsettings.json**. Open it in a text 
 * ApplicationTitle - Change to your realm name
 * MembershipEnabled - false
 * StoreEnabled - false
+* BackupsToKeep - set to whatever you want, be careful as large numbers could result in low disk space
+* ArchivePath - This is where backups will be stored. Make sure that permissions are set to read/write for the web app user
+* TempPath - Staging location for backup zips. Make sure that permissions are set to read/write for the web app user
+* WorldName - The name of your world, set in server.properties (eventually this will be determined automatically, but this is easier for now)
 
 The following sections are a little more complicated.
 
