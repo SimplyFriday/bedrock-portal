@@ -29,7 +29,7 @@ namespace MinecraftWrapper.Services
 
             try
             {
-                var jsonString = File.ReadAllText ( _applicationSettings.WhiteListPath );
+                var jsonString = File.ReadAllText ( $"{_applicationSettings.BdsPath}{Path.DirectorySeparatorChar}whitelist.json" );
                 entries = JsonConvert.DeserializeObject<List<WhiteListEntry>> ( jsonString );                
             } catch (Exception ex )
             {
@@ -47,7 +47,7 @@ namespace MinecraftWrapper.Services
                 entries = entries.Where ( e => e.name != name ).ToList ();
                 var jsonString = JsonConvert.SerializeObject ( entries );
 
-                File.WriteAllText ( _applicationSettings.WhiteListPath, jsonString );
+                File.WriteAllText ( $"{_applicationSettings.BdsPath}{Path.DirectorySeparatorChar}whitelist.json", jsonString );
 
                 _wrapper.SendInput ( "whitelist reload", null );
             }
@@ -72,7 +72,7 @@ namespace MinecraftWrapper.Services
                 entries.Add ( new WhiteListEntry { name = name, ignoresPlayerLimit = false } );
                 var jsonString = JsonConvert.SerializeObject ( entries );
 
-                File.WriteAllText ( _applicationSettings.WhiteListPath, jsonString );
+                File.WriteAllText ( $"{_applicationSettings.BdsPath}{Path.DirectorySeparatorChar}whitelist.json", jsonString );
 
                 _wrapper.SendInput ( "whitelist reload", null );
             }

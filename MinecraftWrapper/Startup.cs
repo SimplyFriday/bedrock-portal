@@ -95,6 +95,7 @@ namespace MinecraftWrapper
             services.AddTransient<MinecraftStoreService> ();
             services.AddTransient<StoreRepository> ();
             services.AddTransient<ScheduledTaskRepository> ();
+            services.AddTransient<BackupService> ();
 
             services.AddSingleton<StatusService> ();
             services.AddSingleton<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
