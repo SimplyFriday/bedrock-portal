@@ -40,7 +40,7 @@ namespace MinecraftWrapper.Services
         public async Task ReplaceFiles ( bool fullBds, IFormFile file )
         {
             // Make a backup first
-            //await _scheduledTaskService.CreateBackup ( fullBds );
+            await _scheduledTaskService.CreateBackup ( fullBds );
             try
             {
                 var tmpZipLocation = Path.GetTempFileName ();
