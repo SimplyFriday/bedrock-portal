@@ -1,0 +1,36 @@
+﻿@model IEnumerable<string>
+@{
+    ViewData["Title"] = "Backups";
+}
+
+<h2>Backups</h2>
+
+<p>Backups adapted from <a href="https://github.com/clarkx86/papyrus-automation">papyrus.automation</a>, check it out!</p>
+
+<div>
+    <a asp-action="NewBackup" class="btn btn-default">Take Backup Now</a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                File Name
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ( var item in Model )
+        {
+            <tr>
+                <td>
+                    @item
+                </td>
+                <td>
+                    <a asp-action="DownloadBackup" asp-route-id="@item">Download</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

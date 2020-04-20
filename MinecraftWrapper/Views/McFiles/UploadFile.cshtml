@@ -1,0 +1,51 @@
+﻿@model Microsoft.AspNetCore.Http.IFormFile
+@{
+    ViewData["Title"] = "UploadFile";
+}
+
+<h2>UploadFile</h2>
+
+<ul class="nav nav-tabs">
+    <li><a data-toggle="tab" href="#world">Upload World</a></li>
+    <li><a data-toggle="tab" href="#full">Upload BDS</a></li>
+</ul>
+
+<div class="tab-content">
+    <div id="world" class="tab-pane fade in active">
+        <h3>World Upload</h3>
+        <p>
+            Use this form to upload a world zip. The root of the zip should contain level.dat, level.dat_old, and levelname.txt. 
+            Everything else should be in the /bd/ directory.
+        </p>
+        <form method="post" enctype="multipart/form-data" asp-controller="McFiles" asp-action="UploadWorldFile">
+            <div class="form-group">
+                <label class="control-label">Select File</label>
+                <input type="file" name="file" class="form-control-file" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Upload" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+    <div id="full" class="tab-pane fade">
+        <h3>BDS Upload</h3>
+        <p>
+            Use this form to upload new BDS zip. This can include anything from just server.properties to an entire instalation,
+            including world files. The root zip directory should mirror the instalation root (do not put everything into a subfolder
+            off of root).
+        </p>
+        <form method="post" enctype="multipart/form-data" asp-controller="McFiles" asp-action="UploadBdsFile">
+            <div class="form-group">
+                <label class="control-label">Select File</label>
+                <input type="file" name="file" class="form-control-file" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Upload" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
