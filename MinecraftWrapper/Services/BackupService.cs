@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using MinecraftWrapper.Data;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -44,10 +45,9 @@ namespace MinecraftWrapper.Services
             {
                 await _scheduledTaskService.CreateBackup ( fullBds );
             }
-            catch 
+            catch ( Exception ex )
             {
-                // Nothing really to do here... Windows backups are broken. We could test for Windows before
-                // backing up, but I don't want to publish a new release just to address this.
+                Log.Error ( ex, "An error occurred while taking a backup" );
             }
 
             try
@@ -59,8 +59,8 @@ namespace MinecraftWrapper.Services
                 }
 
                 var extractPath = fullBds ?
-                _applicationSettings.BdsPath :
-                $"{_applicationSettings.BdsPath}{Path.DirectorySeparatorChar}worlds{Path.DirectorySeparatorChar}{_applicationSettings.WorldName}";
+                    _applicationSettings.BdsPath :
+                    $"{_applicationSettings.BdsPath}{Path.DirectorySeparatorChar}worlds{Path.DirectorySeparatorChar}{_applicationSettings.WorldName}";
 
                 _wrapper.Dispose ();
 
@@ -69,7 +69,14 @@ namespace MinecraftWrapper.Services
                 {
                     foreach ( var entry in archive.Entries.Where ( entry => !entry.FullName.EndsWith ( '/' ) ) ) 
                     {
-                        entry.ExtractToFile ( Path.Combine ( extractPath, entry.FullName ), true );
+                        var filePath = Path.Combine ( extractPath, entry.FullName );
+
+                        if ( !Directory.Exists ( Path.GetDirectoryName ( filePath ) ) )
+                        {
+                            Directory.CreateDirectory ( Path.GetDirectoryName ( filePath ) );
+                        }
+
+                        entry.ExtractToFile ( filePath, true );
                     }
                 }
 
