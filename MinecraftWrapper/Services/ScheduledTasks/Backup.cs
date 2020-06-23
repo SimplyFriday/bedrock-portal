@@ -107,7 +107,7 @@ namespace MinecraftWrapper.Services
                         ? $"{Path.DirectorySeparatorChar}db" : "";
 
                     string filePath = Path.Join(worldPath, subdir, Path.GetFileName(sourceFiles[i, 0]));
-                    string targetPath = tempPath + subdir + sourceFiles[i, 0];
+                    string targetPath = tempPath + sourceFiles[i, 0];
 
                     wrapper.AddEphemeralMessage ( $"Copying from '{filePath}' to '{targetPath}'", null );
 
