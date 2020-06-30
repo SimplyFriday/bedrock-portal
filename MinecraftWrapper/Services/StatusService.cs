@@ -34,6 +34,11 @@ namespace MinecraftWrapper.Services
             return _onlineUsers.Any ( ou => ou.Key == gametag && ou.Value );
         }
 
+        public IEnumerable<string> GetAllUsersByState (bool isOnline)
+        {
+            return _onlineUsers.Where ( u => u.Value == isOnline ).Select ( u => u.Key );
+        }
+
         private async Task RefreshUserList ()
         {
             using ( var scope = _serviceProvider.CreateScope () )

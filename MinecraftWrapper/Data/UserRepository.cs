@@ -115,5 +115,26 @@ namespace MinecraftWrapper.Data
 
             return;
         }
+
+        public async Task AddPlaytimeEvent ( ApplicationUser user, string type )
+        {
+            var evt = new PlaytimeEvent
+            {
+                EventTime = DateTime.UtcNow,
+                Type = type,
+                User = user
+            };
+
+            _context.PlaytimeEvent.Add ( evt );
+            await _context.SaveChangesAsync ();
+        }
+
+        public async Task<List<PlaytimeEvent>> GetPlaytimeEventsByUserIDSinceDateAsync (string userId, DateTime date)
+        {
+            return await _context.PlaytimeEvent
+                            .Where ( pe => pe.User.Id == userId &&
+                                           pe.EventTime >= date )
+                            .ToListAsync ();
+        }
     }
 }

@@ -19,5 +19,6 @@ namespace MinecraftWrapper.Data
         public DbSet<StoreItem> StoreItem { get; set; }
         public DbSet<ScheduledTask> ScheduledTask { get; set; }
         public DbSet<ScheduledTaskLog> ScheduledTaskLog { get; set; }
+        public DbSet<PlaytimeEvent> PlaytimeEvent { get; set; }
     }
 }

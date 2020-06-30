@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MinecraftWrapper.Data;
 using MinecraftWrapper.Data.Constants;
+using MinecraftWrapper.Data.Entities;
 using MinecraftWrapper.Models;
 using Serilog;
 using System;
@@ -17,6 +18,7 @@ namespace MinecraftWrapper.Services
     {
         private const string PLAYER_CONNECTED = "player connected: ";
         private const string PLAYER_DISCONNECTED = "player disconnected: ";
+        private const string SERVER_STOPPED = "Server stop requested";
 
         private readonly StatusService _statusService;
         private readonly WhiteListService _whiteListService;
@@ -41,8 +43,34 @@ namespace MinecraftWrapper.Services
 
         public async void HandleOutput ( string output )
         {
-            await ChangePlayerOnlineStatus ( PLAYER_CONNECTED, output, true );
-            await ChangePlayerOnlineStatus ( PLAYER_DISCONNECTED, output, false );
+            if ( output.Contains ( SERVER_STOPPED ) )
+            {
+                await LogAllPlayersOut ();
+            }
+
+            await CheckForPlayerOnlineStatusChange ( PLAYER_CONNECTED, output, true );
+            await CheckForPlayerOnlineStatusChange ( PLAYER_DISCONNECTED, output, false );
+            
+        }
+
+        private async Task LogAllPlayersOut ()
+        {
+            try
+            {
+                using ( var scope = _serviceProvider.CreateScope () )
+                {
+                    var statusService = scope.ServiceProvider.GetRequiredService<StatusService> ();
+
+                    foreach ( var player in statusService.GetAllUsersByState ( true ) )
+                    {
+                        await ChangePlayerStatus ( player, false );
+                    }
+                }
+            }
+            catch ( Exception ex )
+            {
+                Log.Error ( ex, $"An error occurred in {nameof ( LogAllPlayersOut )}()" );
+            }
         }
 
         /// <summary>
@@ -50,9 +78,9 @@ namespace MinecraftWrapper.Services
         /// </summary>
         /// <param name="needle">Phrase to search for</param>
         /// <param name="haystack">Text to search</param>
-        /// <param name="status">What to change the player's online state to - true for logged in, false for logged out</param>
+        /// <param name="isOnline">What to change the player's online state to - true for logged in, false for logged out</param>
         /// <returns>Returns true if the needle was found and the status was successfully updated</returns>
-        private async Task<bool> ChangePlayerOnlineStatus(string needle, string haystack, bool status )
+        private async Task<bool> CheckForPlayerOnlineStatusChange (string needle, string haystack, bool isOnline )
         {
             Regex regex = new Regex ( $"{needle}(.+?),", RegexOptions.IgnoreCase);
             var matches = regex.Matches ( haystack );
@@ -61,53 +89,65 @@ namespace MinecraftWrapper.Services
             {
                 try
                 {
-                    var gamerTag = matches[ 0 ].Groups[ 1 ].Value;
+                    var gamertag = matches[ 0 ].Groups[ 1 ].Value;
 
-                    if ( gamerTag != null )
+                    if ( gamertag != null )
                     {
-                        using ( var scope = _serviceProvider.CreateScope () )
-                        {
-                            var userRepository = scope.ServiceProvider.GetRequiredService<UserRepository>();
-                            var minecraftStoreService = scope.ServiceProvider.GetRequiredService<MinecraftStoreService>();
-
-                            _statusService.UpdateUserStatus ( gamerTag, status );
-                            var user = await userRepository.GetUserByGamerTagAsync ( gamerTag );
-
-                            if ( status )
-                            {
-                                // Player has logged in
-                                if ( user != null && (user.LastLoginReward == null || user.LastLoginReward.Value.AddDays ( 1 ) <= DateTime.UtcNow) )
-                                {
-                                    // daily login bonus
-                                    await minecraftStoreService.AddCurrencyForUser ( gamerTag, _applicationSettings.DailyLoginBonus, CurrencyTransactionReason.DailyLogin );
-                                    user.LastLoginReward = DateTime.UtcNow;
-                                }
-
-                                user.LastMinecraftLogin = DateTime.UtcNow;
-                                await userRepository.SaveUserAsync ( user );
-
-                                _discordService.SendWebhookMessage ( $"{gamerTag} has logged in!" );
-                            }
-                            else
-                            {
-                                // Player has logged out
-                                if ( user.LastMinecraftLogin.HasValue )
-                                {
-                                    var seconds = (DateTime.UtcNow - user.LastMinecraftLogin.Value).TotalSeconds;
-                                    await minecraftStoreService.AddCurrencyForUser ( gamerTag, (decimal) seconds * _applicationSettings.PointsPerSecond, CurrencyTransactionReason.TimePlayed );
-                                }
-                            }
-                        }
+                        await ChangePlayerStatus ( gamertag, isOnline );
                     }
 
                     return true;
                 } catch (Exception ex)
                 {
-                    Log.Error ( ex, $"An error occurred in ChangePlayerOnlineStatus({needle},{haystack},{status})" );
+                    Log.Error ( ex, $"An error occurred in {nameof ( CheckForPlayerOnlineStatusChange )}({needle},{haystack},{isOnline})" );
                 }
             }
 
             return false;
+        }
+
+        private async Task ChangePlayerStatus ( string gamertag, bool isOnline )
+        {
+            using ( var scope = _serviceProvider.CreateScope () )
+            {
+                var userRepository = scope.ServiceProvider.GetRequiredService<UserRepository>();
+                var minecraftStoreService = scope.ServiceProvider.GetRequiredService<MinecraftStoreService>();
+
+                _statusService.UpdateUserStatus ( gamertag, isOnline );
+                var user = await userRepository.GetUserByGamerTagAsync ( gamertag );
+
+                if ( isOnline )
+                {
+                    // Player has logged in
+                    if ( user != null && ( user.LastLoginReward == null || user.LastLoginReward.Value.AddDays ( 1 ) <= DateTime.UtcNow ) )
+                    {
+                        // daily login bonus
+                        await minecraftStoreService.AddCurrencyForUser ( gamertag, _applicationSettings.DailyLoginBonus, CurrencyTransactionReason.DailyLogin );
+                        user.LastLoginReward = DateTime.UtcNow;
+                    }
+
+                    user.LastMinecraftLogin = DateTime.UtcNow;
+                    await userRepository.SaveUserAsync ( user );
+                    await userRepository.AddPlaytimeEvent ( user, PlaytimeEvent.LOGIN_EVENT_CODE );
+
+                    _discordService.SendWebhookMessage ( $"{gamertag} has logged in!" );
+                }
+                else
+                {
+                    // Player has logged out
+                    if ( user.LastMinecraftLogin.HasValue )
+                    {
+                        var seconds = (DateTime.UtcNow - user.LastMinecraftLogin.Value).TotalSeconds;
+
+                        if ( _applicationSettings.StoreEnabled )
+                        {
+                            await minecraftStoreService.AddCurrencyForUser ( gamertag, (decimal) seconds * _applicationSettings.PointsPerSecond, CurrencyTransactionReason.TimePlayed );
+                        }
+
+                        await userRepository.AddPlaytimeEvent ( user, PlaytimeEvent.LOGOUT_EVENT_CODE );
+                    }
+                }
+            }
         }
     }
 }

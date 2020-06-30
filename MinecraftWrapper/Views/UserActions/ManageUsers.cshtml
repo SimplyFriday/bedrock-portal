@@ -6,7 +6,7 @@
 
 <h2>ManageUsers</h2>
 
-<table class="table">
+<table class="table table-responsive">
     <thead>
         <tr>
             <th>
@@ -24,13 +24,12 @@
             <th>
                 Rank
             </th>
-            <th style="min-width:140px"></th>
+            @*<th style="min-width:140px"></th>*@
             <th style="min-width:140px"></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Users ) {
-
+    @foreach (var item in Model.Users ) {
     <tr>
         <td>
             @Html.DisplayFor(modelItem => item.GamerTag)
@@ -48,14 +47,7 @@
             @Html.DisplayFor( modelItem => item.Rank )
         </td>
         <td>
-            Active: @item.IsActive <br />
-            Moderator: @item.IsModerator <br />
-            Admin: @item.IsAdmin <br />
-        </td>
-        <td>
-            <a asp-action="ToggleUserActiveState" asp-route-id="@item.UserId">Toggle Active</a><br />
-            <a asp-action="ToggleModerator" asp-route-id="@item.UserId">Toggle Moderator</a><br />
-            <a asp-action="ToggleAdmin" asp-route-id="@item.UserId">Toggle Admin</a><br />
+            <a asp-action="ManageUserDetails" asp-controller="Users" asp-route-id="@item.UserId">Details</a><br />
         </td>
     </tr>
 }
