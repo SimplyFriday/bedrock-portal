@@ -26,6 +26,9 @@ namespace MinecraftWrapper.Services
         private readonly ApplicationSettings _applicationSettings;
         private readonly IServiceProvider _serviceProvider;
 
+        private List<ScheduledTask> _playerHooksCache;
+        private DateTime _hookLastRefresh;
+
         public MinecraftMessageParser ( StatusService statusService, WhiteListService whiteListService, DiscordService discordService, IOptions<ApplicationSettings> options, IServiceProvider serviceProvider)
         {
             _statusService = statusService;
@@ -48,9 +51,21 @@ namespace MinecraftWrapper.Services
                 await LogAllPlayersOut ();
             }
 
+            if ( _playerHooksCache == null ||
+                 _hookLastRefresh < DateTime.UtcNow.AddSeconds (-30) )
+            {
+                _hookLastRefresh = DateTime.UtcNow;
+
+                using ( var scope = _serviceProvider.CreateScope () )
+                {
+                    _playerHooksCache = await scope.ServiceProvider
+                        .GetRequiredService<ScheduledTaskRepository> ()
+                        .GetAllPlayerHooksAsync ();
+                }
+            }
+
             await CheckForPlayerOnlineStatusChange ( PLAYER_CONNECTED, output, true );
-            await CheckForPlayerOnlineStatusChange ( PLAYER_DISCONNECTED, output, false );
-            
+            await CheckForPlayerOnlineStatusChange ( PLAYER_DISCONNECTED, output, false );            
         }
 
         private async Task LogAllPlayersOut ()
@@ -94,6 +109,23 @@ namespace MinecraftWrapper.Services
                     if ( gamertag != null )
                     {
                         await ChangePlayerStatus ( gamertag, isOnline );
+
+                        var type = isOnline ? ScheduledTaskType.PlayerLogin : ScheduledTaskType.PlayerLogout;
+
+                        using ( var scope = _serviceProvider.CreateScope () )
+                        {
+                            var wrapper = scope.ServiceProvider.GetRequiredService<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
+
+                            foreach ( var task in _playerHooksCache.Where ( t => t.ScheduledTaskType == type ) )
+                            {
+                                var commands = task.Command.Split ( '\n' );
+
+                                foreach ( var command in commands )
+                                {
+                                    wrapper.SendInput ( command.Replace ( "{gamertag}", gamertag ), null );
+                                }
+                            }
+                        }
                     }
 
                     return true;

@@ -41,6 +41,8 @@ namespace MinecraftWrapper.Data.Constants
     public enum ScheduledTaskType
     {
         Backup = 1,
-        Command = 2
+        Command = 2,
+        PlayerLogin = 3,
+        PlayerLogout = 4
     }
 }

@@ -11,7 +11,7 @@ namespace MinecraftWrapper.Data
     {
         private readonly ApplicationDbContext _context;
 
-        public ScheduledTaskRepository (ApplicationDbContext context)
+        public ScheduledTaskRepository ( ApplicationDbContext context )
         {
             _context = context;
         }
@@ -83,5 +83,14 @@ namespace MinecraftWrapper.Data
 
             await _context.SaveChangesAsync ();
         }
+
+        public async Task<List<ScheduledTask>> GetAllPlayerHooksAsync () 
+        {
+            return await _context.ScheduledTask
+                .Where ( t => t.ScheduledTaskType == Constants.ScheduledTaskType.PlayerLogin ||
+                              t.ScheduledTaskType == Constants.ScheduledTaskType.PlayerLogout )
+                .ToListAsync ();
+        }
+
     }
 }

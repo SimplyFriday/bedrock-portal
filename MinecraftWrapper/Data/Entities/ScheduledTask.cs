@@ -24,7 +24,7 @@ namespace MinecraftWrapper.Data.Entities
         [Required]
         public ScheduledTaskType ScheduledTaskType { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(2000)]
         public string Command { get; set; }
     }
 }
