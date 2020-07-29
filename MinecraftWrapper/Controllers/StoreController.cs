@@ -75,7 +75,7 @@ namespace MinecraftWrapper.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize ( Roles = "Admin" )]
-        public async Task<IActionResult> Create ( [Bind ( "StoreItemId,Description,StoreItemTypeId,MinimumRank,Price,Title,Effect" )] StoreItem storeItem )
+        public async Task<IActionResult> Create ( [Bind ( "StoreItemId,Description,StoreItemTypeId,MinimumRank,Price,Title,Effect,RequiresLogin" )] StoreItem storeItem )
         {
             if ( ModelState.IsValid )
             {
@@ -107,7 +107,7 @@ namespace MinecraftWrapper.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize ( Roles = "Admin" )]
-        public async Task<IActionResult> Edit ( Guid id, [Bind ( "StoreItemId,Description,StoreItemTypeId,MinimumRank,Price,Title,Effect" )] StoreItem storeItem )
+        public async Task<IActionResult> Edit ( Guid id, [Bind ( "StoreItemId,Description,StoreItemTypeId,MinimumRank,Price,Title,Effect,RequiresLogin" )] StoreItem storeItem )
         {
             if ( id != storeItem.StoreItemId )
             {
