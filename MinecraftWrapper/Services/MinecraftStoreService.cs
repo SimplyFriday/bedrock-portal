@@ -30,7 +30,8 @@ namespace MinecraftWrapper.Services
             _applicationSettings = options.Value;
         }
 
-        public async Task AddCurrencyForUser ( string gamerTag, decimal amount, CurrencyTransactionReason currencyTransactionReason, CurrencyType currencyType = CurrencyType.Normal )
+        public async Task<UserCurrency> AddCurrencyForUser ( string gamerTag, decimal amount, CurrencyTransactionReason currencyTransactionReason, 
+            CurrencyType currencyType = CurrencyType.Normal, Guid? createdFromTransactionId = null )
         {
             using ( var scope = _serviceProvider.CreateScope () )
             using ( var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>> () ) 
@@ -43,10 +44,13 @@ namespace MinecraftWrapper.Services
                     CurrencyTransactionReasonId = currencyTransactionReason,
                     CurrencyTypeId = currencyType,
                     DateNoted = DateTime.UtcNow,
-                    UserId = user.Id
+                    UserId = user.Id,
+                    CreatedFromTransactionId = createdFromTransactionId
                 };
 
                 await _storeRepository.SaveUserCurrency ( uc );
+
+                return uc;
             }
         }
 

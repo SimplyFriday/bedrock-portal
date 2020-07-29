@@ -361,8 +361,11 @@ namespace MinecraftWrapper.Controllers
 
             if ( ModelState.IsValid )
             {
-                await _minecraftStoreService.AddCurrencyForUser ( currentUser.GamerTag, -model.Amount, CurrencyTransactionReason.Gift, CurrencyType.Gift );
-                await _minecraftStoreService.AddCurrencyForUser ( targetUser.GamerTag, model.Amount, CurrencyTransactionReason.Gift, CurrencyType.Normal );
+                var uc = await _minecraftStoreService.AddCurrencyForUser ( currentUser.GamerTag, -model.Amount, CurrencyTransactionReason.Gift, 
+                    CurrencyType.Gift );
+
+                await _minecraftStoreService.AddCurrencyForUser ( targetUser.GamerTag, model.Amount, CurrencyTransactionReason.Gift,
+                    currencyType: CurrencyType.Normal, createdFromTransactionId: uc.UserCurrencyId );
 
                 TempData["Status"] = $"{model.Amount} was sent to {model.GamerTag}!";
 

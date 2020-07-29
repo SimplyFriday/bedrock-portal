@@ -26,5 +26,10 @@ namespace MinecraftWrapper.Data.Entities
 
         [ForeignKey(nameof(StoreItem))]
         public virtual Guid? StoreItemId { get; set; }
+
+        public virtual UserCurrency CreatedFromTransaction { get; set; }
+
+        [ForeignKey ( nameof ( CreatedFromTransaction ) )]
+        public virtual Guid? CreatedFromTransactionId { get; set; }
     }
 }
