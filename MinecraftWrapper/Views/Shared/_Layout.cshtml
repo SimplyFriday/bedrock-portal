@@ -38,6 +38,7 @@
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
         <script src="~/lib/summernote/dist/summernote.js"></script>
+        <script src="~/lib/list.js/list.min.js"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
     </environment>
     <environment exclude="Development">
@@ -53,6 +54,8 @@
                 crossorigin="anonymous"
                 integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
         </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"
+              asp-fallback-src="~/lib/list.js/list.min.js"> </script>
         <script src="~/js/site.min.js" asp-append-version="true"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote.js"
                 asp-fallback-src="~/lib/summernote/dist/summernote.js"></script>
@@ -61,3 +64,4 @@
     @RenderSection( "Scripts", required: false )
 </body>
 </html>
+

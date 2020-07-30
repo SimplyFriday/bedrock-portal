@@ -114,7 +114,7 @@ namespace MinecraftWrapper.Services
             var gift = new UserCurrency
             {
                 Amount = item.Price * _applicationSettings.GiftPointPercentage,
-                CurrencyTransactionReasonId = CurrencyTransactionReason.Gift,
+                CurrencyTransactionReasonId = CurrencyTransactionReason.Purchase,
                 CurrencyTypeId = CurrencyType.Gift,
                 DateNoted = DateTime.UtcNow,
                 UserId = user.Id,

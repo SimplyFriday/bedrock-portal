@@ -95,5 +95,35 @@ namespace MinecraftWrapper.Data
                 .OrderBy ( uc => uc.DateNoted )
                 .LastOrDefault ( uc => uc.UserId == id && uc.CurrencyTransactionReasonId == currencyTransactionReason );
         }
+
+        public async Task<List<UserCurrency>> GetUserGiftsSentByUserIdAsyc ( string id )
+        {
+            return await _context.UserCurrency
+                            .Where ( uc =>  uc.UserId == id && 
+                                            uc.CurrencyTypeId == CurrencyType.Gift &&
+                                            uc.CurrencyTransactionReasonId == CurrencyTransactionReason.Gift )
+                            .ToListAsync ();
+        }
+
+        public async Task<string> GetGamertagFromSentGiftAsyc ( Guid id )
+        {
+            return await _context.UserCurrency
+                            .Where ( uc => uc.UserCurrencyId == id )
+                            .Select ( uc => uc.User.GamerTag )
+                            .SingleOrDefaultAsync ();
+        }
+
+        public async Task<List<UserCurrency>> GetUserReceivedGiftCurrenciesByUserIdAsyc ( string id )
+        {
+            return await _context.UserCurrency
+                            .Where ( uc => uc.UserId == id
+                                            && uc.CurrencyTypeId == CurrencyType.Normal
+                                            && uc.CurrencyTransactionReasonId == CurrencyTransactionReason.Gift )
+                                .Include ( uc => uc.CreatedFromTransaction )
+                                    .ThenInclude ( uc => uc.User )
+                            .ToListAsync ();
+        }
+
+
     }
 }

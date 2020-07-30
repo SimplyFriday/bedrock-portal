@@ -298,10 +298,50 @@ namespace MinecraftWrapper.Controllers
             var giftCurrency = await _storeRepository.GetCurrencyTotalForUserAsync ( user.Id, CurrencyType.Gift );
             var activeUsers = await _userManager.Users.Where ( u => u.IsActive && u.Id != user.Id ).ToListAsync ();
 
+            // First we loop through all sent gifts
+            IEnumerable<UserCurrency> transactions = await _storeRepository.GetUserGiftsSentByUserIdAsyc ( user.Id );
+            var displays = new List<GiftCurrencyViewModel.TransactionDisplay> ();
+
+            foreach ( var transaction in transactions )
+            {
+                var display = new GiftCurrencyViewModel.TransactionDisplay ();
+
+                display.Amount = Math.Abs ( transaction.Amount );
+                display.TransactionDate = transaction.DateNoted;
+
+                var recipient = await _storeRepository.GetGamertagFromSentGiftAsyc ( transaction.UserCurrencyId ) ?? "Unknown";
+                display.Notes = $"Sent to {recipient}.";
+
+                displays.Add ( display );
+            }
+
+            // Now we loop through received transactions
+            transactions = await _storeRepository.GetUserReceivedGiftCurrenciesByUserIdAsyc ( user.Id );
+
+            foreach ( var transaction in transactions )
+            {
+                var display = new GiftCurrencyViewModel.TransactionDisplay ();
+
+                display.Amount = Math.Abs ( transaction.Amount );
+                display.TransactionDate = transaction.DateNoted;
+
+                if ( transaction.CreatedFromTransaction != null )
+                {
+                    display.Notes = $"Received from {transaction.CreatedFromTransaction.User.GamerTag}.";
+                }
+                else
+                {
+                    display.Notes = "Received from Unknown";
+                }
+
+                displays.Add ( display );
+            }
+
             var model = new GiftCurrencyViewModel
             {
-                GiftCurrancy = giftCurrency,
-                Users = activeUsers
+                GiftCurrency = giftCurrency,
+                Users = activeUsers,
+                Transactions = displays
             };
 
             return View ( model );

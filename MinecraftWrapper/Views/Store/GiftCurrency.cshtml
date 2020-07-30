@@ -6,54 +6,83 @@
 
 <h2>Send Gift</h2>
 
-@*<input type="text" id="searchBox" onkeyup="filter()" placeholder="Search for names..">*@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h5 class="panel-title">Actions</h5>
+    </div>
+    <div class="panel-body">
+        <b>Available @Options.Value.MinecraftCurrencyName to sent:</b> @Model.GiftCurrency
+        <div id="userList" style="height:400px;overflow:auto;">
+            <b>Search: </b><input type="text" placeholder="search" class="search" />
+            <table class="table" id="users">
+                <thead>
+                    <tr>
+                        <th>
+                            GamerTag
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="list">
+                    @foreach ( var user in Model.Users.OrderBy ( u => u.GamerTag ) )
+                    {
+                        <tr>
+                            <td class="gamertag">
+                                @Html.DisplayFor( u => user.GamerTag )
+                            </td>
+                            <td class="nothing">
+                                <a asp-action="SendGift" asp-route-id="@user.GamerTag">Send @Options.Value.MinecraftCurrencyName</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-<table class="table" id="users">
-    <thead>
-        <tr>
-            <th>
-                GamerTag
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ( var user in Model.Users )
-        {
+<hr />
+
+<div style="height:400px;overflow:auto;">
+    <table class="table" id="transactions">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor( u => user.GamerTag )
-                </td>
-                <td>
-                    <a asp-action="SendGift" asp-route-id="@user.GamerTag">Send @Options.Value.MinecraftCurrencyName</a>
-                </td>
+                <th>
+                    Date
+                </th>
+                <th>
+                    Amount
+                </th>
+                <th>
+                    Notes
+                </th>
             </tr>
-        }
-    </tbody>
-</table>
-
-
-
-@*@section Scripts{
-    <script>
-        function filter() {
-            // Declare variables
-            var input, filter, table, tr, a, i, txtValue;
-            input = document.getElementById('searchBox');
-            filter = input.value.toUpperCase();
-            table = document.getElementById("users");
-            tr = table.getElementsByTagName('tr');
-
-            // Loop through all list items, and hide those who don't match the search query
-            for (i = 0; i < tr.length; i++) {
-                a = tr[i].getElementsByTagName("td")[0];
-                txtValue = a.textContent || a.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = "";
-                } else {
-                    tr[i].style.display = "none";
-                }
+        </thead>
+        <tbody>
+            @foreach ( var transaction in Model.Transactions.OrderByDescending ( t => t.TransactionDate ) )
+            {
+                <tr>
+                    <td>
+                        @transaction.TransactionDate
+                    </td>
+                    <td>
+                        @transaction.Amount
+                    </td>
+                    <td>
+                        @transaction.Notes
+                    </td>
+                </tr>
             }
-        }
+        </tbody>
+    </table>
+</div>
+@section Scripts {
+    <script>
+        var options = {
+            valueNames: ['gamertag','nothing']
+        };
+
+        // Init list
+        var contactList = new List('userList', options);
     </script>
-}*@
+}
