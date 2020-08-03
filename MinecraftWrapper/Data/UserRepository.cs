@@ -19,8 +19,7 @@ namespace MinecraftWrapper.Data
 
         public async Task<IList<ApplicationUser>> GetAllUsersAsync ()
         {
-            return await _context.Users
-                         .Include(u=>u.CurrencyLog)        
+            return await _context.Users  
                          .ToListAsync ();
         }
 

@@ -25,14 +25,21 @@ namespace MinecraftWrapper.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly WhiteListService _whiteListService;
         private readonly ApplicationSettings _applicationSettings;
+        private readonly StoreRepository _storeRepository;
 
-        public UserActionsController ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, UserRepository userRepository, UserManager<ApplicationUser> userManager, WhiteListService whiteListService, IOptions<ApplicationSettings> applicationSettings )
+        public UserActionsController ( ConsoleApplicationWrapper<MinecraftMessageParser> wrapper, 
+                                       UserRepository userRepository, 
+                                       UserManager<ApplicationUser> userManager, 
+                                       WhiteListService whiteListService, 
+                                       IOptions<ApplicationSettings> applicationSettings,
+                                       StoreRepository storeRepository )
         {
             _wrapper = wrapper;
             _userRepository = userRepository;
             _userManager = userManager;
             _whiteListService = whiteListService;
             _applicationSettings = applicationSettings.Value;
+            _storeRepository = storeRepository;
         }
 
         [HttpGet]
@@ -247,6 +254,11 @@ namespace MinecraftWrapper.Controllers
 
             foreach (var user in users )
             {
+                if ( user.CurrentMoney == null ) 
+                {
+                    user.CurrentMoney = await _storeRepository.UpdateUserCurrentMoneyAsync ( user.Id );
+                }
+
                 var item = new ManageUsersViewModel.ManageUserItem
                 {
                     UserId = user.Id,

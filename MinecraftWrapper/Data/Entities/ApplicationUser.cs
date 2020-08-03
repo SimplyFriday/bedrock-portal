@@ -45,9 +45,7 @@ namespace MinecraftWrapper.Data.Entities
         public int Rank { get; set; }
 
         public virtual IEnumerable<UserPreference> UserPreferences { get; set; }
-        public virtual IEnumerable<UserCurrency> CurrencyLog { get; internal set; }
 
-        [NotMapped]
-        public decimal? CurrentMoney => CurrencyLog?.Where ( c => c.CurrencyTypeId == CurrencyType.Normal )?.Sum ( c => c.Amount );
+        public decimal? CurrentMoney { get; set; }
     }
 }

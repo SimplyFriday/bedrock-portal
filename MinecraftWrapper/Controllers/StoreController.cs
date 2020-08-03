@@ -192,7 +192,6 @@ namespace MinecraftWrapper.Controllers
         {
             var user = await _userManager.GetUserAsync ( HttpContext.User );
             var items = await _storeRepository.GetAvailableStoreItemsByRank ( user.Rank );
-            var currentMoney = await _storeRepository.GetCurrencyTotalForUserAsync ( user.Id, CurrencyType.Normal );
             
             foreach (var item in items )
             {
@@ -202,7 +201,7 @@ namespace MinecraftWrapper.Controllers
             var viewModel = new StoreIndexViewModel
             {
                 StoreItems = items,
-                UserCurrencyTotel = currentMoney
+                UserCurrencyTotel = user.CurrentMoney ?? 0
             };
 
             if ( !string.IsNullOrEmpty ( statusMessage ) ) 

@@ -69,6 +69,17 @@ namespace MinecraftWrapper.Data
             }
 
             await _context.SaveChangesAsync ();
+
+            await UpdateUserCurrentMoneyAsync ( userCurrency.UserId );
+        }
+
+        public async Task<decimal> UpdateUserCurrentMoneyAsync ( string userId )
+        {
+            var user = _context.Users.Single ( u => u.Id == userId );
+            user.CurrentMoney = await GetCurrencyTotalForUserAsync ( userId, CurrencyType.Normal );
+            await _context.SaveChangesAsync ();
+
+            return user.CurrentMoney.Value;
         }
 
         public async Task<decimal> GetCurrencyTotalForUserAsync ( string userId, CurrencyType currencyType )
