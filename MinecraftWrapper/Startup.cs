@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -86,6 +87,12 @@ namespace MinecraftWrapper
                     options.ClientSecret = Configuration[ "Authentication:Google:ClientSecret" ];
                 } );
 
+            services.Configure<ForwardedHeadersOptions> ( options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            } );
+
             // We're doing some crazy stuff with singletons, so basically everything is either transient or singleton.
             services.AddTransient<UserRepository> ();
             services.AddTransient<SystemRepository> ();
@@ -139,6 +146,8 @@ namespace MinecraftWrapper
             {
                 app.UseHsts ();
             }
+
+            app.UseForwardedHeaders ();
 
             app.UseHttpsRedirection ();
             app.UseStaticFiles ();
