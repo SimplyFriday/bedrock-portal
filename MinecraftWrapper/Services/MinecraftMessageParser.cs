@@ -177,6 +177,8 @@ namespace MinecraftWrapper.Services
                         }
 
                         await userRepository.AddPlaytimeEvent ( user, PlaytimeEvent.LOGOUT_EVENT_CODE );
+
+                        _discordService.SendWebhookMessage($"{gamertag} has logged out!");
                     }
                 }
             }
