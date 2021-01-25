@@ -31,6 +31,7 @@ namespace MinecraftWrapper.Data
         public string ArchivePath { get; set; }
         public string TempPath { get; set; }
         public string WorldName { get; set; }
+        public bool DiscordLogOutMessages { get; set; }
     }
 
     public class MenuLink
