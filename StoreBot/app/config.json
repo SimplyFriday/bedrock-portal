@@ -1,0 +1,6 @@
+{
+    "DiscordToken" : "NTcyMTM4NjcwNjE0NjQyNjg5.XMX7qA.tSjMQfUDQ3pzbqv2EDNXwHQxFgI",
+    "PortalApiSecret" : "My Super Secret Secret",
+    "PortalUri" : "https://localhost:44306",
+    "PointsChannels" : ["general", "random", "trading", "community-projects", "events"]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "storebot",
+  "version": "1.0.0",
+  "description": "Simple Discord bot to call the BedrockPortal API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Josh Greenlaw",
+  "license": "MIT",
+  "dependencies": {
+    "@typeit/discord": "^1.0.3",
+    "@types/node": "^12.7.11",
+    "@types/request": "^2.48.5",
+    "axios": "^0.21.1",
+    "clime": "^0.5.10",
+    "discord.js": "github:discordjs/discord.js",
+    "reflect-metadata": "^0.1.13",
+    "through2": "^3.0.1",
+    "tslib": "^1.10.0",
+    "typescript": "^3.6.3"
+  }
+}
