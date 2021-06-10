@@ -29,5 +29,8 @@ namespace MinecraftWrapper.Data.Entities
         
         [Required]
         public bool RequiresLogin { get; set; }
+
+        [Required]
+        public virtual MinecraftInstance MinecraftInstance { get; set; }
     }
 }

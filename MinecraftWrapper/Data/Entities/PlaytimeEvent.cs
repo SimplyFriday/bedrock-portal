@@ -35,5 +35,8 @@ namespace MinecraftWrapper.Data.Entities
 
         [Required]
         public virtual ApplicationUser User { get; set; }
+
+        [Required]
+        public virtual MinecraftInstance MinecraftInstance { get; set; }
     }
 }

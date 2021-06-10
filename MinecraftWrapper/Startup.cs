@@ -103,11 +103,12 @@ namespace MinecraftWrapper
             services.AddTransient<StoreRepository> ();
             services.AddTransient<ScheduledTaskRepository> ();
             services.AddTransient<BackupService> ();
+            services.AddTransient<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
 
             services.AddSingleton<StatusService> ();
-            services.AddSingleton<ConsoleApplicationWrapper<MinecraftMessageParser>> ();
             services.AddSingleton<MinecraftMessageParser> ();
             services.AddSingleton<ScheduledTaskService> ();
+            services.AddSingleton<ApplicationWrapperProvider> ();
         }
 
         private void ConfigureSerilog ()

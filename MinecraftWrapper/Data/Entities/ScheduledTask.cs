@@ -26,5 +26,8 @@ namespace MinecraftWrapper.Data.Entities
 
         [MaxLength(2000)]
         public string Command { get; set; }
+
+        [Required]
+        public virtual MinecraftInstance MinecraftInstance { get; set; }
     }
 }
