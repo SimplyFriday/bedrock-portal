@@ -145,7 +145,7 @@ namespace MinecraftWrapper.Services
                 Console.WriteLine ( "Resuming world saving..." );
 
                 wrapper.SendInput ( "save resume", null );
-                var resumeRegex = new Regex ( "^(Changes to the level are resumed.)" );
+                var resumeRegex = new Regex ( "^Changes to the (level|world) are resumed.?" );
 
                 while ( !wrapper.StandardOutput.Any ( item => resumeRegex.IsMatch ( item ) ) )
                 {
