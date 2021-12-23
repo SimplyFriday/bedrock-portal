@@ -19,7 +19,7 @@ namespace MinecraftWrapper.Services
         private const string PLAYER_CONNECTED = "player connected: ";
         private const string PLAYER_DISCONNECTED = "player disconnected: ";
         private const string SERVER_STOPPED = "Server stop requested";
-        private const string SERVER_RESTART = "NO LOG FILE! - setting up server logging...";
+        private const string SERVER_RESTART = "NO LOG FILE! - [] setting up server logging...";
 
         private readonly StatusService _statusService;
         private readonly WhiteListService _whiteListService;
