@@ -178,7 +178,7 @@ namespace MinecraftWrapper.Services
 
         private void WriteFileCopy (string filePath, string targetPath, int fileLength)
         {
-            using ( FileStream sourceStream = File.Open ( filePath, FileMode.Open, FileAccess.Read ) )
+            using ( FileStream sourceStream = File.Open ( filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite ) )
             using ( FileStream targetStream = File.Open ( targetPath, FileMode.Create, FileAccess.Write ) )
             {
                 // Read bytes until truncate indicator

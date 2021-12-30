@@ -19,6 +19,7 @@ namespace MinecraftWrapper.Services
         private const string PLAYER_CONNECTED = "player connected: ";
         private const string PLAYER_DISCONNECTED = "player disconnected: ";
         private const string SERVER_STOPPED = "Server stop requested";
+        private const string SERVER_RESTART = "NO LOG FILE! - [] setting up server logging...";
 
         private readonly StatusService _statusService;
         private readonly WhiteListService _whiteListService;
@@ -49,6 +50,15 @@ namespace MinecraftWrapper.Services
             if ( output.Contains ( SERVER_STOPPED ) )
             {
                 await LogAllPlayersOut ();
+            }
+
+            //Post a Discord message saying the server has restarted
+            if (_applicationSettings.DiscordServerRestartMessages)
+            {
+                if (output.Contains(SERVER_RESTART))
+                {
+                    _discordService.SendWebhookMessage($":octagonal_sign:Server has Restarted!:white_check_mark:");
+                }
             }
 
             if ( _playerHooksCache == null ||
